@@ -1,0 +1,54 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Travel_Explorer.Domain.Entities;
+
+namespace Travel_Explorer.Infrastructure.Configurations
+{
+    public class PaymentTransactionConfiguration : IEntityTypeConfiguration<PaymentTransaction>
+    {
+        public void Configure(EntityTypeBuilder<PaymentTransaction> builder)
+        {
+            builder.ToTable("payment_transactions");
+
+            builder.HasKey(p => p.Id);
+
+            builder.Property(p => p.Amount)
+                .HasPrecision(18, 2);
+
+            builder.Property(p => p.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            builder.Property(p => p.PaymentMethod)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.Property(p => p.TransactionReference)
+                .HasMaxLength(200);
+
+            builder.HasQueryFilter(p => !p.IsDeleted);
+
+            // Indexes
+            builder.HasIndex(p => p.UserId).HasDatabaseName("IX_Payments_UserId");
+            builder.HasIndex(p => p.DestinationBookId).HasDatabaseName("IX_Payments_DestinationBookId");
+            builder.HasIndex(p => p.FlightBookId).HasDatabaseName("IX_Payments_FlightBookId");
+             builder.HasIndex(p => p.IsDeleted).HasDatabaseName("IX_Payments_IsDeleted");
+
+            // Relationships
+            builder.HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(p => p.DestinationBook)
+                .WithOne(db => db.Payment)
+                .HasForeignKey<PaymentTransaction>(p => p.DestinationBookId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(p => p.FlightBook)
+                .WithOne(fb => fb.Payment)
+                .HasForeignKey<PaymentTransaction>(p => p.FlightBookId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+}

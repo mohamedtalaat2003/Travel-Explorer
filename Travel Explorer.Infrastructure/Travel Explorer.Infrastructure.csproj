@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Travel_Explorer.Infrastructure</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Configurations\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+	</ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\Travel Explorer.Application\Travel Explorer.Application.csproj" />
+    <ProjectReference Include="..\Travel Explorer.Domain\Travel Explorer.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
