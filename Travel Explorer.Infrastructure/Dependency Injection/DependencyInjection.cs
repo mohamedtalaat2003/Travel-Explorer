@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Travel_Explorer.Domain.Common;
 using Travel_Explorer.Domain.Interfaces;
 using Travel_Explorer.Infrastructure.Data;
 using Travel_Explorer.Infrastructure.Repositories;
@@ -24,6 +25,7 @@ namespace Travel_Explorer.Infrastructure.Dependency_Injection
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped(typeof(ISpecification<>), typeof(BaseSpecification<>));
             return services;
         }
     }
