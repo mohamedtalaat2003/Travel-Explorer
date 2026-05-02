@@ -30,3 +30,4 @@ namespace Travel_Explorer.Infrastructure.Dependency_Injection
         }
     }
 }
+

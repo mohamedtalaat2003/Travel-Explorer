@@ -26,8 +26,6 @@ namespace Travel_Explorer.Infrastructure.Configurations
             builder.Property(d => d.PricePerNight)
                 .HasPrecision(18, 2);
 
-            builder.Property(d => d.ThumbnailUrl)
-                .HasMaxLength(500);
 
             builder.HasQueryFilter(d => !d.IsDeleted);
 

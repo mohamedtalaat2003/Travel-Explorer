@@ -60,3 +60,4 @@ namespace Travel_Explorer.Domain.Entities
         public Category? Category { get; set; }
     }
 }
+

@@ -39,11 +39,6 @@ namespace Travel_Explorer.Domain.Entities
         public int ReviewCount { get; set; }
 
         /// <summary>
-        /// Main thumbnail image URL for display.
-        /// </summary>
-        public string? ThumbnailUrl { get; set; }
-
-        /// <summary>
         /// Collection of image URLs for the destination gallery.
         /// </summary>
         public List<string> ImageUrls { get; set; } = new List<string>();
