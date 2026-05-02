@@ -28,6 +28,10 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 query = query.Skip(spec.Skip).Take(spec.Take);
             }
 
+            if (spec.IsSplitQuery)
+            {
+                query = query.AsSplitQuery();
+            }
             // Apply includes for navigation properties
             query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
 

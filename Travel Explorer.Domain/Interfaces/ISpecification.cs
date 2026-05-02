@@ -18,5 +18,7 @@ namespace Travel_Explorer.Domain.Interfaces
         int Take { get; }
         int Skip { get; }
         bool HasPaging { get; }
+
+        bool IsSplitQuery { get; }
     }
 }

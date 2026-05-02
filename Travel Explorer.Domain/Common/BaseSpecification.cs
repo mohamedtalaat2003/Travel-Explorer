@@ -8,7 +8,7 @@ using Travel_Explorer.Domain.Interfaces;
 
 namespace Travel_Explorer.Domain.Common
 {
-    public class BaseSpecification<T> :ISpecification<T> where T : class
+    public class BaseSpecification<T> : ISpecification<T> where T : class
     {
         public BaseSpecification() { } //علشان لو في داتا هتيجي من غير معمل filterليها 
 
@@ -30,6 +30,12 @@ namespace Travel_Explorer.Domain.Common
 
         public bool HasPaging { get; private set; }
 
+        public bool IsSplitQuery { get; private set; }
+
+        protected void ApplySplitQuery()
+        {
+            IsSplitQuery = true;
+        }
 
         protected void AddOrderBy(Expression<Func<T, object>> orderByExpression)
         {
