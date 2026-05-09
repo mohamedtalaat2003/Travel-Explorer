@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Travel_Explorer.Domain.Common;
 
 namespace Travel_Explorer.Domain.Entities
 {

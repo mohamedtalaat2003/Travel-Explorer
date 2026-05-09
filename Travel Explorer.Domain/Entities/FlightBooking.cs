@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Travel_Explorer.Domain.Common;
 using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>
     /// Represents a flight booking made by a user.
-    /// This is a transactional entity — records must never be hard-deleted
+    /// This is a transactional entity � records must never be hard-deleted
     /// for audit and legal compliance purposes.
     /// </summary>
     public class FlightBooking : BaseEntity

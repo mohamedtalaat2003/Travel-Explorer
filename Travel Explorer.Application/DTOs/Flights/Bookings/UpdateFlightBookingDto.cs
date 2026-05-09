@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Application.DTOs.Flights.Bookings

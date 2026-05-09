@@ -1,0 +1,52 @@
+
+namespace Travel_Explorer.Application.Features.Reviews.Commands.CreateReview
+{
+    public class CreateReviewCommandHandler
+        : IRequestHandler<CreateReviewCommand, ReviewDto>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+
+        public CreateReviewCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        {
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
+
+        public async Task<ReviewDto> Handle(
+            CreateReviewCommand request, CancellationToken cancellationToken)
+        {
+            var review = _mapper.Map<Review>(request);
+            review.CreatedAt = DateTime.UtcNow;
+
+            await _unitOfWork.Repository<Review>().AddAsync(review);
+
+            // Update destination average rating and review count
+            await RecalculateDestinationRating(request.DestinationId, cancellationToken);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            // Reload with includes
+            var spec = new ReviewSpecification(review.Id);
+            var loaded = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(spec);
+
+            return _mapper.Map<ReviewDto>(loaded);
+        }
+
+        private async Task RecalculateDestinationRating(int destinationId, CancellationToken cancellationToken)
+        {
+            var destination = await _unitOfWork.Repository<Destination>().GetAsync(destinationId);
+            if (destination == null) return;
+
+            var reviewSpec = new ReviewSpecification(destinationId, true);
+            var reviews = await _unitOfWork.Repository<Review>().ListSpecAsync(reviewSpec);
+
+            destination.ReviewCount = reviews.Count;
+            destination.AverageRating = reviews.Count > 0
+                ? reviews.Average(r => r.Rating)
+                : 0;
+            destination.UpdatedAt = DateTime.UtcNow;
+        
+    }
+}
+}

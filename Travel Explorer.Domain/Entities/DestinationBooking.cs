@@ -1,15 +1,10 @@
-ï»¿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Travel_Explorer.Domain.Common;
 using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Domain.Entities
 {/// <summary>
  /// Represents a destination booking made by a user.
- /// This is a transactional entity â€” records must never be hard-deleted
+ /// This is a transactional entity — records must never be hard-deleted
  /// for audit and legal compliance purposes.
  /// </summary>
     public class DestinationBooking : BaseEntity
@@ -30,7 +25,7 @@ namespace Travel_Explorer.Domain.Entities
         public int NumberOfGuests { get; set; }
 
         /// <summary>
-        /// The total price for the entire booking (calculated from PricePerNight Ã— nights).
+        /// The total price for the entire booking (calculated from PricePerNight × nights).
         /// </summary>
         public decimal TotalPrice { get; set; }
 

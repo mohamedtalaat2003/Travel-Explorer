@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Travel_Explorer.Domain.Entities;
 
 namespace Travel_Explorer.Infrastructure.Configurations
 {

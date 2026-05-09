@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using Travel_Explorer.Domain.Interfaces;
 
 namespace Travel_Explorer.Domain.Common
 {
     public class BaseSpecification<T> : ISpecification<T> where T : class
     {
-        public BaseSpecification() { } //علشان لو في داتا هتيجي من غير معمل filterليها 
+        public BaseSpecification() { } 
 
         public BaseSpecification(Expression<Func<T, bool>> criteria)
         {
             Criteria = criteria;
         }
-        //just get : علشان امنع من برا التغير 
-        public Expression<Func<T, bool>> Criteria { get; }
+        
+        public Expression<Func<T, bool>> Criteria { get; private set; }
 
-        public List<Expression<Func<T, object>>> Includes { get; } = new List<Expression<Func<T, object>>>(); // just used to store navigations
+        public List<Expression<Func<T, object>>> Includes { get; } = new List<Expression<Func<T, object>>>(); 
 
         public Expression<Func<T, object>> OrderBy { get; private set; }
 
@@ -37,6 +31,27 @@ namespace Travel_Explorer.Domain.Common
             IsSplitQuery = true;
         }
 
+        protected void AddCriteria(Expression<Func<T, bool>> criteriaExpression)
+        {
+            if (Criteria == null)
+            {
+                Criteria = criteriaExpression;
+            }
+            else
+            {
+                // ده جزء تقني شوية لدمج اتنين Expressions مع بعض
+                var parameter = Expression.Parameter(typeof(T));
+                var combined = Expression.Lambda<Func<T, bool>>(
+                    Expression.AndAlso(
+                        Expression.Invoke(Criteria, parameter),
+                        Expression.Invoke(criteriaExpression, parameter)
+                    ), parameter);
+                    
+                Criteria = combined;
+            }
+        }
+
+
         protected void AddOrderBy(Expression<Func<T, object>> orderByExpression)
         {
             OrderBy = orderByExpression;
@@ -52,10 +67,7 @@ namespace Travel_Explorer.Domain.Common
             Take = take;
             HasPaging = true;
         }
-        //Helper method to add include expressions to the specification 
-        //make code cleaner and more maintainable and more easy to reade and avoid code duplication when we need to add include expressions in different specifications
 
-        //protected to encapsulate the logic from the outside like controller
         protected void AddInclude(Expression<Func<T, object>> includeExpression)
         {
             Includes.Add(includeExpression);

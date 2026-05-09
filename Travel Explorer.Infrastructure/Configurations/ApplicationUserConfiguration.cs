@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Travel_Explorer.Domain.Entities;
 
 namespace Travel_Explorer.Infrastructure.Configurations
 {
@@ -14,9 +13,6 @@ namespace Travel_Explorer.Infrastructure.Configurations
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(u => u.Role)
-                .HasConversion<string>()
-                .HasMaxLength(20);
 
             builder.HasQueryFilter(u => !u.IsDeleted);
 

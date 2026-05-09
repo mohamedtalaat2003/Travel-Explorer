@@ -1,4 +1,3 @@
-using Travel_Explorer.Domain.Common;
 
 namespace Travel_Explorer.Domain.Entities
 {
@@ -60,7 +59,7 @@ namespace Travel_Explorer.Domain.Entities
         /// <summary>
         /// All activities available at this destination.
         /// </summary>
-        public ICollection<Activitie> Activities { get; set; } = new List<Activitie>();
+        public ICollection<Activity> Activities { get; set; } = new List<Activity>();
 
         /// <summary>
         /// All bookings made for this destination.

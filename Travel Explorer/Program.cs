@@ -1,4 +1,5 @@
 
+using Travel_Explorer.Application.DependencyInjection;
 using Travel_Explorer.Infrastructure.Dependency_Injection;
 
 namespace Travel_Explorer
@@ -10,6 +11,7 @@ namespace Travel_Explorer
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
           
             builder.Services.AddControllers();

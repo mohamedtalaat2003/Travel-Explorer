@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 
 namespace Travel_Explorer.Application.DTOs.Categories
 {

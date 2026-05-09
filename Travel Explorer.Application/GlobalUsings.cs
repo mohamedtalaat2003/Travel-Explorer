@@ -1,0 +1,16 @@
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using MediatR;
+global using AutoMapper;
+global using System.ComponentModel.DataAnnotations;
+global using Travel_Explorer.Domain.Entities;
+global using Travel_Explorer.Domain.Interfaces;
+global using Travel_Explorer.Domain.Common;
+global using Travel_Explorer.Application.DTOs.Destinations;
+global using Travel_Explorer.Application.DTOs.Activities;
+global using Travel_Explorer.Application.DTOs.Bookings;
+global using Travel_Explorer.Application.DTOs.Reviews;
+global using Travel_Explorer.Application.DTOs.Categories;

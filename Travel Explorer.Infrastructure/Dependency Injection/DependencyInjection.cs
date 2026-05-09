@@ -1,9 +1,6 @@
-﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Travel_Explorer.Domain.Common;
-using Travel_Explorer.Domain.Interfaces;
 using Travel_Explorer.Infrastructure.Data;
 using Travel_Explorer.Infrastructure.Repositories;
 

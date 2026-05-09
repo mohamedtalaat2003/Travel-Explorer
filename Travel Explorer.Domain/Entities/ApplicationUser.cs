@@ -16,12 +16,6 @@ namespace Travel_Explorer.Domain.Entities
         public string FullName { get; set; }
 
         /// <summary>
-        /// The role assigned to this user (Admin, Traveler, or ContentWriter).
-        /// Determines what features and pages the user can access.
-        /// </summary>
-        public UserRole Role { get; set; }
-
-        /// <summary>
         /// The date and time when this user account was created.
         /// </summary>
         public DateTime CreatedAt { get; set; }

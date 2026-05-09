@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Travel_Explorer.Domain.Common;
 using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>
     /// Represents a payment transaction linked to a booking.
-    /// This is a financial entity — records must NEVER be hard-deleted.
+    /// This is a financial entity � records must NEVER be hard-deleted.
     /// Full audit trail is legally required for all financial operations.
     /// </summary>
     public class PaymentTransaction : BaseEntity

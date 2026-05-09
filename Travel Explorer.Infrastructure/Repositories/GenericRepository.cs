@@ -1,10 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
-using System.Threading.Tasks;
-using Travel_Explorer.Domain.Interfaces;
 using Travel_Explorer.Infrastructure.Data;
 
 namespace Travel_Explorer.Infrastructure.Repositories
@@ -44,9 +39,12 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<T>> ListSpecAsync(ISpecification<T> spec) => await ApplySpecification(spec).ToListAsync();
 
+        /// <inheritdoc/>
+        public async Task<int> CountAsync(ISpecification<T> spec)
+            => await ApplySpecification(spec).CountAsync();
+
         private IQueryable<T> ApplySpecification(ISpecification<T> spec)
-        {
-            return SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
-        }
+            => SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
+
     }
 }

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Travel_Explorer.Domain.Entities;
 using System.Reflection;
 
 namespace Travel_Explorer.Infrastructure.Data
@@ -16,7 +15,7 @@ namespace Travel_Explorer.Infrastructure.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<DestinationBooking> DestinationBookings { get; set; }
-        public DbSet<Activitie> Activities { get; set; }
+        public DbSet<Activity> Activities { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<FlightSchedule> FlightSchedules { get; set; }

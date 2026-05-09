@@ -1,0 +1,11 @@
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Http;
+global using MediatR;
+global using System.Collections.Generic;
+global using System.Threading.Tasks;
+global using Travel_Explorer.Application.DTOs.Destinations;
+global using Travel_Explorer.Application.DTOs.Activities;
+global using Travel_Explorer.Application.DTOs.Bookings;
+global using Travel_Explorer.Application.DTOs.Reviews;
+global using Travel_Explorer.Application.DTOs.Categories;

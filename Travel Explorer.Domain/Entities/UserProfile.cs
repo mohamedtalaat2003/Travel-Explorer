@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Travel_Explorer.Domain.Common;
 
 namespace Travel_Explorer.Domain.Entities
 {
@@ -50,7 +45,7 @@ namespace Travel_Explorer.Domain.Entities
 
         /// <summary>
         /// Foreign key to the ApplicationUser this profile belongs to.
-        /// One-to-one relationship — each user has exactly one profile.
+        /// One-to-one relationship � each user has exactly one profile.
         /// </summary>
         public int UserId { get; set; }
 
