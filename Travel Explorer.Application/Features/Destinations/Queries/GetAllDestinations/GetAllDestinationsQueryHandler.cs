@@ -17,11 +17,10 @@ namespace Travel_Explorer.Application.Features.Destinations.Queries.GetAllDestin
         public async Task<PaginatedResult<DestinationDto>> Handle(
             GetAllDestinationsQuery request, CancellationToken cancellationToken)
         {
-            var countSpec = new DestinationSpecification(request.PageNumber, request.PageSize);
-            var totalCount = await _unitOfWork.Repository<Destination>().CountAsync(countSpec);
-
-            var dataSpec = new DestinationSpecification(request.PageNumber, request.PageSize);
-            var destinations = await _unitOfWork.Repository<Destination>().ListSpecAsync(dataSpec);
+            var spec = new DestinationSpecification(request.PageNumber, request.PageSize);
+            
+            var totalCount = await _unitOfWork.Repository<Destination>().CountAsync(spec);
+            var destinations = await _unitOfWork.Repository<Destination>().ListSpecAsync(spec);
 
             var dtos = _mapper.Map<IReadOnlyList<DestinationDto>>(destinations);
 

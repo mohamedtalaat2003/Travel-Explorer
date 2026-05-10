@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Travel_Explorer.Infrastructure.Data;
 using Travel_Explorer.Infrastructure.Repositories;
 
-namespace Travel_Explorer.Infrastructure.Dependency_Injection
+namespace Travel_Explorer.Infrastructure.DependencyInjection
 {
     public static class DependencyInjection
     {
@@ -27,4 +27,3 @@ namespace Travel_Explorer.Infrastructure.Dependency_Injection
         }
     }
 }
-

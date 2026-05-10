@@ -15,9 +15,9 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task AddAsync(T entity) => await _context.Set<T>().AddAsync(entity);
 
-        public async Task Delete(T Id)
+        public async Task Delete(object id)
         {
-            var entity = await _context.Set<T>().FindAsync(Id);
+            var entity = await _context.Set<T>().FindAsync(id);
             if (entity != null)
             {
                 _context.Set<T>().Remove(entity);
@@ -28,23 +28,20 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<T>> GetAllAsync() => await _context.Set<T>().ToListAsync();
         public async Task<T> GetAsync(object id) => await _context.Set<T>().FindAsync(id);
-        public async Task Update(object id)
+        public void Update(T entity)
         {
-            var entity = await GetAsync(id);
-            if (entity != null)
-            {
-                _context.Set<T>().Update(entity);
-            }
+            _context.Set<T>().Attach(entity);
+            _context.Entry(entity).State = EntityState.Modified;
         }
 
         public async Task<IReadOnlyList<T>> ListSpecAsync(ISpecification<T> spec) => await ApplySpecification(spec).ToListAsync();
 
         /// <inheritdoc/>
         public async Task<int> CountAsync(ISpecification<T> spec)
-            => await ApplySpecification(spec).CountAsync();
+            => await ApplySpecification(spec, true).CountAsync();
 
-        private IQueryable<T> ApplySpecification(ISpecification<T> spec)
-            => SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
+        private IQueryable<T> ApplySpecification(ISpecification<T> spec, bool ignorePaging = false)
+            => SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec, ignorePaging);
 
     }
 }

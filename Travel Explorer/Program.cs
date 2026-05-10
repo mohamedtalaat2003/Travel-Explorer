@@ -1,6 +1,6 @@
 
 using Travel_Explorer.Application.DependencyInjection;
-using Travel_Explorer.Infrastructure.Dependency_Injection;
+using Travel_Explorer.Infrastructure.DependencyInjection;
 
 namespace Travel_Explorer
 {

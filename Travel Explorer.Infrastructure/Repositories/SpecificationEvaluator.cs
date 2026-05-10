@@ -5,7 +5,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
     public class SpecificationEvaluator<T> where T : class
     {
         
-        public static IQueryable<T> GetQuery(IQueryable<T> inputQuery, ISpecification<T> spec)
+        public static IQueryable<T> GetQuery(IQueryable<T> inputQuery, ISpecification<T> spec, bool ignorePaging = false)
         {
             var query = inputQuery;
 
@@ -17,7 +17,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
             else if (spec.OrderByDescending != null)
                 query = query.OrderByDescending(spec.OrderByDescending);
 
-            if (spec.HasPaging)
+            if (spec.HasPaging && !ignorePaging)
                 query = query.Skip(spec.Skip).Take(spec.Take);
 
             if (spec.IsSplitQuery)
