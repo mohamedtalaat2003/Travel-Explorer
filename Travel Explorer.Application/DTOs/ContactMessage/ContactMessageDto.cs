@@ -1,4 +1,4 @@
-namespace Travel_Explorer.Application.DTOs.Contact
+namespace Travel_Explorer.Application.DTOs.ContactMessage
 {
     public class ContactMessageDto
     {

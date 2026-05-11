@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Travel_Explorer.Application.Features.DestinationBookings.Commands.CreateBooking;
 using Travel_Explorer.Application.Features.DestinationBookings.Commands.DeleteBooking;
 using Travel_Explorer.Application.Features.DestinationBookings.Commands.UpdateBookingNotes;
@@ -35,8 +36,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Create([FromBody] CreateBookingCommand command)
         {
-            // TODO: Replace with actual authenticated user ID from JWT claims
-            command.UserId = 1; // Placeholder for now
+            var userId = GetCurrentUserId();
+            if (userId.HasValue)
+                command.UserId = userId.Value;
 
             var result = await _mediator.Send(command);
 
@@ -71,8 +73,7 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMyBookings([FromQuery] string? status = null)
         {
-            // TODO: Replace with actual authenticated user ID from JWT claims
-            var userId = 0;
+            var userId = GetCurrentUserId() ?? 0;
 
             var result = await _mediator.Send(new GetMyBookingsQuery(userId, status));
             return Ok(result);
@@ -151,6 +152,17 @@ namespace Travel_Explorer.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Extracts the current user's ID from the JWT claims.
+        /// </summary>
+        private int? GetCurrentUserId()
+        {
+            var userIdStr = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+                return null;
+            return userId;
         }
     }
 }

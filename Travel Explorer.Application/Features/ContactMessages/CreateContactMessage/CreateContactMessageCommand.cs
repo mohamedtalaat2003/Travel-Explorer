@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Travel_Explorer.Application.DTOs.ContactMessage;
 
-namespace Travel_Explorer.Application.Features.ContactMessage.CreateContactMessage
+namespace Travel_Explorer.Application.Features.ContactMessages.CreateContactMessage
 {
-    internal class CreateContactMessageCommand
-    {
-    }
+    public record CreateContactMessageCommand(
+        [Required][StringLength(200, MinimumLength = 3)] string FullName,
+        [Required][EmailAddress][StringLength(200)] string Email,
+        [Required][StringLength(300)] string Subject,
+        [Required][StringLength(2000)] string Message ,
+        [Required] int UserId
+    ) : IRequest<ContactMessageDto>; 
 }

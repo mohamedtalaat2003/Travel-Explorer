@@ -22,7 +22,7 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.CreateReview
             await _unitOfWork.Repository<Review>().AddAsync(review);
 
             // Update destination average rating and review count
-            await RecalculateDestinationRating(request.DestinationId, cancellationToken);
+            await RecalculateDestinationRating(request.DestinationId);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -33,7 +33,7 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.CreateReview
             return _mapper.Map<ReviewDto>(loaded);
         }
 
-        private async Task RecalculateDestinationRating(int destinationId, CancellationToken cancellationToken)
+        private async Task RecalculateDestinationRating(int destinationId)
         {
             var destination = await _unitOfWork.Repository<Destination>().GetAsync(destinationId);
             if (destination == null) return;
@@ -47,6 +47,6 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.CreateReview
                 : 0;
             destination.UpdatedAt = DateTime.UtcNow;
         
+        }
     }
-}
 }

@@ -10,8 +10,8 @@ namespace Travel_Explorer.Controllers
     /// Manages activity resources.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
-    [Produces("application/json")]
+    [Route("api/Activities")]
+    [Produces("application/json")] // response json only
     public class ActivitiesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -27,9 +27,9 @@ namespace Travel_Explorer.Controllers
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<ActivityDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int? destinationId)
         {
-            var result = await _mediator.Send(new GetAllActivitiesQuery());
+            var result = await _mediator.Send(new GetAllActivitiesQuery(destinationId));
             return Ok(result);
         }
 

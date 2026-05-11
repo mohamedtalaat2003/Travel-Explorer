@@ -5,6 +5,10 @@ using Travel_Explorer.Application.Features.Destinations.Commands.CreateDestinati
 using Travel_Explorer.Application.Features.Destinations.Commands.UpdateDestination;
 using Travel_Explorer.Application.Features.Reviews.Commands.CreateReview;
 using Travel_Explorer.Application.Features.Reviews.Commands.UpdateReview;
+using Travel_Explorer.Application.Features.ContactMessages.CreateContactMessage;
+using Travel_Explorer.Application.DTOs.ContactMessage;
+using Travel_Explorer.Application.DTOs.Profiles;
+using Travel_Explorer.Application.Features.Profiles.Commands.UpdateUserProfile;
 
 namespace Travel_Explorer.Application.Mapping
 {
@@ -87,6 +91,32 @@ namespace Travel_Explorer.Application.Mapping
                 .ForMember(dest => dest.Destination, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
+
+            // ─── ContactMessage ─────────────────────────────────────────────
+            CreateMap<ContactMessage, ContactMessageDto>();
+            CreateMap<CreateContactMessageCommand, ContactMessage>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.IsRead, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore());
+
+            // ─── UserProfile ────────────────────────────────────────────────
+            CreateMap<UserProfile, UserProfileDto>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber));
+
+            CreateMap<UpdateUserProfileCommand, UserProfile>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForMember(dest => dest.User, opt => opt.MapFrom(src => src));
+
+            CreateMap<UpdateUserProfileCommand, ApplicationUser>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Email, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
 
     }

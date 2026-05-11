@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Travel_Explorer.Application.Features.Reviews.Commands.CreateReview;
 using Travel_Explorer.Application.Features.Reviews.Commands.DeleteReview;
 using Travel_Explorer.Application.Features.Reviews.Commands.UpdateReview;
@@ -9,7 +10,7 @@ namespace Travel_Explorer.Controllers
     /// Manages user reviews on destinations.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/Reviews")]
     [Produces("application/json")]
     public class ReviewsController : ControllerBase
     {
@@ -50,8 +51,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Create([FromBody] CreateReviewCommand command)
         {
-            // TODO: Replace with actual authenticated user ID from JWT claims
-            command.UserId = 1; // Placeholder for now
+            var userId = GetCurrentUserId();
+            if (userId.HasValue)
+                command.UserId = userId.Value;
 
             var result = await _mediator.Send(command);
 
@@ -99,6 +101,17 @@ namespace Travel_Explorer.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Extracts the current user's ID from the JWT claims.
+        /// </summary>
+        private int? GetCurrentUserId()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+                return null;
+            return userId;
         }
     }
 }

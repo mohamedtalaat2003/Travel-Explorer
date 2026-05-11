@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Travel_Explorer.Domain.Entities
 {/// <summary>
  /// Represents a contact message submitted by a visitor or registered user.

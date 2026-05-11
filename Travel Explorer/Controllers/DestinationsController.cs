@@ -14,7 +14,7 @@ namespace Travel_Explorer.Controllers
     /// Manages travel destination resources.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/Destinations")]
     [Produces("application/json")]
     public class DestinationsController : ControllerBase
     {

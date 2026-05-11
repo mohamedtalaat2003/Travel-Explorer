@@ -1,4 +1,3 @@
-using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Application.Features.DestinationBookings
 {
@@ -11,7 +10,7 @@ namespace Travel_Explorer.Application.Features.DestinationBookings
         /// Get a single booking by ID (non-deleted) with User and Destination included.
         /// </summary>
         public DestinationBookingSpecification(int id)
-            : base(b => b.Id == id && !b.IsDeleted)
+            : base(b => b.Id == id )
         {
             AddInclude(b => b.User);
             AddInclude(b => b.Destination);
@@ -21,8 +20,7 @@ namespace Travel_Explorer.Application.Features.DestinationBookings
         /// Get bookings filtered by optional UserId and/or Status.
         /// </summary>
         public DestinationBookingSpecification(int? userId, string? status)
-            : base(b => !b.IsDeleted
-                && (!userId.HasValue || b.UserId == userId.Value)
+            : base(b => (!userId.HasValue || b.UserId == userId.Value)
                 && (string.IsNullOrEmpty(status) || b.Status.ToString() == status))
         {
             AddInclude(b => b.User);

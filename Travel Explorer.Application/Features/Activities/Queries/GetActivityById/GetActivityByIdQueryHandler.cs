@@ -23,7 +23,7 @@ namespace Travel_Explorer.Application.Features.Activities.Queries.GetActivityByI
                 return null;
 
             return _mapper.Map<ActivityDto>(activity);
-        
+
+        }
     }
-}
 }

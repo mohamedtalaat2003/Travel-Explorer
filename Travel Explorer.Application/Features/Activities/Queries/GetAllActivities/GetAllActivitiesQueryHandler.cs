@@ -16,11 +16,11 @@ namespace Travel_Explorer.Application.Features.Activities.Queries.GetAllActiviti
         public async Task<IReadOnlyList<ActivityDto>> Handle(
             GetAllActivitiesQuery request, CancellationToken cancellationToken)
         {
-            var spec = new ActivitySpecification();
+            var spec = new ActivitySpecification(request.destinationId);
             var activities = await _unitOfWork.Repository<Activity>().ListSpecAsync(spec);
 
             return _mapper.Map<IReadOnlyList<ActivityDto>>(activities);
-        
+
+        }
     }
-}
 }

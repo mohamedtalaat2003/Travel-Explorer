@@ -26,7 +26,7 @@ namespace Travel_Explorer.Application.Features.Activities.Commands.CreateActivit
             var loaded = await _unitOfWork.Repository<Activity>().GenericEntitiesWithSpec(spec);
 
             return _mapper.Map<ActivityDto>(loaded);
-        
+
+        }
     }
-}
 }
