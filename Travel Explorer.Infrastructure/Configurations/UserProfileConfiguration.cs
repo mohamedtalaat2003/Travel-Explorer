@@ -24,6 +24,7 @@ namespace Travel_Explorer.Infrastructure.Configurations
                 .HasMaxLength(100);
 
             builder.Property(p => p.PassportNumber)
+                .IsRequired()
                 .HasMaxLength(50);
 
             builder.HasQueryFilter(p => !p.IsDeleted);

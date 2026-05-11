@@ -114,7 +114,6 @@ namespace Travel_Explorer.Application.Mapping
 
             CreateMap<UpdateUserProfileCommand, ApplicationUser>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Email, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
