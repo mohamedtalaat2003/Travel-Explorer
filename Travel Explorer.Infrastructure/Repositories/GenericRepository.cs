@@ -18,9 +18,20 @@ namespace Travel_Explorer.Infrastructure.Repositories
         public async Task Delete(object id)
         {
             var entity = await _context.Set<T>().FindAsync(id);
+
             if (entity != null)
             {
-                _context.Set<T>().Remove(entity);
+                if (entity is BaseEntity softDeleteEntity)
+                {
+                    softDeleteEntity.IsDeleted = true;
+                    softDeleteEntity.UpdatedAt = DateTime.UtcNow; 
+
+                    _context.Set<T>().Update(entity);
+                }
+                else
+                {
+                    _context.Set<T>().Remove(entity);
+                }
             }
         }
         public async Task<T> GenericEntitiesWithSpec(ISpecification<T> spec) => await ApplySpecification(spec).FirstOrDefaultAsync();

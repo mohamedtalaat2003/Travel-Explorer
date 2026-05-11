@@ -39,7 +39,7 @@ namespace Travel_Explorer.Application.Mapping
                 .ForMember(dest => dest.Activities, opt => opt.Ignore())
                 .ForMember(dest => dest.Bookings, opt => opt.Ignore())
                 .ForMember(dest => dest.Reviews, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // لا نغير تاريخ الإنشاء
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) 
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
 
             // ─── DestinationBooking ─────────────────────────────────────────
