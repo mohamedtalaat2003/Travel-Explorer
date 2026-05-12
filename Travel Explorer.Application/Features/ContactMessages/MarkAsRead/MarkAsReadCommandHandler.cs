@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Travel_Explorer.Application.DTOs.ContactMessage;
 
 namespace Travel_Explorer.Application.Features.ContactMessages.MarkAsRead
@@ -17,7 +18,8 @@ namespace Travel_Explorer.Application.Features.ContactMessages.MarkAsRead
         {
             var message = await _unitOfWork.Repository<ContactMessage>().GetAsync(request.Id);
 
-            if (message == null) return null;
+            if (message == null)
+                throw new NotFoundException(nameof(ContactMessage), request.Id);
 
             message.IsRead = true;
             _unitOfWork.Repository<ContactMessage>().Update(message);

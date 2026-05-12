@@ -22,10 +22,7 @@ namespace Travel_Explorer.Application.Features.Profiles.Commands.UpdateUserProfi
 
             if (profile == null)
             {
-                // Optionally create profile if it doesn't exist? 
-                // But usually it's created on registration. 
-                // For now, let's just return null or handle appropriately.
-                return null;
+                throw new NotFoundException(nameof(UserProfile), request.UserId);
             }
 
             // Update UserProfile and nested User fields using AutoMapper

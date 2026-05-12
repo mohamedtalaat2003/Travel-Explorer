@@ -21,7 +21,7 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Upda
             var booking = await _unitOfWork.Repository<DestinationBooking>().GenericEntitiesWithSpec(spec);
 
             if (booking == null)
-                return null;
+                throw new NotFoundException(nameof(DestinationBooking), request.Id);
 
             booking.Status = request.Status;
             booking.UpdatedAt = DateTime.UtcNow;

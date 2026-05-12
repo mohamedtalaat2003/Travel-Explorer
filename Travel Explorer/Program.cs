@@ -44,7 +44,10 @@ namespace Travel_Explorer
 
             var app = builder.Build();
 
+            app.UseMiddleware<Travel_Explorer.Middleware.ExceptionMiddleware>();
+
             // Configure the HTTP request pipeline.
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

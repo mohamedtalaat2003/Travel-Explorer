@@ -61,10 +61,8 @@ namespace Travel_Explorer.Controllers
             bool isAdmin = User.IsInRole("Admin");
 
             var result = await _mediator.Send(new GetContactMessageByIdQuery(id, isAdmin ? null : currentUserId));
-
-            if (result == null) return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -91,13 +89,13 @@ namespace Travel_Explorer.Controllers
         
         [HttpPatch("{id:int}")]
         [Authorize(Roles = "Admin")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> MarkAsRead(int id)
         {
             var result = await _mediator.Send(new MarkAsReadCommand(id));
-            if (result ==null) return NotFound();
             return Ok(result) ;
+
         }
 
         /// <summary>
@@ -109,9 +107,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _mediator.Send(new DeleteContactMessageCommand(id));
-            if (!result) return NotFound();
+            await _mediator.Send(new DeleteContactMessageCommand(id));
             return NoContent();
+
         }
 
         /// <summary>

@@ -56,12 +56,12 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await _mediator.Send(new GetBookingByIdQuery(id));
+            var userId = GetCurrentUserId() ?? 0;
+            var isAdmin = User.IsInRole("Admin");
 
-            if (result == null)
-                return NotFound();
-
+            var result = await _mediator.Send(new GetBookingByIdQuery(id, userId, isAdmin));
             return Ok(result);
+
         }
 
         /// <summary>
@@ -94,10 +94,10 @@ namespace Travel_Explorer.Controllers
         }
 
         /// <summary>
-        /// Updates the status of a specific booking.
+        /// Updates the status of a specific booking. Requires the Admin role.
         /// </summary>
         [HttpPatch("{id:int}/status")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -107,11 +107,8 @@ namespace Travel_Explorer.Controllers
         {
             command.Id = id;
             var result = await _mediator.Send(command);
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -126,13 +123,14 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateNotes(int id, [FromBody] UpdateBookingNotesCommand command)
         {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue) return Unauthorized();
+
             command.Id = id;
+            command.UserId = userId.Value;
             var result = await _mediator.Send(command);
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -146,12 +144,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _mediator.Send(new DeleteBookingCommand(id));
-
-            if (!result)
-                return NotFound();
-
+            await _mediator.Send(new DeleteBookingCommand(id));
             return NoContent();
+
         }
 
         /// <summary>

@@ -20,7 +20,7 @@ namespace Travel_Explorer.Application.Features.Activities.Queries.GetActivityByI
             var activity = await _unitOfWork.Repository<Activity>().GenericEntitiesWithSpec(spec);
 
             if (activity == null)
-                return null;
+                throw new NotFoundException(nameof(Activity), request.Id);
 
             return _mapper.Map<ActivityDto>(activity);
 

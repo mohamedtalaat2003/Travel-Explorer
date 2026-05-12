@@ -34,10 +34,8 @@ namespace Travel_Explorer.Controllers
             if (!userId.HasValue) return Unauthorized();
 
             var result = await _mediator.Send(new GetUserProfileQuery(userId.Value));
-
-            if (result == null) return NotFound("Profile not found.");
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -55,10 +53,8 @@ namespace Travel_Explorer.Controllers
 
             command.UserId = userId.Value;
             var result = await _mediator.Send(command);
-
-            if (result == null) return NotFound("Profile not found.");
-
             return Ok(result);
+
         }
 
         /// <summary>

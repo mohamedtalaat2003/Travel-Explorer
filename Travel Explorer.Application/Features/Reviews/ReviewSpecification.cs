@@ -10,7 +10,7 @@ namespace Travel_Explorer.Application.Features.Reviews
         /// Get a single review by ID (non-deleted) with User included.
         /// </summary>
         public ReviewSpecification(int id)
-            : base(r => r.Id == id && !r.IsDeleted)
+            : base(r => r.Id == id)
         {
             AddInclude(r => r.User);
         }
@@ -20,11 +20,10 @@ namespace Travel_Explorer.Application.Features.Reviews
         /// Pass filterByDestination = true to distinguish from the ID constructor.
         /// </summary>
         public ReviewSpecification(int destinationId, bool filterByDestination)
-            : base(r => !r.IsDeleted && r.DestinationId == destinationId)
+            : base(r => r.DestinationId == destinationId)
         {
             AddInclude(r => r.User);
             AddOrderByDescending(r => r.CreatedAt);
-        
-    }
+        }
 }
 }

@@ -20,7 +20,11 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.UpdateReview
             var review = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(spec);
 
             if (review == null)
-                return null;
+                throw new NotFoundException(nameof(Review), request.Id);
+
+            // Only the review owner can update it
+            if (review.UserId != request.UserId)
+                throw new ForbiddenAccessException("You are not authorized to update this review.");
 
             _mapper.Map(request, review);
             review.UpdatedAt = DateTime.UtcNow;

@@ -20,11 +20,14 @@ namespace Travel_Explorer.Application.Features.ContactMessages.GetContactMessage
             var spec = new ContactMessageSpecification(request.Id);
             var message = await _unitOfWork.Repository<ContactMessage>().GenericEntitiesWithSpec(spec);
 
-            if (message == null) return null;
+            if (message == null)
+                throw new NotFoundException(nameof(ContactMessage), request.Id);
+
 
             // If a requesting user ID is provided, validate ownership
             if (request.RequestingUserId.HasValue && message.UserId != request.RequestingUserId.Value)
-                return null;
+                throw new NotFoundException(nameof(ContactMessage), request.Id);
+
 
             return _mapper.Map<ContactMessageDto>(message);
         }

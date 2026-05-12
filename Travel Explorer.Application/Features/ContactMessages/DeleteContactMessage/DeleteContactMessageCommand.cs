@@ -16,7 +16,9 @@ namespace Travel_Explorer.Application.Features.ContactMessages.DeleteContactMess
             var repo = _unitOfWork.Repository<ContactMessage>();
             var message = await repo.GetAsync(request.Id);
 
-            if (message == null) return false;
+            if (message == null)
+                throw new NotFoundException(nameof(ContactMessage), request.Id);
+
 
             await repo.Delete(request.Id);
             return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;

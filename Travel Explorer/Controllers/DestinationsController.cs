@@ -47,11 +47,8 @@ namespace Travel_Explorer.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _mediator.Send(new GetDestinationByIdQuery(id));
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -136,16 +133,12 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateDestinationCommand command)
         {
-            // Ensure ID from URL matches the command ID
-            if (id != command.Id)
-                return BadRequest("ID mismatch between URL and body.");
+            // Set the ID from the URL directly into the command
+            command.Id = id;
 
             var result = await _mediator.Send(command);
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -159,12 +152,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _mediator.Send(new DeleteDestinationCommand(id));
-
-            if (!result)
-                return NotFound();
-
+            await _mediator.Send(new DeleteDestinationCommand(id));
             return NoContent();
+
         }
     }
 }

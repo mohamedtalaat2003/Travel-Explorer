@@ -16,5 +16,8 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.UpdateReview
     {
         [JsonIgnore]
         public int Id { get; set; }
+
+        [JsonIgnore]
+        public int UserId { get; set; }
     }
 }

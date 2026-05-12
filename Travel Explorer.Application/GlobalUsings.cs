@@ -14,3 +14,5 @@ global using Travel_Explorer.Application.DTOs.Activities;
 global using Travel_Explorer.Application.DTOs.Bookings;
 global using Travel_Explorer.Application.DTOs.Reviews;
 global using Travel_Explorer.Application.DTOs.Categories;
+global using Travel_Explorer.Application.Common.Exceptions;
+

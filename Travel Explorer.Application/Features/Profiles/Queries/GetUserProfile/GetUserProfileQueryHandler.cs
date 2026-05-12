@@ -21,7 +21,7 @@ namespace Travel_Explorer.Application.Features.Profiles.Queries.GetUserProfile
             var profile = await _unitOfWork.Repository<UserProfile>().GenericEntitiesWithSpec(spec);
 
             if (profile == null)
-                return null;
+                throw new NotFoundException(nameof(UserProfile), request.UserId);
 
             return _mapper.Map<UserProfileDto>(profile);
         }
