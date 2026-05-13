@@ -5,6 +5,6 @@ namespace Travel_Explorer.Application.Features.Activities.Queries.GetAllActiviti
     /// <summary>
     /// Returns all active activities across all destinations.
     /// </summary>
-    public record GetAllActivitiesQuery() : IRequest<IReadOnlyList<ActivityDto>>;
+    public record GetAllActivitiesQuery(int ? destinationId =null) : IRequest<IReadOnlyList<ActivityDto>>;
 
 }

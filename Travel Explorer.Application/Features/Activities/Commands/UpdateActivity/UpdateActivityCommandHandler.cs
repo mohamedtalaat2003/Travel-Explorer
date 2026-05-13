@@ -19,8 +19,8 @@ namespace Travel_Explorer.Application.Features.Activities.Commands.UpdateActivit
             var spec = new ActivitySpecification(request.Id);
             var activity = await _unitOfWork.Repository<Activity>().GenericEntitiesWithSpec(spec);
 
-            if (activity == null || activity.IsDeleted)
-                return null;
+            if (activity == null)
+                throw new NotFoundException(nameof(Activity), request.Id);
 
             _mapper.Map(request, activity);
             activity.UpdatedAt = DateTime.UtcNow;

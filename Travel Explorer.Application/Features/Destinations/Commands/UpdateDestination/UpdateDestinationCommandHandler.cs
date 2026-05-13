@@ -20,7 +20,7 @@ namespace Travel_Explorer.Application.Features.Destinations.Commands.UpdateDesti
             var destination = await _unitOfWork.Repository<Destination>().GenericEntitiesWithSpec(spec);
 
             if (destination == null)
-                return null;
+                throw new NotFoundException(nameof(Destination), request.Id);
 
             _mapper.Map(request, destination);
             destination.UpdatedAt = DateTime.UtcNow;

@@ -20,7 +20,7 @@ namespace Travel_Explorer.Application.Features.Reviews.Queries.GetReviewById
             var review = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(spec);
 
             if (review == null)
-                return null;
+                throw new NotFoundException(nameof(Review), request.Id);
 
             return _mapper.Map<ReviewDto>(review);
         

@@ -16,8 +16,8 @@ namespace Travel_Explorer.Application.Features.Destinations.Commands.DeleteDesti
         {
             var destination = await _unitOfWork.Repository<Destination>().GetAsync(request.Id);
 
-            if (destination == null || destination.IsDeleted)
-                return false;
+            if (destination == null)
+                throw new NotFoundException(nameof(Destination), request.Id);
 
             destination.IsDeleted = true;
             destination.UpdatedAt = DateTime.UtcNow;

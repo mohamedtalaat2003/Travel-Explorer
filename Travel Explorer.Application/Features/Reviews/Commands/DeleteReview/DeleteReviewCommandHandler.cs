@@ -16,8 +16,8 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.DeleteReview
         {
             var review = await _unitOfWork.Repository<Review>().GetAsync(request.Id);
 
-            if (review == null || review.IsDeleted)
-                return false;
+            if (review == null)
+                throw new NotFoundException(nameof(Review), request.Id);
 
             review.IsDeleted = true;
             review.UpdatedAt = DateTime.UtcNow;
@@ -27,7 +27,7 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.DeleteReview
             if (destination != null)
             {
                 var reviewSpec = new BaseSpecification<Review>(
-                    r => r.DestinationId == review.DestinationId && !r.IsDeleted && r.Id != review.Id);
+                    r => r.DestinationId == review.DestinationId && r.Id != review.Id);
                 var remainingReviews = await _unitOfWork.Repository<Review>().ListSpecAsync(reviewSpec);
 
                 destination.ReviewCount = remainingReviews.Count;

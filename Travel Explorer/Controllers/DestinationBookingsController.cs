@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Travel_Explorer.Application.Features.DestinationBookings.Commands.CreateBooking;
 using Travel_Explorer.Application.Features.DestinationBookings.Commands.DeleteBooking;
 using Travel_Explorer.Application.Features.DestinationBookings.Commands.UpdateBookingNotes;
@@ -35,8 +36,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Create([FromBody] CreateBookingCommand command)
         {
-            // TODO: Replace with actual authenticated user ID from JWT claims
-            command.UserId = 1; // Placeholder for now
+            var userId = GetCurrentUserId();
+            if (userId.HasValue)
+                command.UserId = userId.Value;
 
             var result = await _mediator.Send(command);
 
@@ -54,12 +56,12 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await _mediator.Send(new GetBookingByIdQuery(id));
+            var userId = GetCurrentUserId() ?? 0;
+            var isAdmin = User.IsInRole("Admin");
 
-            if (result == null)
-                return NotFound();
-
+            var result = await _mediator.Send(new GetBookingByIdQuery(id, userId, isAdmin));
             return Ok(result);
+
         }
 
         /// <summary>
@@ -71,8 +73,7 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMyBookings([FromQuery] string? status = null)
         {
-            // TODO: Replace with actual authenticated user ID from JWT claims
-            var userId = 0;
+            var userId = GetCurrentUserId() ?? 0;
 
             var result = await _mediator.Send(new GetMyBookingsQuery(userId, status));
             return Ok(result);
@@ -93,10 +94,10 @@ namespace Travel_Explorer.Controllers
         }
 
         /// <summary>
-        /// Updates the status of a specific booking.
+        /// Updates the status of a specific booking. Requires the Admin role.
         /// </summary>
         [HttpPatch("{id:int}/status")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -106,11 +107,8 @@ namespace Travel_Explorer.Controllers
         {
             command.Id = id;
             var result = await _mediator.Send(command);
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -125,13 +123,14 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateNotes(int id, [FromBody] UpdateBookingNotesCommand command)
         {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue) return Unauthorized();
+
             command.Id = id;
+            command.UserId = userId.Value;
             var result = await _mediator.Send(command);
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -145,12 +144,20 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _mediator.Send(new DeleteBookingCommand(id));
-
-            if (!result)
-                return NotFound();
-
+            await _mediator.Send(new DeleteBookingCommand(id));
             return NoContent();
+
+        }
+
+        /// <summary>
+        /// Extracts the current user's ID from the JWT claims.
+        /// </summary>
+        private int? GetCurrentUserId()
+        {
+            var userIdStr = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+                return null;
+            return userId;
         }
     }
 }

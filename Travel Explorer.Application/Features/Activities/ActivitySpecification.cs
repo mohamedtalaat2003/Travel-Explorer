@@ -10,7 +10,7 @@ namespace Travel_Explorer.Application.Features.Activities
         /// Get a single activity by ID (non-deleted) with Destination included.
         /// </summary>
         public ActivitySpecification(int id)
-            : base(a => a.Id == id && !a.IsDeleted)
+            : base(a => a.Id == id)
         {
             AddInclude(a => a.Destination);
         }
@@ -19,12 +19,11 @@ namespace Travel_Explorer.Application.Features.Activities
         /// Get all active activities, optionally filtered by destination.
         /// </summary>
         public ActivitySpecification(int? destinationId = null)
-            : base(a => !a.IsDeleted
-                && (!destinationId.HasValue || a.DestinationId == destinationId.Value))
+            : base(a => !destinationId.HasValue || a.DestinationId == destinationId.Value)
         {
             AddInclude(a => a.Destination);
             AddOrderBy(a => a.Id);
-        
+
+        }
     }
-}
 }

@@ -20,7 +20,11 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Queries.GetBo
             var booking = await _unitOfWork.Repository<DestinationBooking>().GenericEntitiesWithSpec(spec);
 
             if (booking == null)
-                return null;
+                throw new NotFoundException(nameof(DestinationBooking), request.Id);
+
+            // Non-admin users can only view their own bookings
+            if (!request.IsAdmin && booking.UserId != request.RequesterUserId)
+                throw new ForbiddenAccessException("You are not authorized to view this booking.");
 
             return _mapper.Map<DestinationBookingDto>(booking);
         

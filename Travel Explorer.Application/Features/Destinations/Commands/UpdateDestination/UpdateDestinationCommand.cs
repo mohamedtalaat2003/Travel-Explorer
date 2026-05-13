@@ -1,4 +1,6 @@
 
+using System.Text.Json.Serialization;
+
 namespace Travel_Explorer.Application.Features.Destinations.Commands.UpdateDestination
 {
     /// <summary>
@@ -6,9 +8,6 @@ namespace Travel_Explorer.Application.Features.Destinations.Commands.UpdateDesti
     /// Note: The Id can be bound from the route, while other properties come from the body.
     /// </summary>
     public record UpdateDestinationCommand(
-        [Required]
-        int Id,
-
         [Required(ErrorMessage = "Destination name is required")]
         [StringLength(200, MinimumLength = 3)]
         string Name,
@@ -27,5 +26,9 @@ namespace Travel_Explorer.Application.Features.Destinations.Commands.UpdateDesti
         List<string> ImageUrls,
 
         [Required]
-        int CategoryId) : IRequest<DestinationDto?>;
+        int CategoryId) : IRequest<DestinationDto?>
+    {
+        [JsonIgnore]
+        public int Id { get; set; }
+    }
 }

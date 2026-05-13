@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Travel_Explorer.Application.Features.Reviews.Commands.CreateReview;
 using Travel_Explorer.Application.Features.Reviews.Commands.DeleteReview;
 using Travel_Explorer.Application.Features.Reviews.Commands.UpdateReview;
@@ -9,7 +10,7 @@ namespace Travel_Explorer.Controllers
     /// Manages user reviews on destinations.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/Reviews")]
     [Produces("application/json")]
     public class ReviewsController : ControllerBase
     {
@@ -30,11 +31,8 @@ namespace Travel_Explorer.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _mediator.Send(new GetReviewByIdQuery(id));
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -50,8 +48,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Create([FromBody] CreateReviewCommand command)
         {
-            // TODO: Replace with actual authenticated user ID from JWT claims
-            command.UserId = 1; // Placeholder for now
+            var userId = GetCurrentUserId();
+            if (userId.HasValue)
+                command.UserId = userId.Value;
 
             var result = await _mediator.Send(command);
 
@@ -70,35 +69,42 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateReviewCommand command)
         {
-            // Ensure ID from URL matches the command ID
-            if (id != command.Id)
-                return BadRequest("ID mismatch between URL and body.");
+            var userId = GetCurrentUserId();
+
+            if (userId.HasValue) command.UserId = userId.Value; 
+
+            command.Id = id;
 
             var result = await _mediator.Send(command);
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
-        /// Soft-deletes a review.
+        /// Soft-deletes a review. Requires the Admin role.
         /// </summary>
         [HttpDelete("{id:int}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _mediator.Send(new DeleteReviewCommand(id));
-
-            if (!result)
-                return NotFound();
-
+            await _mediator.Send(new DeleteReviewCommand(id));
             return NoContent();
+
+        }
+
+        /// <summary>
+        /// Extracts the current user's ID from the JWT claims.
+        /// </summary>
+        private int? GetCurrentUserId()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+                return null;
+            return userId;
         }
     }
 }

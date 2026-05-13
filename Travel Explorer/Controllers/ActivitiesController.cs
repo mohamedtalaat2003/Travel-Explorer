@@ -10,8 +10,8 @@ namespace Travel_Explorer.Controllers
     /// Manages activity resources.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
-    [Produces("application/json")]
+    [Route("api/Activities")]
+    [Produces("application/json")] // response json only
     public class ActivitiesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -27,9 +27,9 @@ namespace Travel_Explorer.Controllers
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<ActivityDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int? destinationId)
         {
-            var result = await _mediator.Send(new GetAllActivitiesQuery());
+            var result = await _mediator.Send(new GetAllActivitiesQuery(destinationId));
             return Ok(result);
         }
 
@@ -43,11 +43,8 @@ namespace Travel_Explorer.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _mediator.Send(new GetActivityByIdQuery(id));
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -77,16 +74,12 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateActivityCommand command)
         {
-            // Ensure ID from URL matches the command ID
-            if (id != command.Id)
-                return BadRequest("ID mismatch between URL and body.");
+            // Set the ID from the URL directly into the command
+            command.Id = id;
 
             var result = await _mediator.Send(command);
-
-            if (result == null)
-                return NotFound();
-
             return Ok(result);
+
         }
 
         /// <summary>
@@ -100,12 +93,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _mediator.Send(new DeleteActivityCommand(id));
-
-            if (!result)
-                return NotFound();
-
+            await _mediator.Send(new DeleteActivityCommand(id));
             return NoContent();
+
         }
     }
 }

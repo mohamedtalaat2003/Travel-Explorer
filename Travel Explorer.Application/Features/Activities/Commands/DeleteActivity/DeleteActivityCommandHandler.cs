@@ -16,8 +16,8 @@ namespace Travel_Explorer.Application.Features.Activities.Commands.DeleteActivit
         {
             var activity = await _unitOfWork.Repository<Activity>().GetAsync(request.Id);
 
-            if (activity == null || activity.IsDeleted)
-                return false;
+            if (activity == null)
+                throw new NotFoundException(nameof(Activity), request.Id);
 
             activity.IsDeleted = true;
             activity.UpdatedAt = DateTime.UtcNow;

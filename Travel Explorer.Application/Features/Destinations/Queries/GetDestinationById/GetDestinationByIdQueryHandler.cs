@@ -20,7 +20,7 @@ namespace Travel_Explorer.Application.Features.Destinations.Queries.GetDestinati
             var destination = await _unitOfWork.Repository<Destination>().GenericEntitiesWithSpec(spec);
 
             if (destination == null)
-                return null;
+                throw new NotFoundException(nameof(Destination), request.Id);
 
             return _mapper.Map<DestinationDto>(destination);
         }

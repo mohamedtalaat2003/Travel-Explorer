@@ -20,7 +20,11 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Upda
             var booking = await _unitOfWork.Repository<DestinationBooking>().GenericEntitiesWithSpec(spec);
 
             if (booking == null)
-                return null;
+                throw new NotFoundException(nameof(DestinationBooking), request.Id);
+
+            // Only the booking owner can update notes
+            if (booking.UserId != request.UserId)
+                throw new ForbiddenAccessException("You are not authorized to update this booking.");
 
             booking.Notes = request.Notes;
             booking.UpdatedAt = DateTime.UtcNow;
