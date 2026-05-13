@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Travel_Explorer.Infrastructure.Data;
@@ -12,17 +11,21 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection"),
+                    configuration.GetConnectionString("DefaultConnection"), 
                     npgsqlOptions => {
+                        
                         npgsqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
                     }
                 )
             );
-          
+
+            
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            services.AddScoped(typeof(ISpecification<>), typeof(BaseSpecification<>));
+
+           
             return services;
         }
     }
