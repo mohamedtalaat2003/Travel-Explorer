@@ -1,5 +1,11 @@
+using Travel_Explorer.Application.DTOs.Blogs;
 using Travel_Explorer.Application.Features.Activities.Commands.CreateActivity;
 using Travel_Explorer.Application.Features.Activities.Commands.UpdateActivity;
+using Travel_Explorer.Application.Features.Blogs.Commands.Add;
+using Travel_Explorer.Application.Features.Blogs.Commands.Delete;
+using Travel_Explorer.Application.Features.Blogs.Commands.Update;
+using Travel_Explorer.Application.Features.Categories.Commands.Create;
+using Travel_Explorer.Application.Features.Categories.Commands.Update;
 using Travel_Explorer.Application.Features.DestinationBookings.Commands.CreateBooking;
 using Travel_Explorer.Application.Features.Destinations.Commands.CreateDestination;
 using Travel_Explorer.Application.Features.Destinations.Commands.UpdateDestination;
@@ -87,6 +93,18 @@ namespace Travel_Explorer.Application.Mapping
                 .ForMember(dest => dest.Destination, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
+
+            CreateMap<CreateBlogCommand, Blog>().ReverseMap();
+            CreateMap<UpdateBlogCommand, Blog>().ReverseMap();
+            CreateMap<BlogDto, Blog>().ReverseMap();
+            CreateMap<CreateBlogDto, Blog>().ReverseMap();
+            CreateMap<UpdateBlogDto, Blog>().ReverseMap();
+
+            CreateMap<CreateCategoryCommand, Category>().ReverseMap();
+            CreateMap<UpdateCategoryCommand, Category>().ReverseMap();
+            CreateMap<CategoryDto, Category>().ReverseMap();
+
+               
         }
 
     }

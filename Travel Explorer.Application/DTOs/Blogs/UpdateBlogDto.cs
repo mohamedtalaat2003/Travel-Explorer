@@ -13,6 +13,9 @@ namespace Travel_Explorer.Application.DTOs.Blogs
         [Required(ErrorMessage = "Content is required")]
         public string Content { get; set; }
 
+        public string AuthorId { get; set; }
+
+
         [StringLength(500)]
         public string ImageUrl { get; set; }
 

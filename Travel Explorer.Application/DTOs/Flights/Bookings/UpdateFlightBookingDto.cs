@@ -8,6 +8,6 @@ namespace Travel_Explorer.Application.DTOs.Flights.Bookings
         public int Id { get; set; }
 
         [Required]
-        public BookingStatus Status { get; set; }
+        public BookingStatus Status { get; set; } = BookingStatus.Pending;
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Travel_Explorer.Domain.Entities
@@ -34,6 +35,7 @@ namespace Travel_Explorer.Domain.Entities
         /// <summary>
         /// Foreign key to the user who authored this blog post.
         /// </summary>
+        [ForeignKey("Author")]
         public int AuthorId { get; set; }
 
         /// <summary>

@@ -26,7 +26,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
         public async Task<T> GenericEntitiesWithSpec(ISpecification<T> spec) => await ApplySpecification(spec).FirstOrDefaultAsync();
 
 
-        public async Task<IReadOnlyList<T>> GetAllAsync() => await _context.Set<T>().ToListAsync();
+        public async Task<IReadOnlyList<T>> GetAllAsync() => await _context.Set<T>().AsNoTracking().ToListAsync();
         public async Task<T> GetAsync(object id) => await _context.Set<T>().FindAsync(id);
         public void Update(T entity)
         {
@@ -34,7 +34,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
             _context.Entry(entity).State = EntityState.Modified;
         }
 
-        public async Task<IReadOnlyList<T>> ListSpecAsync(ISpecification<T> spec) => await ApplySpecification(spec).ToListAsync();
+        public async Task<IReadOnlyList<T>> ListSpecAsync(ISpecification<T> spec) => await ApplySpecification(spec).AsNoTracking().ToListAsync();
 
         /// <inheritdoc/>
         public async Task<int> CountAsync(ISpecification<T> spec)
