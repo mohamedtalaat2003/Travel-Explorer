@@ -1,4 +1,10 @@
-```yaml id="h72kd9"
+
+---
+
+# الملف لازم يكون كده فقط 👇
+
+:::writing{variant="standard" id="47281"}
+```yaml
 name: Sync Upstream
 
 on:
@@ -41,4 +47,3 @@ jobs:
 
       - name: Push changes
         run: git push origin master
-```
