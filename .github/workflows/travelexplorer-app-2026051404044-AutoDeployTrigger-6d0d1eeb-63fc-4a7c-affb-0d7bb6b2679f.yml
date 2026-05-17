@@ -42,5 +42,6 @@ jobs:
           containerAppName: travelexplorer-app-2026051404044
           resourceGroup: CarPrice_RG
           imageToBuild: carpriceacr2003.azurecr.io/travelexplorer-app-2026051404044:${{ github.sha }}
+          location: eastus
 
 
