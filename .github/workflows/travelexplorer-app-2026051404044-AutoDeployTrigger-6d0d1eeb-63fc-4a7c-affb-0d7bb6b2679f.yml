@@ -35,15 +35,12 @@ jobs:
         uses: azure/container-apps-deploy-action@v2
         with:
           appSourcePath: ${{ github.workspace }}
-          _dockerfilePathKey_: _dockerfilePath_
-          _targetLabelKey_: _targetLabel_
+          dockerfilePath: Dockerfile
           registryUrl: carpriceacr2003.azurecr.io
           registryUsername: ${{ secrets.TRAVELEXPLORERAPP2026051404044_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.TRAVELEXPLORERAPP2026051404044_REGISTRY_PASSWORD }}
           containerAppName: travelexplorer-app-2026051404044
           resourceGroup: CarPrice_RG
           imageToBuild: carpriceacr2003.azurecr.io/travelexplorer-app-2026051404044:${{ github.sha }}
-          _buildArgumentsKey_: |
-            _buildArgumentsValues_
 
 

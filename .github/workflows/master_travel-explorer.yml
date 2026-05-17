@@ -1,4 +1,3 @@
-```yaml
 name: Build and deploy ASP.Net Core app to Azure Web App - Travel-Explorer
 
 on:
@@ -65,4 +64,3 @@ jobs:
           app-name: 'Travel-Explorer'
           slot-name: 'Production'
           package: .
-```

@@ -1,16 +1,8 @@
-
----
-
-# الملف لازم يكون كده فقط 👇
-
-:::writing{variant="standard" id="47281"}
-```yaml
 name: Sync Upstream
 
 on:
   schedule:
     - cron: '0 * * * *'
-
   workflow_dispatch:
 
 jobs:
