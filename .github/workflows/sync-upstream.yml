@@ -1,0 +1,28 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour to check for new updates
+  workflow_dispatch: # Allows manual triggering from the Actions tab on GitHub
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Sync and Merge Upstream
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git remote add upstream https://github.com/Mw8969040/Travel-Explorer.git
+          git fetch upstream
+          git checkout master
+          git merge upstream/master -m "Auto-merge upstream changes" || git merge --abort
+          git push origin master
