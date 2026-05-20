@@ -3,6 +3,8 @@ namespace Travel_Explorer.Application.DTOs.Blogs
 {
     public class CreateBlogDto
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "Blog title is required")]
         [StringLength(250, MinimumLength = 5)]
         public string Title { get; set; }

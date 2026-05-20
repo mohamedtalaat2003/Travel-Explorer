@@ -1,17 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using System.Text;
 using Travel_Explorer.Infrastructure.Data;
 
 namespace Travel_Explorer.Infrastructure.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T>(ApplicationDbContext context) : IGenericRepository<T> where T : class
     {
-        private readonly ApplicationDbContext _context;
-
-        public GenericRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task AddAsync(T entity) => await _context.Set<T>().AddAsync(entity);
 

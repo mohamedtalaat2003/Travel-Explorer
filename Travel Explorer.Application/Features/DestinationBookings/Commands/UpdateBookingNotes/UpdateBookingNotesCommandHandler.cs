@@ -1,29 +1,22 @@
+using Travel_Explorer.Application.Common;
 
 namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.UpdateBookingNotes
 {
-    public class UpdateBookingNotesCommandHandler
-        : IRequestHandler<UpdateBookingNotesCommand, DestinationBookingDto?>
+    public class UpdateBookingNotesCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+                : IRequestHandler<UpdateBookingNotesCommand, DestinationBookingDto?>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public UpdateBookingNotesCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
+        private readonly ICurrentUserService _currentUserService = currentUserService;
 
         public async Task<DestinationBookingDto?> Handle(
             UpdateBookingNotesCommand request, CancellationToken cancellationToken)
         {
             var spec = new DestinationBookingSpecification(request.Id);
-            var booking = await _unitOfWork.Repository<DestinationBooking>().GenericEntitiesWithSpec(spec);
+            var booking = await _unitOfWork.Repository<DestinationBooking>().GenericEntitiesWithSpec(spec) ?? throw new NotFoundException(nameof(DestinationBooking), request.Id);
 
-            if (booking == null)
-                throw new NotFoundException(nameof(DestinationBooking), request.Id);
-
-            // Only the booking owner can update notes
-            if (booking.UserId != request.UserId)
+            // Only the booking owner or admin can update notes
+            if (!_currentUserService.IsAdmin && booking.UserId != _currentUserService.UserId)
                 throw new ForbiddenAccessException("You are not authorized to update this booking.");
 
             booking.Notes = request.Notes;

@@ -21,6 +21,7 @@ namespace Travel_Explorer.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -336,6 +337,12 @@ namespace Travel_Explorer.Infrastructure.Migrations
                     b.HasIndex("IsDeleted")
                         .HasDatabaseName("IX_blogs_IsDeleted");
 
+                    b.HasIndex("Title")
+                        .HasDatabaseName("IX_blogs_Title_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Title"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Title"), new[] { "gin_trgm_ops" });
+
                     b.ToTable("blogs", (string)null);
                 });
 
@@ -377,6 +384,11 @@ namespace Travel_Explorer.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("IX_categories_Name");
+
+                    b.HasIndex(new[] { "Name" }, "IX_categories_Name_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Name" }, "IX_categories_Name_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Name" }, "IX_categories_Name_trgm"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("categories", (string)null);
                 });
@@ -433,6 +445,26 @@ namespace Travel_Explorer.Infrastructure.Migrations
                         .HasDatabaseName("IX_ContactMessages_IsDeleted");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex(new[] { "Email" }, "IX_ContactMessages_Email_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Email" }, "IX_ContactMessages_Email_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Email" }, "IX_ContactMessages_Email_trgm"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex(new[] { "FullName" }, "IX_ContactMessages_FullName_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "FullName" }, "IX_ContactMessages_FullName_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "FullName" }, "IX_ContactMessages_FullName_trgm"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex(new[] { "Message" }, "IX_ContactMessages_Message_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Message" }, "IX_ContactMessages_Message_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Message" }, "IX_ContactMessages_Message_trgm"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex(new[] { "Subject" }, "IX_ContactMessages_Subject_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Subject" }, "IX_ContactMessages_Subject_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Subject" }, "IX_ContactMessages_Subject_trgm"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("contact_messages", (string)null);
                 });
@@ -493,8 +525,19 @@ namespace Travel_Explorer.Infrastructure.Migrations
                     b.HasIndex("IsDeleted")
                         .HasDatabaseName("IX_destinations_IsDeleted");
 
+                    b.HasIndex("Location")
+                        .HasDatabaseName("IX_destinations_Location_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Location"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Location"), new[] { "gin_trgm_ops" });
+
                     b.HasIndex("Name")
                         .HasDatabaseName("IX_destinations_Name");
+
+                    b.HasIndex(new[] { "Name" }, "IX_destinations_Name_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Name" }, "IX_destinations_Name_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Name" }, "IX_destinations_Name_trgm"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("destinations", (string)null);
                 });
@@ -640,7 +683,16 @@ namespace Travel_Explorer.Infrastructure.Migrations
                     b.Property<DateTime>("ArrivalTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("AvailableSeats")
+                    b.Property<int>("AvailableBusinessSeats")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AvailableEconomySeats")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AvailableFirstClassSeats")
+                        .IsConcurrencyToken()
                         .HasColumnType("integer");
 
                     b.Property<decimal>("BusinessPrice")
@@ -679,12 +731,22 @@ namespace Travel_Explorer.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ArrivalCity")
+                        .HasDatabaseName("IX_flightschedules_ArrivalCity_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("ArrivalCity"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("ArrivalCity"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("DepartureCity")
+                        .HasDatabaseName("IX_flightschedules_DepartureCity_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("DepartureCity"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("DepartureCity"), new[] { "gin_trgm_ops" });
+
                     b.HasIndex("FlightNumber")
-                        .IsUnique()
                         .HasDatabaseName("IX_flightschedules_FlightNumber");
 
                     b.HasIndex("IsDeleted")
-                        .IsUnique()
                         .HasDatabaseName("IX_flightschedules_IsDeleted");
 
                     b.ToTable("flight_schedules", (string)null);
@@ -773,6 +835,10 @@ namespace Travel_Explorer.Infrastructure.Migrations
 
                     b.Property<int>("DestinationId")
                         .HasColumnType("integer");
+
+                    b.Property<List<string>>("ImageUrls")
+                        .IsRequired()
+                        .HasColumnType("text[]");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");

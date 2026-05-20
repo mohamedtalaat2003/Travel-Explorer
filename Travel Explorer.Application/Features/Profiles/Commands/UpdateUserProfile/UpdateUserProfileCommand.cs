@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Travel_Explorer.Application.DTOs.Profiles;
 
 namespace Travel_Explorer.Application.Features.Profiles.Commands.UpdateUserProfile
@@ -12,9 +10,5 @@ namespace Travel_Explorer.Application.Features.Profiles.Commands.UpdateUserProfi
         string? Bio,
         string? AvatarUrl,
         string? Country,
-        DateTime? DateOfBirth) : IRequest<UserProfileDto?>
-    {
-        [JsonIgnore]
-        public int UserId { get; set; }
-    }
+        DateTime? DateOfBirth) : IRequest<UserProfileDto?>;
 }

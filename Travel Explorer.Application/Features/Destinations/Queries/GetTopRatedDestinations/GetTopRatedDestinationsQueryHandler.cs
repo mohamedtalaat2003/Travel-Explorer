@@ -1,17 +1,11 @@
 
 namespace Travel_Explorer.Application.Features.Destinations.Queries.GetTopRatedDestinations
 {
-    public class GetTopRatedDestinationsQueryHandler
-        : IRequestHandler<GetTopRatedDestinationsQuery, IReadOnlyList<DestinationDto>>
+    public class GetTopRatedDestinationsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+                : IRequestHandler<GetTopRatedDestinationsQuery, IReadOnlyList<DestinationDto>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public GetTopRatedDestinationsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<IReadOnlyList<DestinationDto>> Handle(
             GetTopRatedDestinationsQuery request, CancellationToken cancellationToken)

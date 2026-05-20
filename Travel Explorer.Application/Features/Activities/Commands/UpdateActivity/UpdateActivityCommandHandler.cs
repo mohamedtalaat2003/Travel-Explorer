@@ -1,27 +1,17 @@
 
 namespace Travel_Explorer.Application.Features.Activities.Commands.UpdateActivity
 {
-    public class UpdateActivityCommandHandler
-        : IRequestHandler<UpdateActivityCommand, ActivityDto?>
+    public class UpdateActivityCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+                : IRequestHandler<UpdateActivityCommand, ActivityDto?>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public UpdateActivityCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<ActivityDto?> Handle(
             UpdateActivityCommand request, CancellationToken cancellationToken)
         {
             var spec = new ActivitySpecification(request.Id);
-            var activity = await _unitOfWork.Repository<Activity>().GenericEntitiesWithSpec(spec);
-
-            if (activity == null)
-                throw new NotFoundException(nameof(Activity), request.Id);
-
+            var activity = await _unitOfWork.Repository<Activity>().GenericEntitiesWithSpec(spec) ?? throw new NotFoundException(nameof(Activity), request.Id);
             _mapper.Map(request, activity);
             activity.UpdatedAt = DateTime.UtcNow;
 

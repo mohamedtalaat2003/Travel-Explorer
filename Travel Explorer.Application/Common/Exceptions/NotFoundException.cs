@@ -1,10 +1,6 @@
 namespace Travel_Explorer.Application.Common.Exceptions
 {
-    public class NotFoundException : Exception
+    public class NotFoundException(string name, object key) : Exception($"Entity \"{name}\" ({key}) was not found.")
     {
-        public NotFoundException(string name, object key) 
-            : base($"Entity \"{name}\" ({key}) was not found.")
-        {
-        }
     }
 }

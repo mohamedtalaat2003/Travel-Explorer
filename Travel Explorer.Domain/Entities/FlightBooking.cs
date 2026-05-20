@@ -1,4 +1,3 @@
-using System.Text;
 using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Domain.Entities

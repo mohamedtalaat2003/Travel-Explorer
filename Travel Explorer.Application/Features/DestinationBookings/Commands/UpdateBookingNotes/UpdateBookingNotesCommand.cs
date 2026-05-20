@@ -11,8 +11,5 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Upda
     {
         [JsonIgnore]
         public int Id { get; set; }
-
-        [JsonIgnore]
-        public int UserId { get; set; }
     }
 }

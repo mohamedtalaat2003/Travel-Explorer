@@ -1,26 +1,15 @@
-using System.Security.Claims;
 using Travel_Explorer.Application.DTOs.ContactMessage;
 
 namespace Travel_Explorer.Application.Features.ContactMessages.MarkAsRead
 {
-    public class MarkAsReadCommandHandler : IRequestHandler<MarkAsReadCommand, ContactMessageDto>
+    public class MarkAsReadCommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<MarkAsReadCommand, ContactMessageDto>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        public MarkAsReadCommandHandler(IUnitOfWork unitOfWork , IMapper mapper)
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
+
+        public async Task<ContactMessageDto> Handle(MarkAsReadCommand request, CancellationToken cancellationToken)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-
-        }
-
-        public async Task<ContactMessageDto?> Handle(MarkAsReadCommand request, CancellationToken cancellationToken)
-        {
-            var message = await _unitOfWork.Repository<ContactMessage>().GetAsync(request.Id);
-
-            if (message == null)
-                throw new NotFoundException(nameof(ContactMessage), request.Id);
-
+            var message = await _unitOfWork.Repository<ContactMessage>().GetAsync(request.Id) ?? throw new NotFoundException(nameof(ContactMessage), request.Id);
             message.IsRead = true;
             _unitOfWork.Repository<ContactMessage>().Update(message);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

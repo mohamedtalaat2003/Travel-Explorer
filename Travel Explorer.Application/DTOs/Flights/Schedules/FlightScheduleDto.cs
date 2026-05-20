@@ -12,6 +12,8 @@ namespace Travel_Explorer.Application.DTOs.Flights.Schedules
         public decimal EconomyPrice { get; set; }
         public decimal BusinessPrice { get; set; }
         public decimal FirstClassPrice { get; set; }
-        public int AvailableSeats { get; set; }
+        public int AvailableEconomySeats { get; set; }
+        public int AvailableBusinessSeats { get; set; }
+        public int AvailableFirstClassSeats { get; set; }
     }
 }

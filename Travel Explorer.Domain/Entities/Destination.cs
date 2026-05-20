@@ -40,7 +40,7 @@ namespace Travel_Explorer.Domain.Entities
         /// <summary>
         /// Collection of image URLs for the destination gallery.
         /// </summary>
-        public List<string> ImageUrls { get; set; } = new List<string>();
+        public List<string> ImageUrls { get; set; } = [];
 
         // ===== Foreign Keys =====
 

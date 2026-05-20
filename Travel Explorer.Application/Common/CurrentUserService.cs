@@ -1,28 +1,26 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Travel_Explorer.Application.Common
 {
-    public class CurrentUserService : ICurrentUserService
+    public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        public int? UserId { get
+        public int? UserId 
+        { 
+            get
             {
                 var id = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                return int.TryParse(id, out var userId)
-                ? userId
-                : null;
+                return int.TryParse(id, out var userId) ? userId : null;
+            }
+        }
+
+        public bool IsAdmin
+        {
+            get
+            {
+                return _httpContextAccessor.HttpContext?.User.IsInRole("Admin") ?? false;
             }
         }
     }

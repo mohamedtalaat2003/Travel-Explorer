@@ -2,17 +2,11 @@ using Travel_Explorer.Application.Features.Reviews;
 
 namespace Travel_Explorer.Application.Features.Destinations.Queries.GetDestinationReviews
 {
-    public class GetDestinationReviewsQueryHandler
-        : IRequestHandler<GetDestinationReviewsQuery, IReadOnlyList<ReviewDto>>
+    public class GetDestinationReviewsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+                : IRequestHandler<GetDestinationReviewsQuery, IReadOnlyList<ReviewDto>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public GetDestinationReviewsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<IReadOnlyList<ReviewDto>> Handle(
             GetDestinationReviewsQuery request, CancellationToken cancellationToken)
