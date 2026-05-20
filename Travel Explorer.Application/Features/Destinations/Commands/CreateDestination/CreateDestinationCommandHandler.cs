@@ -1,17 +1,11 @@
 
 namespace Travel_Explorer.Application.Features.Destinations.Commands.CreateDestination
 {
-    public class CreateDestinationCommandHandler
-        : IRequestHandler<CreateDestinationCommand, DestinationDto>
+    public class CreateDestinationCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+                : IRequestHandler<CreateDestinationCommand, DestinationDto>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public CreateDestinationCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<DestinationDto> Handle(
             CreateDestinationCommand request, CancellationToken cancellationToken)

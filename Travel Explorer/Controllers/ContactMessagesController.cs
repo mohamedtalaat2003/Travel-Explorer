@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using Travel_Explorer.Application.Common;
+using Travel_Explorer.Application.Common.Parameters;
 using Travel_Explorer.Application.DTOs.ContactMessage;
 using Travel_Explorer.Application.Features.ContactMessages.CreateContactMessage;
 using Travel_Explorer.Application.Features.ContactMessages.GetAllContactMessages;
@@ -15,33 +15,21 @@ namespace Travel_Explorer.Controllers
     [ApiController]
     [Route("api/ContactMessages")]
     [Produces("application/json")]
-    public class ContactMessagesController : ControllerBase
+    public class ContactMessagesController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public ContactMessagesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        private readonly IMediator _mediator = mediator;
 
         /// <summary>
         /// Retrieves a paginated list of all contact messages. Supports filtering by read status.
         /// Requires Admin role.
         /// </summary>
-        
+
         [HttpGet]
         [Authorize]
         [ProducesResponseType(typeof(PaginatedResult<ContactMessageDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll(
-            [FromQuery] int pageNumber = 1, 
-            [FromQuery] int pageSize = 10, 
-            [FromQuery] bool? isRead = null)
+        public async Task<IActionResult> GetAll([FromQuery] ContactMessageSpecParams p)
         {
-            var currentUserId = GetCurrentUserId();
-
-            bool isAdmin = User.IsInRole("Admin");
-
-            var result = await _mediator.Send(new GetAllContactMessagesQuery(pageNumber, pageSize, isRead,isAdmin? null :currentUserId));
+            var result = await _mediator.Send(new GetAllContactMessagesQuery(p));
             return Ok(result);
         }
 
@@ -55,12 +43,7 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetMessage(int id)
         {
-            
-            var currentUserId = GetCurrentUserId();
-
-            bool isAdmin = User.IsInRole("Admin");
-
-            var result = await _mediator.Send(new GetContactMessageByIdQuery(id, isAdmin ? null : currentUserId));
+            var result = await _mediator.Send(new GetContactMessageByIdQuery(id));
             return Ok(result);
 
         }
@@ -74,11 +57,6 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(typeof(ContactMessageDto), StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] CreateContactMessageCommand command)
         {
-            // Attach UserId if the sender is authenticated
-            var userId = GetCurrentUserId();
-            if (userId.HasValue)
-                command = command with { UserId = userId.Value };
-
             var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetMessage), new { id = result.Id }, result);
         }
@@ -110,17 +88,6 @@ namespace Travel_Explorer.Controllers
             await _mediator.Send(new DeleteContactMessageCommand(id));
             return NoContent();
 
-        }
-
-        /// <summary>
-        /// Extracts the current user's ID from the JWT claims.
-        /// </summary>
-        private int? GetCurrentUserId()
-        {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
-                return null;
-            return userId;
         }
     }
 }

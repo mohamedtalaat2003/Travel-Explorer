@@ -1,6 +1,4 @@
-﻿using Travel_Explorer.Domain.Enums;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>

@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>

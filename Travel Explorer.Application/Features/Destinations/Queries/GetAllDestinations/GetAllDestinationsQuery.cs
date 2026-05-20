@@ -1,12 +1,10 @@
 using Travel_Explorer.Application.Common;
+using Travel_Explorer.Application.Common.Parameters;
 
 namespace Travel_Explorer.Application.Features.Destinations.Queries.GetAllDestinations
 {
-
     /// <summary>
-    /// Returns a paginated list of all active destinations.
+    /// Returns a paginated, optionally filtered list of destinations.
     /// </summary>
-    public record GetAllDestinationsQuery(int PageNumber = 1, int PageSize = 10)
-        : IRequest<PaginatedResult<DestinationDto>>;
-
+    public record GetAllDestinationsQuery(DestinationSpecParams Params) : IRequest<PaginatedResult<DestinationDto>>;
 }

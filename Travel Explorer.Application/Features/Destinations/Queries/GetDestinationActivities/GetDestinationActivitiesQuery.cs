@@ -1,5 +1,3 @@
-using Travel_Explorer.Application.Features.Activities;
-
 namespace Travel_Explorer.Application.Features.Destinations.Queries.GetDestinationActivities
 {
 

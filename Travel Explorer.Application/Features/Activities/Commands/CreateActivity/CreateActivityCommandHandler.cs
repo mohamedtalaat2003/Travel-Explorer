@@ -1,17 +1,11 @@
 
 namespace Travel_Explorer.Application.Features.Activities.Commands.CreateActivity
 {
-    public class CreateActivityCommandHandler
-        : IRequestHandler<CreateActivityCommand, ActivityDto>
+    public class CreateActivityCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+                : IRequestHandler<CreateActivityCommand, ActivityDto>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public CreateActivityCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<ActivityDto> Handle(
             CreateActivityCommand request, CancellationToken cancellationToken)

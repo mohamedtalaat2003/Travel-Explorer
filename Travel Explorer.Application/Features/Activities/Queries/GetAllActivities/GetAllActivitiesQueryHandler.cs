@@ -1,17 +1,11 @@
 
 namespace Travel_Explorer.Application.Features.Activities.Queries.GetAllActivities
 {
-    public class GetAllActivitiesQueryHandler
-        : IRequestHandler<GetAllActivitiesQuery, IReadOnlyList<ActivityDto>>
+    public class GetAllActivitiesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+                : IRequestHandler<GetAllActivitiesQuery, IReadOnlyList<ActivityDto>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public GetAllActivitiesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<IReadOnlyList<ActivityDto>> Handle(
             GetAllActivitiesQuery request, CancellationToken cancellationToken)

@@ -13,7 +13,7 @@ namespace Travel_Explorer.Domain.Common
         
         public Expression<Func<T, bool>> Criteria { get; private set; }
 
-        public List<Expression<Func<T, object>>> Includes { get; } = new List<Expression<Func<T, object>>>(); 
+        public List<Expression<Func<T, object>>> Includes { get; } = []; 
 
         public Expression<Func<T, object>> OrderBy { get; private set; }
 

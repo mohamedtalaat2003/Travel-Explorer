@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Travel_Explorer.Application.Features.Reviews.Commands.CreateReview;
 using Travel_Explorer.Application.Features.Reviews.Commands.DeleteReview;
 using Travel_Explorer.Application.Features.Reviews.Commands.UpdateReview;
@@ -12,14 +11,9 @@ namespace Travel_Explorer.Controllers
     [ApiController]
     [Route("api/Reviews")]
     [Produces("application/json")]
-    public class ReviewsController : ControllerBase
+    public class ReviewsController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public ReviewsController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        private readonly IMediator _mediator = mediator;
 
         /// <summary>
         /// Returns a single review by its ID.
@@ -48,12 +42,7 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Create([FromBody] CreateReviewCommand command)
         {
-            var userId = GetCurrentUserId();
-            if (userId.HasValue)
-                command.UserId = userId.Value;
-
             var result = await _mediator.Send(command);
-
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
@@ -69,15 +58,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateReviewCommand command)
         {
-            var userId = GetCurrentUserId();
-
-            if (userId.HasValue) command.UserId = userId.Value; 
-
             command.Id = id;
-
             var result = await _mediator.Send(command);
             return Ok(result);
-
         }
 
         /// <summary>
@@ -93,18 +76,6 @@ namespace Travel_Explorer.Controllers
         {
             await _mediator.Send(new DeleteReviewCommand(id));
             return NoContent();
-
-        }
-
-        /// <summary>
-        /// Extracts the current user's ID from the JWT claims.
-        /// </summary>
-        private int? GetCurrentUserId()
-        {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
-                return null;
-            return userId;
         }
     }
 }

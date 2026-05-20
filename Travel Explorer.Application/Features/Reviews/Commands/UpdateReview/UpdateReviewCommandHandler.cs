@@ -1,29 +1,22 @@
+using Travel_Explorer.Application.Common;
 
 namespace Travel_Explorer.Application.Features.Reviews.Commands.UpdateReview
 {
-    public class UpdateReviewCommandHandler
-        : IRequestHandler<UpdateReviewCommand, ReviewDto?>
+    public class UpdateReviewCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+                : IRequestHandler<UpdateReviewCommand, ReviewDto?>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public UpdateReviewCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
+        private readonly ICurrentUserService _currentUserService = currentUserService;
 
         public async Task<ReviewDto?> Handle(
             UpdateReviewCommand request, CancellationToken cancellationToken)
         {
             var spec = new ReviewSpecification(request.Id);
-            var review = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(spec);
+            var review = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(spec) ?? throw new NotFoundException(nameof(Review), request.Id);
 
-            if (review == null)
-                throw new NotFoundException(nameof(Review), request.Id);
-
-            // Only the review owner can update it
-            if (review.UserId != request.UserId)
+            // Only the review owner or an admin can update it
+            if (!_currentUserService.IsAdmin && review.UserId != _currentUserService.UserId)
                 throw new ForbiddenAccessException("You are not authorized to update this review.");
 
             _mapper.Map(request, review);

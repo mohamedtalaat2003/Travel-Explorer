@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Travel_Explorer.Application.Common.Parameters;
+
 namespace Travel_Explorer.Application.Features.ContactMessages
 {
     public class ContactMessageSpecification : BaseSpecification<ContactMessage>
@@ -7,18 +10,25 @@ namespace Travel_Explorer.Application.Features.ContactMessages
             AddInclude(C => C.User!);
         }
 
-        public ContactMessageSpecification(int? pageNumber = null, int? pageSize = null, bool? isRead = null, int? userId = null) : base()
+        public ContactMessageSpecification(ContactMessageSpecParams p, int? userId = null) : base()
         {
-            if (isRead.HasValue)
-                AddCriteria(C => C.IsRead == isRead.Value);
+            if (p.IsRead.HasValue)
+                AddCriteria(C => C.IsRead == p.IsRead.Value);
 
             if (userId.HasValue)
                 AddCriteria(C => C.UserId == userId.Value);
 
+            if (!string.IsNullOrWhiteSpace(p.Keyword))
+            {
+                var pattern = $"%{p.Keyword}%";
+                AddCriteria(C => EF.Functions.ILike(C.FullName, pattern)
+                              || EF.Functions.ILike(C.Email, pattern)
+                              || EF.Functions.ILike(C.Subject, pattern)
+                              || EF.Functions.ILike(C.Message, pattern));
+            }
+
             AddOrderByDescending(C => C.CreatedAt);
-            
-            if (pageNumber.HasValue && pageSize.HasValue)
-                ApplyPaging((pageNumber.Value - 1) * pageSize.Value, pageSize.Value);
+            ApplyPaging((p.PageNumber - 1) * p.PageSize, p.PageSize);
         }
     }
 }
