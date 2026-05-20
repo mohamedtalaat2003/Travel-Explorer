@@ -21,6 +21,7 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
 
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IJwtAuthService, JwtAuthService>();
 
             
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

@@ -32,6 +32,12 @@ namespace Travel_Explorer.Domain.Entities
         /// </summary>
         public bool IsDeleted { get; set; } = false;
 
+        public string Role { get; set; }
+        public string? RefreshToken { get; set; }
+       public DateTime? RefreshTokenExpiryTime { get; set; }
+       // Navigation property - supports multiple active sessions (multi-device)
+       public ICollection<UserRefreshToken> RefreshTokens { get; set; } = new List<UserRefreshToken>();
+
         // ===== Navigation Properties =====
 
         /// <summary>

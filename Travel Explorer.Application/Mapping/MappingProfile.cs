@@ -15,6 +15,7 @@ using Travel_Explorer.Application.Features.ContactMessages.CreateContactMessage;
 using Travel_Explorer.Application.DTOs.ContactMessage;
 using Travel_Explorer.Application.DTOs.Profiles;
 using Travel_Explorer.Application.Features.Profiles.Commands.UpdateUserProfile;
+using Travel_Explorer.Application.DTOs.Users;
 
 namespace Travel_Explorer.Application.Mapping
 {
@@ -95,6 +96,9 @@ namespace Travel_Explorer.Application.Mapping
             CreateMap<UpdateUserProfileCommand, ApplicationUser>()
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<RegisterDto, ApplicationUser>().ReverseMap();
+            CreateMap<LoginDto, ApplicationUser>().ReverseMap();
         }
 
     }

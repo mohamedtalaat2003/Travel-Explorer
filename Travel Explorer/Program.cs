@@ -39,7 +39,7 @@ namespace Travel_Explorer
                         System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "YourSecretKeyHere_MustBeAtLeast32CharsLong!"))
                 };
             });
-
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddAuthorization();
 
             var app = builder.Build();

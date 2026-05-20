@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Travel_Explorer.Application.Common;
 
 namespace Travel_Explorer.Application.DependencyInjection
 {
@@ -10,6 +11,7 @@ namespace Travel_Explorer.Application.DependencyInjection
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
             services.AddAutoMapper(assembly);
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             return services;
         }

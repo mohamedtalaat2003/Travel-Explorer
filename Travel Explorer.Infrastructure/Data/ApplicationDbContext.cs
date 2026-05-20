@@ -22,6 +22,7 @@ namespace Travel_Explorer.Infrastructure.Data
         public DbSet<FlightBooking> FlightBookings { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<ContactMessage> ContactMessages { get; set; }
+        public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
