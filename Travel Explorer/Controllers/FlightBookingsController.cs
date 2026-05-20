@@ -15,7 +15,7 @@ namespace Travel_Explorer.Controllers
     /// Manages flight booking operations.
     /// </summary>
     [ApiController]
-    [Route("api/flight-bookings")]
+    [Route("api/FlightBookings")]
     [Produces("application/json")]
     public class FlightBookingsController(IMediator mediator) : ControllerBase
     {
