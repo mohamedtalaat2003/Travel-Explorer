@@ -25,10 +25,4 @@ namespace Travel_Explorer.Domain.Enums
         FirstClass = 3
     }
 
-    public enum UserRole
-    {
-        Admin = 1,
-        Traveler = 2,
-        Author = 3 // ??? Blog
-    }
 }
