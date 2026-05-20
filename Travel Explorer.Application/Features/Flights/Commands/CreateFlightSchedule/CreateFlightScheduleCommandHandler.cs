@@ -1,3 +1,4 @@
+
 using Travel_Explorer.Application.DTOs.Flights.Schedules;
 
 namespace Travel_Explorer.Application.Features.Flights.Commands.CreateFlightSchedule
@@ -9,12 +10,12 @@ namespace Travel_Explorer.Application.Features.Flights.Commands.CreateFlightSche
 
         public async Task<FlightScheduleDto> Handle(CreateFlightScheduleCommand request, CancellationToken cancellationToken)
         {
-            if (request.Dto.ArrivalTime <= request.Dto.DepartureTime)
+            if (request.ArrivalTime <= request.DepartureTime)
             {
                 throw new BadRequestException("Arrival time must be after departure time.");
             }
 
-            var flightSchedule = _mapper.Map<FlightSchedule>(request.Dto);
+            var flightSchedule = _mapper.Map<FlightSchedule>(request);
             flightSchedule.CreatedAt = DateTime.UtcNow;
 
             await _unitOfWork.Repository<FlightSchedule>().AddAsync(flightSchedule);

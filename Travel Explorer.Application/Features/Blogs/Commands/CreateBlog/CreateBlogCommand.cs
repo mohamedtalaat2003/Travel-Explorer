@@ -8,5 +8,5 @@ namespace Travel_Explorer.Application.Features.Blogs.Commands.CreateBlog
         string ImageUrl,
         bool IsPublished,
         int? CategoryId
-    ) : IRequest<CreateBlogDto>;
+    ) : IRequest<BlogDto>;
 }

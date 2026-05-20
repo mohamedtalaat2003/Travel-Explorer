@@ -1,6 +1,7 @@
 using Travel_Explorer.Application.Common;
 using Travel_Explorer.Application.Common.Parameters;
 using Travel_Explorer.Application.DTOs.Flights.Schedules;
+
 using Travel_Explorer.Application.Features.Flights.Queries.GetAllFlightSchedules;
 using Travel_Explorer.Application.Features.Flights.Queries.GetFlightScheduleById;
 using Travel_Explorer.Application.Features.Flights.Commands.CreateFlightSchedule;
@@ -51,9 +52,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Create([FromBody] CreateFlightScheduleDto dto)
+        public async Task<IActionResult> Create([FromBody] CreateFlightScheduleCommand command)
         {
-            var result = await _mediator.Send(new CreateFlightScheduleCommand(dto));
+            var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
@@ -67,9 +68,10 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateFlightScheduleDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateFlightScheduleCommand command)
         {
-            var result = await _mediator.Send(new UpdateFlightScheduleCommand(id, dto));
+            command.Id = id;
+            var result = await _mediator.Send(command);
             return Ok(result);
         }
 
