@@ -1,6 +1,7 @@
 using Travel_Explorer.Application.Common;
 using Travel_Explorer.Application.Common.Parameters;
 using Travel_Explorer.Application.DTOs.Flights.Bookings;
+
 using Travel_Explorer.Application.Features.FlightBookings.Queries.GetAllFlightBookings;
 using Travel_Explorer.Application.Features.FlightBookings.Queries.GetMyFlightBookings;
 using Travel_Explorer.Application.Features.FlightBookings.Queries.GetFlightBookingById;
@@ -72,9 +73,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Create([FromBody] CreateFlightBookingDto dto)
+        public async Task<IActionResult> Create([FromBody] CreateFlightBookingCommand command)
         {
-            var result = await _mediator.Send(new CreateFlightBookingCommand(dto));
+            var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 

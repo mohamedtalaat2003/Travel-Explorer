@@ -48,7 +48,7 @@ namespace Travel_Explorer.Controllers
         /// </summary>
         [HttpPost]
         [Authorize(Roles = "Author")]
-        [ProducesResponseType(typeof(CreateBlogDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BlogDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -63,7 +63,7 @@ namespace Travel_Explorer.Controllers
         /// </summary>
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Author")]
-        [ProducesResponseType(typeof(UpdateBlogDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BlogDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

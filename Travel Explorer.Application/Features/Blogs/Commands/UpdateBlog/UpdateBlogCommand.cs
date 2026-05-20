@@ -9,5 +9,5 @@ namespace Travel_Explorer.Application.Features.Blogs.Commands.UpdateBlog
         string ImageUrl,
         bool IsPublished,
         int? CategoryId
-    ) : IRequest<UpdateBlogDto>;
+    ) : IRequest<BlogDto>;
 }

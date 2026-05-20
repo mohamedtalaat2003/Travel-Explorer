@@ -1,6 +1,6 @@
+using Travel_Explorer.Application.DTOs.Flights.Bookings;
 using Microsoft.EntityFrameworkCore;
 using Travel_Explorer.Application.Common;
-using Travel_Explorer.Application.DTOs.Flights.Bookings;
 using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFlightBooking
@@ -13,39 +13,39 @@ namespace Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFli
 
         public async Task<FlightBookingDto> Handle(CreateFlightBookingCommand request, CancellationToken cancellationToken)
         {
-            var flightSchedule = await _unitOfWork.Repository<FlightSchedule>().GetAsync(request.Dto.FlightScheduleId) ?? throw new NotFoundException(nameof(FlightSchedule), request.Dto.FlightScheduleId);
+            var flightSchedule = await _unitOfWork.Repository<FlightSchedule>().GetAsync(request.FlightScheduleId) ?? throw new NotFoundException(nameof(FlightSchedule), request.FlightScheduleId);
             decimal ticketPrice;
 
-            switch (request.Dto.Class)
+            switch (request.Class)
             {
                 case FlightClass.Economy:
-                    if (flightSchedule.AvailableEconomySeats < request.Dto.NumberOfPassengers)
+                    if (flightSchedule.AvailableEconomySeats < request.NumberOfPassengers)
                         throw new BadRequestException("Not enough Economy seats available on this flight.");
                     ticketPrice = flightSchedule.EconomyPrice;
-                    flightSchedule.AvailableEconomySeats -= request.Dto.NumberOfPassengers;
+                    flightSchedule.AvailableEconomySeats -= request.NumberOfPassengers;
                     break;
 
                 case FlightClass.Business:
-                    if (flightSchedule.AvailableBusinessSeats < request.Dto.NumberOfPassengers)
+                    if (flightSchedule.AvailableBusinessSeats < request.NumberOfPassengers)
                         throw new BadRequestException("Not enough Business seats available on this flight.");
                     ticketPrice = flightSchedule.BusinessPrice;
-                    flightSchedule.AvailableBusinessSeats -= request.Dto.NumberOfPassengers;
+                    flightSchedule.AvailableBusinessSeats -= request.NumberOfPassengers;
                     break;
 
                 case FlightClass.FirstClass:
-                    if (flightSchedule.AvailableFirstClassSeats < request.Dto.NumberOfPassengers)
+                    if (flightSchedule.AvailableFirstClassSeats < request.NumberOfPassengers)
                         throw new BadRequestException("Not enough First Class seats available on this flight.");
                     ticketPrice = flightSchedule.FirstClassPrice;
-                    flightSchedule.AvailableFirstClassSeats -= request.Dto.NumberOfPassengers;
+                    flightSchedule.AvailableFirstClassSeats -= request.NumberOfPassengers;
                     break;
 
                 default:
                     throw new BadRequestException("Invalid flight class.");
             }
 
-            decimal totalPrice = ticketPrice * request.Dto.NumberOfPassengers;
+            decimal totalPrice = ticketPrice * request.NumberOfPassengers;
 
-            var booking = _mapper.Map<FlightBooking>(request.Dto);
+            var booking = _mapper.Map<FlightBooking>(request);
             booking.UserId = _currentUserService.UserId ?? 0;
             booking.TotalPrice = totalPrice;
             booking.Status = BookingStatus.Pending;

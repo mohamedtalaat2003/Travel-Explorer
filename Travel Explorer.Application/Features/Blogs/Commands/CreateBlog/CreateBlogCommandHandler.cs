@@ -3,13 +3,13 @@ using Travel_Explorer.Application.DTOs.Blogs;
 
 namespace Travel_Explorer.Application.Features.Blogs.Commands.CreateBlog
 {
-    public class CreateBlogCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService) : IRequestHandler<CreateBlogCommand, CreateBlogDto>
+    public class CreateBlogCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService) : IRequestHandler<CreateBlogCommand, BlogDto>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
         private readonly ICurrentUserService _currentUserService = currentUserService;
 
-        public async Task<CreateBlogDto> Handle(CreateBlogCommand request, CancellationToken cancellationToken)
+        public async Task<BlogDto> Handle(CreateBlogCommand request, CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
@@ -24,7 +24,7 @@ namespace Travel_Explorer.Application.Features.Blogs.Commands.CreateBlog
             var spec = new BlogSpecification(blog.Id);
             var loaded = await _unitOfWork.Repository<Blog>().GenericEntitiesWithSpec(spec);
 
-            return _mapper.Map<CreateBlogDto>(loaded);
+            return _mapper.Map<BlogDto>(loaded);
         }
     }
 }

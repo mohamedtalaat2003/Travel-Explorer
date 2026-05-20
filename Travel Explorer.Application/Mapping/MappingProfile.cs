@@ -16,6 +16,9 @@ using Travel_Explorer.Application.DTOs.Profiles;
 using Travel_Explorer.Application.Features.Profiles.Commands.UpdateUserProfile;
 using Travel_Explorer.Application.DTOs.Flights.Schedules;
 using Travel_Explorer.Application.DTOs.Flights.Bookings;
+using Travel_Explorer.Application.Features.Flights.Commands.CreateFlightSchedule;
+using Travel_Explorer.Application.Features.Flights.Commands.UpdateFlightSchedule;
+using Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFlightBooking;
 
 namespace Travel_Explorer.Application.Mapping
 {
@@ -110,8 +113,6 @@ namespace Travel_Explorer.Application.Mapping
 
             // ─── Blog ───────────────────────────────────────────────────────
             CreateMap<Blog, BlogDto>();
-            CreateMap<Blog, CreateBlogDto>();
-            CreateMap<Blog, UpdateBlogDto>();
             CreateMap<CreateBlogCommand, Blog>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
             CreateMap<UpdateBlogCommand, Blog>()
@@ -122,8 +123,8 @@ namespace Travel_Explorer.Application.Mapping
             // ─── Flights (Schedules) ─────────────────────────────────────────
             CreateMap<FlightSchedule, FlightScheduleDto>();
             CreateMap<FlightScheduleDto, FlightSchedule>();
-            CreateMap<CreateFlightScheduleDto, FlightSchedule>();
-            CreateMap<UpdateFlightScheduleDto, FlightSchedule>()
+            CreateMap<CreateFlightScheduleCommand, FlightSchedule>();
+            CreateMap<UpdateFlightScheduleCommand, FlightSchedule>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
@@ -138,10 +139,7 @@ namespace Travel_Explorer.Application.Mapping
                 .ForMember(dest => dest.DepartureTime,
                     opt => opt.MapFrom(src => src.FlightSchedule != null ? src.FlightSchedule.DepartureTime : default));
 
-            CreateMap<CreateFlightBookingDto, FlightBooking>();
-            CreateMap<UpdateFlightBookingDto, FlightBooking>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<CreateFlightBookingCommand, FlightBooking>();
         }
 
     }

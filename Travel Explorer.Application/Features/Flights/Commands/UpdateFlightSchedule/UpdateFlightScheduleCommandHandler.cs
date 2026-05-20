@@ -1,3 +1,4 @@
+
 using Travel_Explorer.Application.DTOs.Flights.Schedules;
 
 namespace Travel_Explorer.Application.Features.Flights.Commands.UpdateFlightSchedule
@@ -9,19 +10,14 @@ namespace Travel_Explorer.Application.Features.Flights.Commands.UpdateFlightSche
 
         public async Task<FlightScheduleDto> Handle(UpdateFlightScheduleCommand request, CancellationToken cancellationToken)
         {
-            if (request.Id != request.Dto.Id)
-            {
-                throw new BadRequestException("ID mismatch between route parameters and body.");
-            }
-
             var spec = new FlightScheduleSpecification(request.Id);
             var flightSchedule = await _unitOfWork.Repository<FlightSchedule>().GenericEntitiesWithSpec(spec) ?? throw new NotFoundException(nameof(FlightSchedule), request.Id);
-            if (request.Dto.ArrivalTime <= request.Dto.DepartureTime)
+            if (request.ArrivalTime <= request.DepartureTime)
             {
                 throw new BadRequestException("Arrival time must be after departure time.");
             }
 
-            _mapper.Map(request.Dto, flightSchedule);
+            _mapper.Map(request, flightSchedule);
             flightSchedule.UpdatedAt = DateTime.UtcNow;
 
             _unitOfWork.Repository<FlightSchedule>().Update(flightSchedule);
