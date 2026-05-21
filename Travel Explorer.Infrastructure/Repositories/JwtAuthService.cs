@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Travel_Explorer.Application.DTOs;
 using Travel_Explorer.Application.DTOs.Account;
 using Travel_Explorer.Application.DTOs.Users;
 using Travel_Explorer.Application.Services;
@@ -69,6 +70,18 @@ namespace Travel_Explorer.Infrastructure.Repositories
             }
 
             //var token = JwtTokenGenerator.GenerateToken(user, jwtSettings);
+            return await CreateToken(user);
+        }
+
+        public async Task<string> AssignUserAsync(AssignRoleDto request)
+        {
+            var user = await _context.Users.FindAsync(request.userId);
+
+            if (user is null) return null;
+
+            user.Role = request.newRole;
+            await _context.SaveChangesAsync();
+
             return await CreateToken(user);
         }
 

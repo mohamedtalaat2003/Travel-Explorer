@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Travel_Explorer.Application.DTOs;
 using Travel_Explorer.Application.DTOs.Account;
 using Travel_Explorer.Application.DTOs.Users;
 using Travel_Explorer.Domain.Entities;
@@ -17,6 +18,7 @@ namespace Travel_Explorer.Domain.Interfaces
         public Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request);
 
 
+        public Task<string> AssignUserAsync(AssignRoleDto request);
 
 
 

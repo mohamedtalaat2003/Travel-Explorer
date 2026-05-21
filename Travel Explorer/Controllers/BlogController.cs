@@ -14,7 +14,7 @@ using Travel_Explorer.Domain.Interfaces;
 
 namespace Travel_Explorer.Controllers
 {
-    [Authorize(Roles = "Author")]
+    [Authorize(Roles = "Author,Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class BlogController : ControllerBase
@@ -79,7 +79,7 @@ namespace Travel_Explorer.Controllers
             if (result.Items.Count <= 0) return NotFound("No blogs found.");
             return Ok(result);
         }
-
+        [AllowAnonymous]
         [HttpGet("search")]
         public ActionResult Search([FromQuery]int? AuthorId ,[FromQuery] int? CategoryId)
         {

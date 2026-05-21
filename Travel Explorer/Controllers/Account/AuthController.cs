@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Travel_Explorer.Application.DTOs;
 using Travel_Explorer.Application.DTOs.Account;
 using Travel_Explorer.Application.DTOs.Users;
 using Travel_Explorer.Domain.Entities;
@@ -11,6 +12,7 @@ namespace Travel_Explorer.Controllers.Account
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class AuthController(IJwtAuthService _jwtAuthService, IMapper _mapper) : ControllerBase
     {
         [HttpPost("register")]
@@ -61,6 +63,17 @@ namespace Travel_Explorer.Controllers.Account
             return Ok("Logged out successfully.");
         }
 
+        [Authorize(Roles ="Admin")]
+        [HttpPost("assign-role")]
+        public async Task<ActionResult> AssignRole(AssignRoleDto request)
+        {
+            var result = await _jwtAuthService.AssignUserAsync(request);
+
+            if (result == null)
+                return BadRequest("User not found or invalid role.");
+
+            return Ok(result);
+        }
 
     }
 }
