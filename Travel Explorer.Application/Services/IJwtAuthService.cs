@@ -19,7 +19,6 @@ namespace Travel_Explorer.Domain.Interfaces
 
         public Task<TokenResponseDto> AssignUserAsync(AssignRoleDto request , CancellationToken cancellationToken = default);
 
-        string GetGoogleAuthorizationUrl(); 
-        Task<ApplicationUser?> RegisterGoogleUserWithCodeAsyc(string code , CancellationToken cancellationToken = default);
+        Task<ApplicationUser?> HandleGoogleAuthentication(string email,string userName , string googleId, CancellationToken cancellationToken = default);
     }
 }

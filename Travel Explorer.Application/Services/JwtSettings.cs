@@ -17,8 +17,6 @@ namespace Travel_Explorer.Application.Services
         //GOOGLE AUTH (OIDC)
         public string GoogleClientId { get; set; }
         public string GoogleClientSecret { get; set; }
-        public string GoogleRedirectUrl { get; set; }//Api Callback URL to receive the Auth code
         public string GoogleFrontendRedirectURl { get; set; }//successful rgister
-
     }
 }

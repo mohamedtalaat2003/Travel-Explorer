@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
@@ -14,6 +15,12 @@ namespace Travel_Explorer
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddCors(options => {
+                options.AddPolicy("AllowAll", policy => {
+                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
+
             // Add services to the container.
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -26,7 +33,14 @@ namespace Travel_Explorer
             // Authentication & Authorization
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+
+
+            builder.Services.AddAuthentication(
+                options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }).AddCookie("ExternalCookie")//temp cookie for google schema
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -40,9 +54,16 @@ namespace Travel_Explorer
                         ClockSkew = TimeSpan.Zero,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Token))
                     };
+                })
+                .AddGoogle(Options =>
+                {
+                    Options.ClientId = jwtSettings.GoogleClientId;
+                    Options.ClientSecret = jwtSettings.GoogleClientSecret;
+                    Options.SignInScheme = "ExternalCookie";
                 });
 
-          
+         
+
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddAuthorization();
 
@@ -62,6 +83,7 @@ namespace Travel_Explorer
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseCors("AllowAll");
 
 
             app.MapControllers();

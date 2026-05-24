@@ -208,98 +208,32 @@ namespace Travel_Explorer.Infrastructure.Repositories
             return Convert.ToBase64String(hash);
         }
 
-        public string GetGoogleAuthorizationUrl()
+        public async Task<ApplicationUser?> HandleGoogleAuthentication(string email, string name, string googleId, CancellationToken cancellationToken = default)
         {
-            var clientId = _jwtSettings.GoogleClientId;
-            var redirectUri = _jwtSettings.GoogleRedirectUrl;
-            var scope = Uri.EscapeDataString("openid profile email");
+            //check if the user already exists
 
-            return $"https://accounts.google.com/o/oauth2/v2/auth?" +
-                    $"client_id={clientId}&" +
-                    $"redirect_uri={redirectUri}&" +
-                    $"response_type=code&" +
-                    $"scope={scope}&" +
-                    $"state=register";
-        }
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId || u.Email == email, cancellationToken);
 
-        public async Task<ApplicationUser?> RegisterGoogleUserWithCodeAsyc(string code, CancellationToken cancellationToken = default)
-        {
-            try
+            if (existingUser != null)
             {
-                using var httpClient = new HttpClient();
+                //already Registered user
+                return existingUser;
+            }
 
-                var tokenRequestParameters = new Dictionary<string, string>
+            var newUser = new ApplicationUser
             {
-                { "code", code },
-                { "client_id", _jwtSettings.GoogleClientId },
-                { "client_secret", _jwtSettings.GoogleClientSecret },
-                { "redirect_uri", _jwtSettings.GoogleRedirectUrl },
-                { "grant_type", "authorization_code" }
+                UserName = name,
+                Email = email,
+                GoogleId = googleId,
+                Role = "Traveler",
+                PasswordHash = null
             };
 
-                var response = httpClient.PostAsync("https://oauth2.googleapis.com/token",
-                    new FormUrlEncodedContent(tokenRequestParameters)).Result;
+            _context.Users.Add(newUser);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    return null;
-                }
-
-                var tokenResult = await response.Content.ReadFromJsonAsync<GoogleTokenResponse>();
-                if (tokenResult == null || string.IsNullOrEmpty(tokenResult.IdToken))
-                {
-                    return null;
-                }
-
-                //Validate googleId Token
-                var validationSettings = new GoogleJsonWebSignature.ValidationSettings
-                {
-                    Audience = new List<string> { _jwtSettings.GoogleClientId }
-                };
-
-                var payload = await GoogleJsonWebSignature.ValidateAsync(tokenResult.IdToken, validationSettings);
-
-                string email = payload.Email;
-                string Name = payload.Name ?? payload.GivenName ?? email.Split('@')[0];
-                string googleId = payload.Subject;
-
-                //check if the user already exists
-
-                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId || u.Email == email, cancellationToken);
-
-                if (existingUser != null)
-                {
-                    //already Registered user
-                    return existingUser;
-                }
-
-                var newUser = new ApplicationUser
-                {
-                    UserName = Name,
-                    Email = email,
-                    GoogleId = googleId,
-                    Role = "User",
-                    PasswordHash = null
-                };
-
-                _context.Users.Add(newUser);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return newUser;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (you can use a logging framework like Serilog, NLog, etc.)
-                return null;
-            }
-
-        }
-
-        // Simple helper class for parsing token endpoint response
-        private class GoogleTokenResponse
-        {
-            [System.Text.Json.Serialization.JsonPropertyName("id_token")]
-            public string? IdToken { get; set; }
+            return newUser;
         }
     }
 }
+

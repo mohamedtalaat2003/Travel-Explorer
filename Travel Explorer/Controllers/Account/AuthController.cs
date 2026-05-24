@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -81,27 +83,41 @@ namespace Travel_Explorer.Controllers.Account
         [HttpGet("google-register")]
         public ActionResult InitiateGoogleRegister()
         {
-            var url = _jwtAuthService.GetGoogleAuthorizationUrl();
-            return Redirect(url);
+            //challange google schema and tell it to redirct to our GoogleRegisterCallback
+            var redirectUrl = Url.Action("GoogleRegisterCallback", "Auth");
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+           return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
-        public async Task<ActionResult> GoogleCallback([FromQuery] string code, [FromQuery] string? error)
+        [HttpGet("google-register-callback")]
+        public async Task<ActionResult> GoogleRegisterCallback([FromQuery] string code, [FromQuery] string? error)
         {
-            if (!string.IsNullOrWhiteSpace(error) || string.IsNullOrWhiteSpace(code))
-                return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?error=AccessDenied");
-
-            var user = await _jwtAuthService.RegisterGoogleUserWithCodeAsyc(code);
-            if (user == null)
+            var result = await HttpContext.AuthenticateAsync("ExternalCookie");
+            if(!result.Succeeded|| result.Principal == null)
             {
-                return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?error=RegistrationFailed");
+                return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?error=AuthenticationFailed");
             }
 
+            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var name = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            var googleId = claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            // Redirect to frontend success page with user details
-            var userName = Uri.EscapeDataString(user.UserName);
-            var email = Uri.EscapeDataString(user.Email);
+            await HttpContext.SignOutAsync("ExternamCookie");
 
-            return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?success=success&username={userName}&email={email}");
+            if(string.IsNullOrEmpty(email) ||string.IsNullOrEmpty(googleId))
+            {
+                return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?error=MissingEmailOrGoogleId");
+            }
+
+            var userName = name ?? email.Split('@')[0];
+
+            var user = await _jwtAuthService.HandleGoogleAuthentication(email, userName, googleId);
+
+            var encodeUserName = Uri.EscapeDataString(userName);
+            var encodeEmail = Uri.EscapeDataString(email);
+
+            return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?success=success&username={encodeUserName}&email={encodeEmail}");
         }
     }
 }
