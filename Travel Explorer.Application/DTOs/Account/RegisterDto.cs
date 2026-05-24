@@ -11,6 +11,10 @@ namespace Travel_Explorer.Application.DTOs.Users
     {
         [Required(ErrorMessage = "Username is required")]
         [MinLength(3, ErrorMessage = "Username must be at least 3 characters")]
+        public string FullName { get; set; }
+
+        [Required(ErrorMessage = "Username is required")]
+        [MinLength(3, ErrorMessage = "Username must be at least 3 characters")]
         [MaxLength(50, ErrorMessage = "Username cannot exceed 50 characters")]
         public string UserName { get; set; } = string.Empty;
 

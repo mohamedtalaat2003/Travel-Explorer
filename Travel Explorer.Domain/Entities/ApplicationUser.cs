@@ -34,7 +34,8 @@ namespace Travel_Explorer.Domain.Entities
 
         public string Role { get; set; }
         public string? RefreshToken { get; set; }
-       public DateTime? RefreshTokenExpiryTime { get; set; }
+        public string? GoogleId { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
        // Navigation property - supports multiple active sessions (multi-device)
        public ICollection<UserRefreshToken> RefreshTokens { get; set; } = new List<UserRefreshToken>();
 
@@ -64,5 +65,7 @@ namespace Travel_Explorer.Domain.Entities
         /// All blog posts authored by this user (ContentWriter role).
         /// </summary>
         public ICollection<Blog> Blogs { get; set; } = new List<Blog>();
+
+
     }
 }

@@ -13,5 +13,12 @@ namespace Travel_Explorer.Application.Services
         public string Audience { get; set; } = string.Empty;
         public int AccessTokenExpirationMinutes { get; set; } = 15;
         public int RefreshTokenExpirationDays { get; set; } = 7;
+
+        //GOOGLE AUTH (OIDC)
+        public string GoogleClientId { get; set; }
+        public string GoogleClientSecret { get; set; }
+        public string GoogleRedirectUrl { get; set; }//Api Callback URL to receive the Auth code
+        public string GoogleFrontendRedirectURl { get; set; }//successful rgister
+
     }
 }

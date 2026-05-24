@@ -12,15 +12,14 @@ namespace Travel_Explorer.Domain.Interfaces
 {
     public interface IJwtAuthService
     {
-        Task<ApplicationUser> RegisterAsync(RegisterDto request);
-        public Task<string> LoginAsync(LoginDto request);
-        public Task<bool> LogoutAync(int userId, string refreshToken);
-        public Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request);
+        Task<ApplicationUser> RegisterAsync(RegisterDto request, CancellationToken cancellationToken = default);
+        public Task<TokenResponseDto> LoginAsync(LoginDto request);
+        public Task<bool> LogoutAync(int userId, string refreshToken, CancellationToken cancellationToken = default);
+        public Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request, CancellationToken cancellationToken = default);
 
+        public Task<TokenResponseDto> AssignUserAsync(AssignRoleDto request , CancellationToken cancellationToken = default);
 
-        public Task<string> AssignUserAsync(AssignRoleDto request);
-
-
-
+        string GetGoogleAuthorizationUrl(); 
+        Task<ApplicationUser?> RegisterGoogleUserWithCodeAsyc(string code , CancellationToken cancellationToken = default);
     }
 }
