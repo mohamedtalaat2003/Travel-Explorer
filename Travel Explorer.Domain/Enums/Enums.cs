@@ -25,4 +25,11 @@ namespace Travel_Explorer.Domain.Enums
         FirstClass = 3
     }
 
+    public enum Gender
+    {
+        Male = 1,
+        Female = 2,
+        Other = 3
+    }
+
 }

@@ -4,7 +4,7 @@ namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>
     /// Represents a flight booking made by a user.
-    /// This is a transactional entity — records must never be hard-deleted
+    /// This is a transactional entity ï¿½ records must never be hard-deleted
     /// for audit and legal compliance purposes.
     /// </summary>
     public class FlightBooking : BaseEntity
@@ -35,6 +35,9 @@ namespace Travel_Explorer.Domain.Entities
         /// Optional seat preference or special requests (e.g., "window seat", "extra legroom").
         /// </summary>
         public string? SeatPreference { get; set; }
+
+        public Gender Gender { get; set; }
+        public string? Nationality { get; set; }
 
         // ===== Foreign Keys =====
 
