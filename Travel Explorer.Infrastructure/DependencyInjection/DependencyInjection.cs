@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
 using Travel_Explorer.Infrastructure.Data;
 using Travel_Explorer.Infrastructure.Repositories;
 
@@ -26,7 +27,25 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
             
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-           
+            // Payment Strategy & Factory
+            services.AddOptions<Travel_Explorer.Application.Services.Payment.PaymobtSettings>()
+                .BindConfiguration("PaymobSettings")
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            services.AddHttpClient<Travel_Explorer.Infrastructure.Services.Payment.PaymobGateway>()
+                .AddPolicyHandler(Polly.Extensions.Http.HttpPolicyExtensions
+                    .HandleTransientHttpError()
+                    .WaitAndRetryAsync(3, a => System.TimeSpan.FromSeconds(System.Math.Pow(2, a))))
+                .AddPolicyHandler(Polly.Extensions.Http.HttpPolicyExtensions
+                    .HandleTransientHttpError()
+                    .CircuitBreakerAsync(5, System.TimeSpan.FromSeconds(30)));
+
+            services.AddScoped<Travel_Explorer.Application.Services.Payment.IPaymentGateway>(sp => 
+                sp.GetRequiredService<Travel_Explorer.Infrastructure.Services.Payment.PaymobGateway>());
+            services.AddScoped<Travel_Explorer.Application.Services.Payment.IPaymentGatewayFactory, 
+                Travel_Explorer.Infrastructure.Services.Payment.PaymentGatewayFactory>();
+
             return services;
         }
     }

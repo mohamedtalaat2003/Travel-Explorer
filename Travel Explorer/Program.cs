@@ -6,6 +6,7 @@ using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
 using Travel_Explorer.Application.Services;
 using Travel_Explorer.Infrastructure.DependencyInjection;
+using Travel_Explorer.Middleware;
 
 namespace Travel_Explorer
 {
@@ -84,7 +85,8 @@ namespace Travel_Explorer
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseCors("AllowAll");
-
+            
+            app.UsePaymentWebhookVerification();
 
             app.MapControllers();
 
