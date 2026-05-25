@@ -1,5 +1,3 @@
-using Travel_Explorer.Domain.Common;
-
 namespace Travel_Explorer.Application.Features.Profiles
 {
     public class UserProfileSpecification : BaseSpecification<UserProfile>

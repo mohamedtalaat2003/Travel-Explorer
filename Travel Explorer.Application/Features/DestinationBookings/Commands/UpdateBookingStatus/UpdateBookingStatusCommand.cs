@@ -7,7 +7,6 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Upda
     /// Updates the status of a booking.
     /// </summary>
     public record UpdateBookingStatusCommand(
-        [Required]
         BookingStatus Status) : IRequest<DestinationBookingDto?>
     {
         [JsonIgnore]

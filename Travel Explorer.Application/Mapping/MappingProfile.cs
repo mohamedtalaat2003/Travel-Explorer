@@ -1,11 +1,10 @@
 using Travel_Explorer.Application.DTOs.Blogs;
 using Travel_Explorer.Application.Features.Activities.Commands.CreateActivity;
 using Travel_Explorer.Application.Features.Activities.Commands.UpdateActivity;
-using Travel_Explorer.Application.Features.Blogs.Commands.Add;
-using Travel_Explorer.Application.Features.Blogs.Commands.Delete;
-using Travel_Explorer.Application.Features.Blogs.Commands.Update;
-using Travel_Explorer.Application.Features.Categories.Commands.Create;
-using Travel_Explorer.Application.Features.Categories.Commands.Update;
+using Travel_Explorer.Application.Features.Blogs.Commands.CreateBlog;
+using Travel_Explorer.Application.Features.Blogs.Commands.UpdateBlog;
+using Travel_Explorer.Application.Features.Categories.Commands.CreateCategory;
+using Travel_Explorer.Application.Features.Categories.Commands.UpdateCategory;
 using Travel_Explorer.Application.Features.DestinationBookings.Commands.CreateBooking;
 using Travel_Explorer.Application.Features.Destinations.Commands.CreateDestination;
 using Travel_Explorer.Application.Features.Destinations.Commands.UpdateDestination;
@@ -15,7 +14,11 @@ using Travel_Explorer.Application.Features.ContactMessages.CreateContactMessage;
 using Travel_Explorer.Application.DTOs.ContactMessage;
 using Travel_Explorer.Application.DTOs.Profiles;
 using Travel_Explorer.Application.Features.Profiles.Commands.UpdateUserProfile;
-using Travel_Explorer.Application.DTOs.Users;
+using Travel_Explorer.Application.DTOs.Flights.Schedules;
+using Travel_Explorer.Application.DTOs.Flights.Bookings;
+using Travel_Explorer.Application.Features.Flights.Commands.CreateFlightSchedule;
+using Travel_Explorer.Application.Features.Flights.Commands.UpdateFlightSchedule;
+using Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFlightBooking;
 
 namespace Travel_Explorer.Application.Mapping
 {
@@ -69,11 +72,13 @@ namespace Travel_Explorer.Application.Mapping
 
             CreateMap<CreateReviewCommand, Review>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.ImageUrls ?? new List<string>()));
 
             CreateMap<UpdateReviewCommand, Review>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.ImageUrls ?? new List<string>()))
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             // ─── ContactMessage ─────────────────────────────────────────────
@@ -97,8 +102,44 @@ namespace Travel_Explorer.Application.Mapping
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-            CreateMap<RegisterDto, ApplicationUser>().ReverseMap();
-            CreateMap<LoginDto, ApplicationUser>().ReverseMap();
+            // ─── Category ───────────────────────────────────────────────────
+            CreateMap<Category, CategoryDto>();
+            CreateMap<CreateCategoryCommand, Category>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
+            CreateMap<UpdateCategoryCommand, Category>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            // ─── Blog ───────────────────────────────────────────────────────
+            CreateMap<Blog, BlogDto>();
+            CreateMap<CreateBlogCommand, Blog>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
+            CreateMap<UpdateBlogCommand, Blog>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            // ─── Flights (Schedules) ─────────────────────────────────────────
+            CreateMap<FlightSchedule, FlightScheduleDto>();
+            CreateMap<FlightScheduleDto, FlightSchedule>();
+            CreateMap<CreateFlightScheduleCommand, FlightSchedule>();
+            CreateMap<UpdateFlightScheduleCommand, FlightSchedule>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            // ─── Flight Bookings ─────────────────────────────────────────────
+            CreateMap<FlightBooking, FlightBookingDto>()
+                .ForMember(dest => dest.UserFullName,
+                    opt => opt.MapFrom(src => src.User != null ? src.User.FullName : string.Empty))
+                .ForMember(dest => dest.Airline,
+                    opt => opt.MapFrom(src => src.FlightSchedule != null ? src.FlightSchedule.Airline : string.Empty))
+                .ForMember(dest => dest.FlightNumber,
+                    opt => opt.MapFrom(src => src.FlightSchedule != null ? src.FlightSchedule.FlightNumber : string.Empty))
+                .ForMember(dest => dest.DepartureTime,
+                    opt => opt.MapFrom(src => src.FlightSchedule != null ? src.FlightSchedule.DepartureTime : default));
+
+            CreateMap<CreateFlightBookingCommand, FlightBooking>();
         }
 
     }

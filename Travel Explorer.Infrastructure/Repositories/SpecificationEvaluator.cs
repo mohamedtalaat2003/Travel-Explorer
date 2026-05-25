@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace Travel_Explorer.Infrastructure.Repositories
 {
     public class SpecificationEvaluator<T> where T : class

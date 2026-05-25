@@ -12,14 +12,9 @@ namespace Travel_Explorer.Controllers
     [ApiController]
     [Route("api/Activities")]
     [Produces("application/json")] // response json only
-    public class ActivitiesController : ControllerBase
+    public class ActivitiesController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public ActivitiesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        private readonly IMediator _mediator = mediator;
 
         /// <summary>
         /// Returns all active activities across all destinations.

@@ -6,13 +6,9 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Upda
     /// Updates the notes on a booking.
     /// </summary>
     public record UpdateBookingNotesCommand(
-        [StringLength(1000)]
         string? Notes) : IRequest<DestinationBookingDto?>
     {
         [JsonIgnore]
         public int Id { get; set; }
-
-        [JsonIgnore]
-        public int UserId { get; set; }
     }
 }

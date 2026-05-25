@@ -6,7 +6,8 @@ using Travel_Explorer.Application.Features.Destinations.Queries.GetDestinationAc
 using Travel_Explorer.Application.Features.Destinations.Queries.GetDestinationById;
 using Travel_Explorer.Application.Features.Destinations.Queries.GetDestinationReviews;
 using Travel_Explorer.Application.Features.Destinations.Queries.GetTopRatedDestinations;
-using Travel_Explorer.Application.Features.Destinations.Queries.SearchDestinations;
+using Travel_Explorer.Application.Common;
+using Travel_Explorer.Application.Common.Parameters;
 
 namespace Travel_Explorer.Controllers
 {
@@ -16,26 +17,22 @@ namespace Travel_Explorer.Controllers
     [ApiController]
     [Route("api/Destinations")]
     [Produces("application/json")]
-    public class DestinationsController : ControllerBase
+    public class DestinationsController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
+        private readonly IMediator _mediator = mediator;
 
-        public DestinationsController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        // ─── Reads (anonymous) ────────────────────────────────────────────────
 
         /// <summary>
-        /// Returns a paginated list of all active (non-deleted) destinations.
+        /// Returns a paginated list of active destinations.
+        /// Supports optional filtering: <paramref name="p"/>.Keyword, .Location,
+        /// .MinPrice, .MaxPrice, .CategoryId.
         /// </summary>
         [HttpGet]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(IEnumerable<DestinationDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-        {
-            var result = await _mediator.Send(new GetAllDestinationsQuery(pageNumber, pageSize));
-            return Ok(result);
-        }
+        [ProducesResponseType(typeof(PaginatedResult<DestinationDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll([FromQuery] DestinationSpecParams p)
+            => Ok(await _mediator.Send(new GetAllDestinationsQuery(p)));
 
         /// <summary>
         /// Returns a single destination by its unique ID.
@@ -45,28 +42,7 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(typeof(DestinationDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
-        {
-            var result = await _mediator.Send(new GetDestinationByIdQuery(id));
-            return Ok(result);
-
-        }
-
-        /// <summary>
-        /// Searches and filters destinations by keyword, location, price range, or category.
-        /// </summary>
-        [HttpGet("search")]
-        [AllowAnonymous]
-        [ProducesResponseType(typeof(IEnumerable<DestinationDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Search(
-            [FromQuery] string? q,
-            [FromQuery] string? location,
-            [FromQuery] decimal? minPrice,
-            [FromQuery] decimal? maxPrice,
-            [FromQuery] int? categoryId)
-        {
-            var result = await _mediator.Send(new SearchDestinationsQuery(q, location, minPrice, maxPrice, categoryId));
-            return Ok(result);
-        }
+            => Ok(await _mediator.Send(new GetDestinationByIdQuery(id)));
 
         /// <summary>
         /// Returns the top-rated destinations ordered by AverageRating descending.
@@ -75,10 +51,7 @@ namespace Travel_Explorer.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<DestinationDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTopRated([FromQuery] int count = 6)
-        {
-            var result = await _mediator.Send(new GetTopRatedDestinationsQuery(count));
-            return Ok(result);
-        }
+            => Ok(await _mediator.Send(new GetTopRatedDestinationsQuery(count)));
 
         /// <summary>
         /// Returns all activities available at a specific destination.
@@ -88,10 +61,7 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(typeof(IEnumerable<ActivityDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetActivities(int id)
-        {
-            var result = await _mediator.Send(new GetDestinationActivitiesQuery(id));
-            return Ok(result);
-        }
+            => Ok(await _mediator.Send(new GetDestinationActivitiesQuery(id)));
 
         /// <summary>
         /// Returns all user reviews for a specific destination.
@@ -101,10 +71,9 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(typeof(IEnumerable<ReviewDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetReviews(int id)
-        {
-            var result = await _mediator.Send(new GetDestinationReviewsQuery(id));
-            return Ok(result);
-        }
+            => Ok(await _mediator.Send(new GetDestinationReviewsQuery(id)));
+
+        // ─── Writes (Admin only) ──────────────────────────────────────────────
 
         /// <summary>
         /// Creates a new destination. Requires the Admin role.
@@ -133,12 +102,8 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateDestinationCommand command)
         {
-            // Set the ID from the URL directly into the command
             command.Id = id;
-
-            var result = await _mediator.Send(command);
-            return Ok(result);
-
+            return Ok(await _mediator.Send(command));
         }
 
         /// <summary>
@@ -154,7 +119,6 @@ namespace Travel_Explorer.Controllers
         {
             await _mediator.Send(new DeleteDestinationCommand(id));
             return NoContent();
-
         }
     }
 }

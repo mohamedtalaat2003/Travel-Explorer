@@ -1,16 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Travel_Explorer.Infrastructure.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
-
         public DbSet<Destination> Destinations { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Review> Reviews { get; set; }
@@ -27,6 +22,9 @@ namespace Travel_Explorer.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Enable pg_trgm extension for fuzzy/trigram search
+            builder.HasPostgresExtension("pg_trgm");
 
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());               
         }

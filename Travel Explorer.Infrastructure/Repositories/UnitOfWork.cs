@@ -1,21 +1,12 @@
-using System.Text;
 using Travel_Explorer.Infrastructure.Data;
 
 namespace Travel_Explorer.Infrastructure.Repositories
 {
-    public class UnitOfWork :IUnitOfWork
+    public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
     {
 
-        private readonly ApplicationDbContext _context;
-        private readonly Dictionary<string, object> _repository;
-
-
-
-        public UnitOfWork(ApplicationDbContext context)
-        {
-            _context = context;
-            _repository = new Dictionary<string, object>();
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly Dictionary<string, object> _repository = [];
 
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class
         {

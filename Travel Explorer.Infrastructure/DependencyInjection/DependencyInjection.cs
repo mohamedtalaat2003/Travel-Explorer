@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Travel_Explorer.Application.Common.Interfaces;
 using Polly;
 using Travel_Explorer.Infrastructure.Data;
 using Travel_Explorer.Infrastructure.Repositories;
+using Travel_Explorer.Infrastructure.Services;
 
 namespace Travel_Explorer.Infrastructure.DependencyInjection
 {
@@ -26,6 +28,10 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
 
             
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            // Cloudinary Photo Upload
+            services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
+            services.AddScoped<IPhotoService, CloudinaryPhotoService>();
 
             // Payment Strategy & Factory
             services.AddOptions<Travel_Explorer.Application.Services.Payment.PaymobtSettings>()

@@ -1,27 +1,17 @@
 
 namespace Travel_Explorer.Application.Features.Destinations.Commands.UpdateDestination
 {
-    public class UpdateDestinationCommandHandler
-        : IRequestHandler<UpdateDestinationCommand, DestinationDto?>
+    public class UpdateDestinationCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+                : IRequestHandler<UpdateDestinationCommand, DestinationDto?>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public UpdateDestinationCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<DestinationDto?> Handle(
             UpdateDestinationCommand request, CancellationToken cancellationToken)
         {
             var spec = new DestinationSpecification(request.Id);
-            var destination = await _unitOfWork.Repository<Destination>().GenericEntitiesWithSpec(spec);
-
-            if (destination == null)
-                throw new NotFoundException(nameof(Destination), request.Id);
-
+            var destination = await _unitOfWork.Repository<Destination>().GenericEntitiesWithSpec(spec) ?? throw new NotFoundException(nameof(Destination), request.Id);
             _mapper.Map(request, destination);
             destination.UpdatedAt = DateTime.UtcNow;
 

@@ -1,14 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+using Travel_Explorer.Application.Common.Parameters;
 
 namespace Travel_Explorer.Application.Features.Destinations
 {
     /// <summary>
-    /// Specification for querying destinations with optional filters, includes, sorting, and paging.
+    /// Unified specification for querying Destinations.
+    /// Supports single lookup, keyword/location/price/category filtering with pagination,
+    /// and top-rated queries.
     /// </summary>
     public class DestinationSpecification : BaseSpecification<Destination>
     {
-        /// <summary>
-        /// Get a single destination by ID (non-deleted) with Category included.
-        /// </summary>
+        /// <summary>Single destination by ID with Category included.</summary>
         public DestinationSpecification(int id)
             : base(d => d.Id == id)
         {
@@ -16,57 +18,44 @@ namespace Travel_Explorer.Application.Features.Destinations
         }
 
         /// <summary>
-        /// Paginated list of all active destinations.
+        /// Paginated, filtered list of destinations.
+        /// Uses PostgreSQL ILIKE for case-insensitive fuzzy search (accelerated by GIN trigram indexes).
         /// </summary>
-        public DestinationSpecification(int? pageNumber = null, int? pageSize = null)
+        public DestinationSpecification(DestinationSpecParams p)
+            : base()
+        {
+            if (!string.IsNullOrWhiteSpace(p.Keyword))
+            {
+                var pattern = $"%{p.Keyword}%";
+                AddCriteria(d => EF.Functions.ILike(d.Name, pattern)
+                              || EF.Functions.ILike(d.Description, pattern));
+            }
+
+            if (!string.IsNullOrWhiteSpace(p.Location))
+                AddCriteria(d => EF.Functions.ILike(d.Location, $"%{p.Location}%"));
+
+            if (p.MinPrice.HasValue)
+                AddCriteria(d => d.PricePerNight >= p.MinPrice.Value);
+
+            if (p.MaxPrice.HasValue)
+                AddCriteria(d => d.PricePerNight <= p.MaxPrice.Value);
+
+            if (p.CategoryId.HasValue)
+                AddCriteria(d => d.CategoryId == p.CategoryId.Value);
+
+            AddInclude(d => d.Category);
+            AddOrderBy(d => d.Id);
+            ApplyPaging((p.PageNumber - 1) * p.PageSize, p.PageSize);
+        }
+
+        /// <summary>Top-N destinations ordered by AverageRating descending.</summary>
+        public DestinationSpecification(int count, bool topRated)
             : base()
         {
             AddInclude(d => d.Category);
-            AddOrderBy(d => d.Id);
-            if (pageNumber.HasValue && pageSize.HasValue)
-                ApplyPaging((pageNumber.Value - 1) * pageSize.Value, pageSize.Value);
-        }
-
-        public DestinationSpecification(
-            string? keyword,
-            string? location,
-            decimal? minPrice,
-            decimal? maxPrice,
-            int? categoryId)
-        {
-            if (!string.IsNullOrEmpty(keyword))
-                AddCriteria(d => d.Name.Contains(keyword) || d.Description.Contains(keyword));
-
-            if (!string.IsNullOrEmpty(location))
-                AddCriteria(d => d.Location.Contains(location));
-
-            if (minPrice.HasValue)
-                AddCriteria(d => d.PricePerNight >= minPrice.Value);
-
-            if (maxPrice.HasValue)
-                AddCriteria(d => d.PricePerNight <= maxPrice.Value);
-
-            if (categoryId.HasValue)
-                AddCriteria(d => d.CategoryId == categoryId.Value);
-
-            AddInclude(d => d.Category);
-            AddOrderBy(d => d.Id);
-        }
-
-        /// <summary>
-        /// Top-rated destinations ordered by AverageRating descending.
-        /// </summary>
-        public DestinationSpecification(int count, bool topRated)
-       : base()
-        {
-            AddInclude(d => d.Category);
-
             if (topRated)
-            {
                 AddOrderByDescending(d => d.AverageRating);
-            }
-
             ApplyPaging(0, count);
         }
     }
-    }
+}

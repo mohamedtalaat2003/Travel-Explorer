@@ -21,6 +21,7 @@ namespace Travel_Explorer.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -596,8 +597,14 @@ namespace Travel_Explorer.Infrastructure.Migrations
                     b.Property<int>("FlightScheduleId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Gender")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Nationality")
+                        .HasColumnType("text");
 
                     b.Property<int>("NumberOfPassengers")
                         .HasColumnType("integer");
@@ -656,7 +663,13 @@ namespace Travel_Explorer.Infrastructure.Migrations
                     b.Property<DateTime>("ArrivalTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("AvailableSeats")
+                    b.Property<int>("AvailableBusinessSeats")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AvailableEconomySeats")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AvailableFirstClassSeats")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("BusinessPrice")
@@ -789,6 +802,10 @@ namespace Travel_Explorer.Infrastructure.Migrations
 
                     b.Property<int>("DestinationId")
                         .HasColumnType("integer");
+
+                    b.Property<List<string>>("ImageUrls")
+                        .IsRequired()
+                        .HasColumnType("text[]");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");

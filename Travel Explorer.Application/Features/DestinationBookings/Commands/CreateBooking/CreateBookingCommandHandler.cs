@@ -1,31 +1,25 @@
+using Travel_Explorer.Application.Common;
 
 namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.CreateBooking
 {
-    public class CreateBookingCommandHandler
-        : IRequestHandler<CreateBookingCommand, DestinationBookingDto>
+    public class CreateBookingCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+                : IRequestHandler<CreateBookingCommand, DestinationBookingDto>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public CreateBookingCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
+        private readonly ICurrentUserService _currentUserService = currentUserService;
 
         public async Task<DestinationBookingDto> Handle(
             CreateBookingCommand request, CancellationToken cancellationToken)
         {
             // Fetch destination to calculate total price
-            var destination = await _unitOfWork.Repository<Destination>().GetAsync(request.DestinationId);
-            if (destination == null)
-                throw new KeyNotFoundException($"Destination with ID {request.DestinationId} not found.");
-
+            var destination = await _unitOfWork.Repository<Destination>().GetAsync(request.DestinationId) ?? throw new NotFoundException(nameof(Destination), request.DestinationId);
             var nights = (request.CheckOutDate.Date - request.CheckInDate.Date).Days;
             if (nights <= 0)
-                throw new ArgumentException("Check-out date must be after check-in date.");
+                throw new BadRequestException("Check-out date must be after check-in date.");
 
             var booking = _mapper.Map<DestinationBooking>(request);
+            booking.UserId = _currentUserService.UserId ?? 0;
             booking.TotalPrice = destination.PricePerNight * nights;
             booking.Status = Domain.Enums.BookingStatus.Pending;
             booking.CreatedAt = DateTime.UtcNow;

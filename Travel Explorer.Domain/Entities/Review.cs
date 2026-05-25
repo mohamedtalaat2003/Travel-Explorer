@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>
@@ -19,6 +17,11 @@ namespace Travel_Explorer.Domain.Entities
         /// An optional text comment/feedback left by the user (nullable).
         /// </summary>
         public string? Comment { get; set; }
+
+        /// <summary>
+        /// Collection of image URLs uploaded for the review.
+        /// </summary>
+        public List<string> ImageUrls { get; set; } = new List<string>();
 
         // ===== Foreign Keys =====
 

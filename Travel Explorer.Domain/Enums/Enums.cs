@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Travel_Explorer.Domain.Enums
 {
     public enum BookingStatus
@@ -27,11 +25,11 @@ namespace Travel_Explorer.Domain.Enums
         FirstClass = 3
     }
 
-    public enum UserRole
+    public enum Gender
     {
-        Admin = 1,
-        Traveler = 2,
-        Author = 3 // ??? Blog
+        Male = 1,
+        Female = 2,
+        Other = 3
     }
 
     public enum RequestToBeAuthor

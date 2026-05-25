@@ -9,5 +9,6 @@ namespace Travel_Explorer.Application.DTOs.Reviews
         public string UserFullName { get; set; }
         public int DestinationId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public List<string> ImageUrls { get; set; } = new List<string>();
     }
 }

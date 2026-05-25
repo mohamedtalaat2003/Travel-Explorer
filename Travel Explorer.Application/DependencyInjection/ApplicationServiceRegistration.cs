@@ -1,5 +1,8 @@
+using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Travel_Explorer.Application.Common;
+using Travel_Explorer.Application.Common.Behaviors;
 
 namespace Travel_Explorer.Application.DependencyInjection
 {
@@ -9,8 +12,15 @@ namespace Travel_Explorer.Application.DependencyInjection
         {
             var assembly = typeof(ApplicationServiceRegistration).Assembly;
 
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
+            services.AddMediatR(cfg => 
+            {
+                cfg.RegisterServicesFromAssembly(assembly);
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            });
+            
             services.AddAutoMapper(assembly);
+            services.AddValidatorsFromAssembly(assembly);
+
             services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             return services;

@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>
@@ -54,10 +52,19 @@ namespace Travel_Explorer.Domain.Entities
         public decimal FirstClassPrice { get; set; }
 
         /// <summary>
-        /// The number of seats still available for booking on this flight.
-        /// Decremented when a booking is confirmed.
+        /// The number of economy seats still available for booking.
         /// </summary>
-        public int AvailableSeats { get; set; }
+        public int AvailableEconomySeats { get; set; }
+
+        /// <summary>
+        /// The number of business class seats still available for booking.
+        /// </summary>
+        public int AvailableBusinessSeats { get; set; }
+
+        /// <summary>
+        /// The number of first class seats still available for booking.
+        /// </summary>
+        public int AvailableFirstClassSeats { get; set; }
 
         // ===== Navigation Properties =====
 
