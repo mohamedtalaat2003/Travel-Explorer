@@ -32,6 +32,8 @@ namespace Travel_Explorer.Domain.Entities
         /// </summary>
         public bool IsDeleted { get; set; } = false;
 
+        public RequestToBeAuthor requestToBeAuthor { get; set; } = RequestToBeAuthor.Pending;
+
         public string Role { get; set; }
         public string? RefreshToken { get; set; }
         public string? GoogleId { get; set; }

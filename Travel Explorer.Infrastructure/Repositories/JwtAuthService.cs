@@ -16,6 +16,7 @@ using Travel_Explorer.Application.DTOs;
 using Travel_Explorer.Application.DTOs.Account;
 using Travel_Explorer.Application.DTOs.Users;
 using Travel_Explorer.Application.Services;
+using Travel_Explorer.Domain.Enums;
 using Travel_Explorer.Infrastructure.Data;
 
 namespace Travel_Explorer.Infrastructure.Repositories
@@ -84,8 +85,10 @@ namespace Travel_Explorer.Infrastructure.Repositories
             if (user is null) return null;
             if(iWantToBeAuthor)
             {
+                user.requestToBeAuthor = RequestToBeAuthor.Approved;
                 user.Role = "Author";
             }
+            user.requestToBeAuthor = RequestToBeAuthor.Rejected;
 
             user.Role = request.newRole;
             await _unitOfWork.SaveChangesAsync(cancellationToken);
