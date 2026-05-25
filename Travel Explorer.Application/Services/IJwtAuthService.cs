@@ -17,7 +17,7 @@ namespace Travel_Explorer.Domain.Interfaces
         public Task<bool> LogoutAync(int userId, string refreshToken, CancellationToken cancellationToken = default);
         public Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request, CancellationToken cancellationToken = default);
 
-        public Task<TokenResponseDto> AssignUserAsync(AssignRoleDto request , CancellationToken cancellationToken = default);
+        public Task<TokenResponseDto> AssignUserAsync(AssignRoleDto request ,bool iWantToBeAuthor = false, CancellationToken cancellationToken = default);
 
         Task<ApplicationUser?> RegisterGoogleUserAsync(string email,string userName , string googleId, CancellationToken cancellationToken = default);
         Task<TokenResponseDto?> LoginGoogleUserAsync(string googleId, CancellationToken cancellationToken = default);

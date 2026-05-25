@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
 using Travel_Explorer.Application.Services;
+using Travel_Explorer.Application.Services.Payment;
 using Travel_Explorer.Infrastructure.DependencyInjection;
 using Travel_Explorer.Middleware;
 
@@ -34,6 +35,8 @@ namespace Travel_Explorer
             // Authentication & Authorization
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+
+            builder.Services.Configure<PaymobtSettings>(builder.Configuration.GetSection("PaymobSettings"));
 
 
             builder.Services.AddAuthentication(

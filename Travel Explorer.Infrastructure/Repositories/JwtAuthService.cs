@@ -77,11 +77,15 @@ namespace Travel_Explorer.Infrastructure.Repositories
             return await CreateTokenResponse(user);
         }
 
-        public async Task<TokenResponseDto> AssignUserAsync(AssignRoleDto request, CancellationToken cancellationToken = default)
+        public async Task<TokenResponseDto> AssignUserAsync(AssignRoleDto request,bool iWantToBeAuthor = false ,  CancellationToken cancellationToken = default)
         {
             var user = await _context.Users.FindAsync(request.userId);
 
             if (user is null) return null;
+            if(iWantToBeAuthor)
+            {
+                user.Role = "Author";
+            }
 
             user.Role = request.newRole;
             await _unitOfWork.SaveChangesAsync(cancellationToken);

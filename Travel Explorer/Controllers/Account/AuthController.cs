@@ -70,9 +70,10 @@ namespace Travel_Explorer.Controllers.Account
 
         [Authorize(Roles = "Admin")]
         [HttpPost("assign-role")]
-        public async Task<ActionResult> AssignRole(AssignRoleDto request)
+        public async Task<ActionResult> AssignRole(AssignRoleDto request , bool IWantToBeAuthor = false)
         {
-            var result = await _jwtAuthService.AssignUserAsync(request);
+
+            var result = await _jwtAuthService.AssignUserAsync(request , IWantToBeAuthor);
 
             if (result == null)
                 return BadRequest("User not found or invalid role.");
