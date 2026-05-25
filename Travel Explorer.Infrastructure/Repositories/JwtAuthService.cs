@@ -208,7 +208,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
             return Convert.ToBase64String(hash);
         }
 
-        public async Task<ApplicationUser?> HandleGoogleAuthentication(string email, string name, string googleId, CancellationToken cancellationToken = default)
+        public async Task<ApplicationUser?> RegisterGoogleUserAsync(string email, string name, string googleId, CancellationToken cancellationToken = default)
         {
             //check if the user already exists
 
@@ -234,6 +234,21 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
             return newUser;
         }
+
+        public async Task<TokenResponseDto?> LoginGoogleUserAsync(string googleId, CancellationToken cancellationToken = default)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId, cancellationToken);
+
+            if (user == null)
+                return null;
+
+            string token =await CreateToken(user);
+            var refreshToken =await GenerateAndSaveRefreshTokenAsync(user, cancellationToken);
+
+            return new TokenResponseDto
+            { AccessToken = token, RefreshToken = refreshToken };
+        }
+       
     }
 }
 

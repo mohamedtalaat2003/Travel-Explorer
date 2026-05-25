@@ -18,5 +18,6 @@ namespace Travel_Explorer.Application.Services
         public string GoogleClientId { get; set; }
         public string GoogleClientSecret { get; set; }
         public string GoogleFrontendRedirectURl { get; set; }//successful rgister
+        public string GoogleFrontendloginRedirectUrl { get; set; }
     }
 }

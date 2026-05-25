@@ -112,12 +112,52 @@ namespace Travel_Explorer.Controllers.Account
 
             var userName = name ?? email.Split('@')[0];
 
-            var user = await _jwtAuthService.HandleGoogleAuthentication(email, userName, googleId);
+            var user = await _jwtAuthService.RegisterGoogleUserAsync(email, userName, googleId);
 
             var encodeUserName = Uri.EscapeDataString(userName);
             var encodeEmail = Uri.EscapeDataString(email);
 
             return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?success=success&username={encodeUserName}&email={encodeEmail}");
+        }
+
+        [HttpGet("google-login")]
+        public ActionResult IntiateGoogleLogin()
+        {
+            var redirectUrl = Url.Action("GoogleLoginCallback", "Auth");
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+
+            return Challenge(properties,GoogleDefaults.AuthenticationScheme);
+        }
+
+
+        [HttpGet("google-login-callback")]
+        public async Task<ActionResult> GoogleLoginCallback()
+        {
+            var result = await HttpContext.AuthenticateAsync("ExternalCookie");
+            if (!result.Succeeded || result.Principal == null)
+            {
+                return Redirect($"{_jwtSettings.GoogleFrontendloginRedirectUrl}?error=AuthenticationFailed");
+            }
+
+            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            var googleId = claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            await HttpContext.SignOutAsync("ExternalCookie");
+
+            if(string.IsNullOrEmpty(googleId))
+            {
+                return Redirect($"{_jwtSettings.GoogleFrontendloginRedirectUrl}?error=MissingGoogleId");
+            }
+            
+            var token = await _jwtAuthService.LoginGoogleUserAsync(googleId);
+            if(token == null)
+                return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?error=UserNotRegistered");
+
+            var accessToken = Uri.EscapeDataString(token.AccessToken);
+            var refreshToken = Uri.UnescapeDataString(token.RefreshToken);
+
+            return Redirect($"{_jwtSettings.GoogleFrontendloginRedirectUrl}?success=success&accessToken={accessToken}&refreshToken={refreshToken}");
+
         }
     }
 }
