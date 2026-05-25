@@ -10,6 +10,8 @@ namespace Travel_Explorer.Application.DTOs.Flights.Bookings
         public decimal TotalPrice { get; set; }
         public BookingStatus Status { get; set; }
         public string? SeatPreference { get; set; }
+        public Gender Gender { get; set; }
+        public string? Nationality { get; set; }
         public int UserId { get; set; }
         public string UserFullName { get; set; }
         public int FlightScheduleId { get; set; }

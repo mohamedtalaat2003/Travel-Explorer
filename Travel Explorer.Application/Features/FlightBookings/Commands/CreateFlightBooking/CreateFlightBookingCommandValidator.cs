@@ -21,6 +21,16 @@ namespace Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFli
             RuleFor(x => x.SeatPreference)
                 .MaximumLength(100)
                 .WithMessage("SeatPreference must not exceed 100 characters.");
+
+            RuleFor(x => x.Gender)
+                .IsInEnum()
+                .WithMessage("A valid passenger gender is required.");
+
+            RuleFor(x => x.Nationality)
+                .NotEmpty()
+                .WithMessage("Passenger nationality is required.")
+                .MaximumLength(50)
+                .WithMessage("Nationality must not exceed 50 characters.");
         }
     }
 }

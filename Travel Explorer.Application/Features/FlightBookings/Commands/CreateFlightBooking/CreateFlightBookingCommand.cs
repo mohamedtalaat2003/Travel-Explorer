@@ -7,5 +7,7 @@ namespace Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFli
         FlightClass Class,
         int NumberOfPassengers,
         int FlightScheduleId,
-        string? SeatPreference) : IRequest<FlightBookingDto>;
+        string? SeatPreference,
+        Gender Gender,
+        string? Nationality) : IRequest<FlightBookingDto>;
 }

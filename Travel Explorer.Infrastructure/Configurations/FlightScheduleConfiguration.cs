@@ -38,8 +38,8 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(fs => !fs.IsDeleted);
 
-            builder.HasIndex(fs => fs.FlightNumber).IsUnique().HasDatabaseName("IX_flightschedules_FlightNumber");
-             builder.HasIndex(fs => fs.IsDeleted).IsUnique().HasDatabaseName("IX_flightschedules_IsDeleted");
+            builder.HasIndex(fs => fs.FlightNumber).HasDatabaseName("IX_flightschedules_FlightNumber");
+             builder.HasIndex(fs => fs.IsDeleted).HasDatabaseName("IX_flightschedules_IsDeleted");
             
         }
     }
