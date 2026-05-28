@@ -21,6 +21,7 @@ namespace Travel_Explorer.Infrastructure.Configurations
                 .WithOne(p => p.User)
                 .HasForeignKey<UserProfile>(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

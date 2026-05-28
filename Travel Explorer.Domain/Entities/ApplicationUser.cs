@@ -1,5 +1,6 @@
-using Travel_Explorer.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
+using Travel_Explorer.Domain.Enums;
+
 namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>
@@ -36,6 +37,14 @@ namespace Travel_Explorer.Domain.Entities
         public Gender? Gender { get; set; }
         public string Role { get; set; } = "Traveler";
 
+        public RequestToBeAuthor requestToBeAuthor { get; set; } = RequestToBeAuthor.Pending;
+
+        public string? RefreshToken { get; set; }
+        public string? GoogleId { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
+       // Navigation property - supports multiple active sessions (multi-device)
+       public ICollection<UserRefreshToken> RefreshTokens { get; set; } = new List<UserRefreshToken>();
+
         // ===== Navigation Properties =====
 
         /// <summary>
@@ -62,5 +71,7 @@ namespace Travel_Explorer.Domain.Entities
         /// All blog posts authored by this user (ContentWriter role).
         /// </summary>
         public ICollection<Blog> Blogs { get; set; } = new List<Blog>();
+
+
     }
 }

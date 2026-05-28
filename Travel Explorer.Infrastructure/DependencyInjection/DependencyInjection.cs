@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Travel_Explorer.Domain.Entities;
 using Travel_Explorer.Application.Common.Interfaces;
+using Polly;
 using Travel_Explorer.Infrastructure.Data;
 using Travel_Explorer.Infrastructure.Repositories;
 using Travel_Explorer.Infrastructure.Services;
@@ -40,6 +41,7 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
 
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IJwtAuthService, JwtAuthService>();
 
             
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -47,6 +49,25 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
             // Cloudinary Photo Upload
             services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
             services.AddScoped<IPhotoService, CloudinaryPhotoService>();
+
+            // Payment Strategy & Factory
+            services.AddOptions<Travel_Explorer.Application.Services.Payment.PaymobtSettings>()
+                .BindConfiguration("PaymobSettings")
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            services.AddHttpClient<Travel_Explorer.Infrastructure.Services.Payment.PaymobGateway>()
+                .AddPolicyHandler(Polly.Extensions.Http.HttpPolicyExtensions
+                    .HandleTransientHttpError()
+                    .WaitAndRetryAsync(3, a => System.TimeSpan.FromSeconds(System.Math.Pow(2, a))))
+                .AddPolicyHandler(Polly.Extensions.Http.HttpPolicyExtensions
+                    .HandleTransientHttpError()
+                    .CircuitBreakerAsync(5, System.TimeSpan.FromSeconds(30)));
+
+            services.AddScoped<Travel_Explorer.Application.Services.Payment.IPaymentGateway>(sp => 
+                sp.GetRequiredService<Travel_Explorer.Infrastructure.Services.Payment.PaymobGateway>());
+            services.AddScoped<Travel_Explorer.Application.Services.Payment.IPaymentGatewayFactory, 
+                Travel_Explorer.Infrastructure.Services.Payment.PaymentGatewayFactory>();
 
             return services;
         }

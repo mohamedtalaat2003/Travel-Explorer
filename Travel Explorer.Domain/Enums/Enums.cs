@@ -38,4 +38,11 @@ namespace Travel_Explorer.Domain.Enums
         Approved = 2,
         Rejected = 3
     }
+
+    public enum RequestToBeAuthor
+    {
+        Pending = 1,
+        Approved,
+        Rejected
+    }
 }
