@@ -8,6 +8,8 @@ namespace Travel_Explorer.Application.DTOs.Users
         string? Email,
         Gender? Gender,
         bool IsBlocked,
-        string Status
+        string Role,
+        string Status,
+        string RequestToBeAuthor
     );
 }

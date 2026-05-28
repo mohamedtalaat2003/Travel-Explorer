@@ -29,6 +29,11 @@ namespace Travel_Explorer.Application.Features.Users
                 AddCriteria(u => u.Status == parameters.Status.Value);
             }
 
+            if (parameters.AuthorRequestStatus.HasValue)
+            {
+                AddCriteria(u => u.requestToBeAuthor == parameters.AuthorRequestStatus.Value);
+            }
+
             // Searching
             if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
             {

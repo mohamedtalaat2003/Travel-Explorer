@@ -4,7 +4,7 @@ namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>
     /// Represents a flight booking made by a user.
-    /// This is a transactional entity � records must never be hard-deleted
+    /// This is a transactional entity - records must never be hard-deleted
     /// for audit and legal compliance purposes.
     /// </summary>
     public class FlightBooking : BaseEntity
@@ -50,6 +50,11 @@ namespace Travel_Explorer.Domain.Entities
         /// Foreign key to the flight schedule being booked.
         /// </summary>
         public int FlightScheduleId { get; set; }
+
+        /// <summary>
+        /// Foreign key to the payment transaction associated with this booking (nullable).
+        /// </summary>
+        public int? PaymentId { get; set; }
 
         // ===== Navigation Properties =====
 

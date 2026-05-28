@@ -11,6 +11,7 @@ namespace Travel_Explorer.Application.DTOs.Users
         bool IsBlocked,
         string Role,
         string Status,
+        string RequestToBeAuthor,
         DateTime CreatedAt
     );
 }

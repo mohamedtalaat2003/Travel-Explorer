@@ -11,6 +11,13 @@ namespace Travel_Explorer.Application.Features.FlightBookings
             AddInclude(fb => fb.FlightSchedule);
         }
 
+        public FlightBookingSpecification(int paymentId, bool isPayment)
+            : base(fb => fb.PaymentId == paymentId)
+        {
+            AddInclude(fb => fb.User);
+            AddInclude(fb => fb.FlightSchedule);
+        }
+
         public FlightBookingSpecification(FlightBookingSpecParams p, int? userId = null)
             : base()
         {

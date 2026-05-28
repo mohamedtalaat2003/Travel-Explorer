@@ -30,6 +30,7 @@ namespace Travel_Explorer.Infrastructure.Configurations
             // Indexes
             builder.HasIndex(fb => fb.FlightScheduleId).HasDatabaseName("IX_flightBookings_FlightScheduleId");
             builder.HasIndex(fb => fb.UserId).HasDatabaseName("IX_flightBookings_UserId");
+            builder.HasIndex(fb => fb.PaymentId).HasDatabaseName("IX_flightBookings_PaymentId");
             builder.HasIndex(a => a.IsDeleted).HasDatabaseName("IX_flightBookings_IsDeleted");
             // Relationships
             builder.HasOne(fb => fb.User)
@@ -41,6 +42,11 @@ namespace Travel_Explorer.Infrastructure.Configurations
                 .WithMany(fs => fs.Bookings)
                 .HasForeignKey(fb => fb.FlightScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(fb => fb.Payment)
+                .WithOne()
+                .HasForeignKey<FlightBooking>(fb => fb.PaymentId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

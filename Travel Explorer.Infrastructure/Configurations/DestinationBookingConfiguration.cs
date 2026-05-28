@@ -27,6 +27,7 @@ namespace Travel_Explorer.Infrastructure.Configurations
             builder.HasIndex(db => db.DestinationId).HasDatabaseName("IX_destinationBookings_DestinationId");
             builder.HasIndex(db => db.UserId).HasDatabaseName("IX_dstinationBookings_UserId");
             builder.HasIndex(db => db.Status).HasDatabaseName("IX_destinationBookings_Status");
+            builder.HasIndex(db => db.PaymentId).HasDatabaseName("IX_destinationBookings_PaymentId");
             builder.HasIndex(a => a.IsDeleted).HasDatabaseName("IX_destinationBokings_IsDeleted");
 
             // Relationships
@@ -39,6 +40,11 @@ namespace Travel_Explorer.Infrastructure.Configurations
                 .WithMany(d => d.Bookings)
                 .HasForeignKey(db => db.DestinationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(db => db.Payment)
+                .WithOne()
+                .HasForeignKey<DestinationBooking>(db => db.PaymentId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

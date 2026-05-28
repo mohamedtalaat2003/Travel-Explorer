@@ -56,10 +56,14 @@ namespace Travel_Explorer.Application.Features.Payments.Commands.CreatePaymentSe
                 Amount = booking.TotalPrice,
                 Status = PaymentStatus.Unpaid,
                 PaymentMethod = gateway.ProviderName,
-                DestinationBookId = booking.Id
+                UserId = request.UserId
             };
 
             await _unitOfWork.Repository<PaymentTransaction>().AddAsync(paymentTx);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            booking.PaymentId = paymentTx.Id;
+            _unitOfWork.Repository<DestinationBooking>().Update(booking);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation(

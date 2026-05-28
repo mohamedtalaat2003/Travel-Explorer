@@ -19,6 +19,16 @@ namespace Travel_Explorer.Application.Features.DestinationBookings
         }
 
         /// <summary>
+        /// Get booking by PaymentId.
+        /// </summary>
+        public DestinationBookingSpecification(int paymentId, bool isPayment)
+            : base(b => b.PaymentId == paymentId)
+        {
+            AddInclude(b => b.User);
+            AddInclude(b => b.Destination);
+        }
+
+        /// <summary>
         /// Get bookings filtered by optional UserId and/or Status.
         /// </summary>
         public DestinationBookingSpecification(int? userId, string? status)

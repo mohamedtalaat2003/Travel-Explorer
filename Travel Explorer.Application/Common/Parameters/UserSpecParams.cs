@@ -8,5 +8,6 @@ namespace Travel_Explorer.Application.Common.Parameters
         public Gender? Gender { get; set; }
         public bool? IsBlocked { get; set; }
         public AccountStatus? Status { get; set; }
+        public RequestToBeAuthor? AuthorRequestStatus { get; set; }
     }
 }

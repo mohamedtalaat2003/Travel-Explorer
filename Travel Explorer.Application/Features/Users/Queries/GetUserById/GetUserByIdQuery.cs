@@ -29,6 +29,7 @@ namespace Travel_Explorer.Application.Features.Users.Queries.GetUserById
                 user.IsBlocked,
                 user.Role,
                 user.Status.ToString(),
+                user.requestToBeAuthor.ToString(),
                 user.CreatedAt
             );
         }

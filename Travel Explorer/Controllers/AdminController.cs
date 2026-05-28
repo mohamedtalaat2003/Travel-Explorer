@@ -1,13 +1,14 @@
 using Travel_Explorer.Application.Common.Parameters;
 using Travel_Explorer.Application.DTOs.Users;
-using Travel_Explorer.Application.Features.Users.Commands.ApproveUser;
+using Travel_Explorer.Application.Features.Users.Commands.ApproveAuthorRequest;
 using Travel_Explorer.Application.Features.Users.Commands.BlockUser;
 using Travel_Explorer.Application.Features.Users.Commands.ChangeUserRole;
-using Travel_Explorer.Application.Features.Users.Commands.RejectUser;
+using Travel_Explorer.Application.Features.Users.Commands.RejectAuthorRequest;
 using Travel_Explorer.Application.Features.Users.Commands.SoftDeleteUser;
 using Travel_Explorer.Application.Features.Users.Commands.UnblockUser;
 using Travel_Explorer.Application.Features.Users.Queries.GetAdminStatistics;
 using Travel_Explorer.Application.Features.Users.Queries.GetAllUsers;
+using Travel_Explorer.Application.Features.Users.Queries.GetPendingAuthorRequests;
 using Travel_Explorer.Application.Features.Users.Queries.GetUserById;
 
 namespace Travel_Explorer.Controllers
@@ -140,54 +141,6 @@ namespace Travel_Explorer.Controllers
         }
 
         /// <summary>
-        /// Approves a user account.
-        /// </summary>
-        /// <param name="id">User identifier.</param>
-        /// <returns>Success message.</returns>
-        [HttpPut("{id}/approve")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> ApproveUser(int id)
-        {
-            var success = await _mediator.Send(new ApproveUserCommand(id));
-
-            if (!success)
-                return NotFound(new { Message = "User not found." });
-
-            return Ok(new
-            {
-                Message = "User account approved successfully."
-            });
-        }
-
-        /// <summary>
-        /// Rejects a user account.
-        /// </summary>
-        /// <param name="id">User identifier.</param>
-        /// <returns>Success message.</returns>
-        [HttpPut("{id}/reject")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> RejectUser(int id)
-        {
-            var success = await _mediator.Send(new RejectUserCommand(id));
-
-            if (!success)
-                return NotFound(new { Message = "User not found." });
-
-            return Ok(new
-            {
-                Message = "User account rejected successfully."
-            });
-        }
-
-        /// <summary>
         /// Performs a soft delete for a specific user.
         /// </summary>
         /// <param name="id">User identifier.</param>
@@ -231,6 +184,73 @@ namespace Travel_Explorer.Controllers
             var stats = await _mediator.Send(new GetAdminStatisticsQuery());
 
             return Ok(stats);
+        }
+
+        // ===== Author Request Management =====
+
+        /// <summary>
+        /// Retrieves all users who have a pending Author role request.
+        /// </summary>
+        /// <returns>List of users with pending Author requests.</returns>
+        [HttpGet("pending-author-requests")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> GetPendingAuthorRequests()
+        {
+            var users = await _mediator.Send(new GetPendingAuthorRequestsQuery());
+            return Ok(users);
+        }
+
+        /// <summary>
+        /// Approves a user's request to become an Author.
+        /// </summary>
+        /// <param name="id">User identifier.</param>
+        /// <returns>Success message.</returns>
+        [HttpPut("{id}/approve-author")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> ApproveAuthorRequest(int id)
+        {
+            var success = await _mediator.Send(new ApproveAuthorRequestCommand(id));
+
+            if (!success)
+                return NotFound(new { Message = "User not found or no pending Author request." });
+
+            return Ok(new
+            {
+                Message = "Author request approved successfully. User is now an Author."
+            });
+        }
+
+        /// <summary>
+        /// Rejects a user's request to become an Author.
+        /// </summary>
+        /// <param name="id">User identifier.</param>
+        /// <returns>Success message.</returns>
+        [HttpPut("{id}/reject-author")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> RejectAuthorRequest(int id)
+        {
+            var success = await _mediator.Send(new RejectAuthorRequestCommand(id));
+
+            if (!success)
+                return NotFound(new { Message = "User not found or no pending Author request." });
+
+            return Ok(new
+            {
+                Message = "Author request rejected successfully."
+            });
         }
     }
 }

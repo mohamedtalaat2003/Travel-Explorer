@@ -1,4 +1,4 @@
-﻿using Google.Apis.Auth;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -43,8 +43,21 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 user.UserName = request.UserName;
                 user.Email = request.Email;
                 user.PasswordHash = hashedPassword;
-                user.Role = "Traveler";//by default
+                user.Role = "Traveler"; // by default
                 user.CreatedAt = DateTime.UtcNow;
+
+                // If the user is requesting to become an Author, mark as Pending for Admin approval.
+                // Otherwise, the Traveler is Approved automatically and doesn't need admin approval.
+                if (request.IWantToBeAuthor)
+                {
+                    user.requestToBeAuthor = RequestToBeAuthor.Pending;
+                    user.Status = AccountStatus.Pending;
+                }
+                else
+                {
+                    user.requestToBeAuthor = RequestToBeAuthor.Rejected;
+                    user.Status = AccountStatus.Approved;
+                }
 
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -66,6 +79,11 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 return null;
             }
 
+            if (user.IsBlocked || user.Status == AccountStatus.Pending || user.Status == AccountStatus.Rejected)
+            {
+                return null;
+            }
+
             var passwordVerificationResult = new PasswordHasher<ApplicationUser>()
                 .VerifyHashedPassword(user, user.PasswordHash, request.Password);
 
@@ -83,14 +101,20 @@ namespace Travel_Explorer.Infrastructure.Repositories
             var user = await _context.Users.FindAsync(request.userId);
 
             if (user is null) return null;
-            if(iWantToBeAuthor)
+
+            if (iWantToBeAuthor)
             {
+                // Admin is approving an Author request
                 user.requestToBeAuthor = RequestToBeAuthor.Approved;
                 user.Role = "Author";
             }
-            user.requestToBeAuthor = RequestToBeAuthor.Rejected;
+            else
+            {
+                // Normal role assignment (not an Author approval)
+                user.requestToBeAuthor = RequestToBeAuthor.Rejected;
+                user.Role = request.newRole;
+            }
 
-            user.Role = request.newRole;
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return await CreateTokenResponse(user);
         }

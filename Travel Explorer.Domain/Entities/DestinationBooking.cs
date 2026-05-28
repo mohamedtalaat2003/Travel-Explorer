@@ -3,7 +3,7 @@ using Travel_Explorer.Domain.Enums;
 namespace Travel_Explorer.Domain.Entities
 {/// <summary>
  /// Represents a destination booking made by a user.
- /// This is a transactional entity — records must never be hard-deleted
+ /// This is a transactional entity â€” records must never be hard-deleted
  /// for audit and legal compliance purposes.
  /// </summary>
     public class DestinationBooking : BaseEntity
@@ -24,7 +24,7 @@ namespace Travel_Explorer.Domain.Entities
         public int NumberOfGuests { get; set; }
 
         /// <summary>
-        /// The total price for the entire booking (calculated from PricePerNight × nights).
+        /// The total price for the entire booking (calculated from PricePerNight Ã— nights).
         /// </summary>
         public decimal TotalPrice { get; set; }
 
@@ -50,6 +50,11 @@ namespace Travel_Explorer.Domain.Entities
         /// Foreign key to the destination being booked.
         /// </summary>
         public int DestinationId { get; set; }
+
+        /// <summary>
+        /// Foreign key to the payment transaction associated with this booking (nullable).
+        /// </summary>
+        public int? PaymentId { get; set; }
 
         // ===== Navigation Properties =====
 

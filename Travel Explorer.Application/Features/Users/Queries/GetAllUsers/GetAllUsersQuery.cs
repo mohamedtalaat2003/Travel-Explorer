@@ -23,7 +23,9 @@ namespace Travel_Explorer.Application.Features.Users.Queries.GetAllUsers
                 u.Email,
                 u.Gender,
                 u.IsBlocked,
-                u.Status.ToString()
+                u.Role,
+                u.Status.ToString(),
+                u.requestToBeAuthor.ToString()
             ));
 
             return (usersDto, totalCount);

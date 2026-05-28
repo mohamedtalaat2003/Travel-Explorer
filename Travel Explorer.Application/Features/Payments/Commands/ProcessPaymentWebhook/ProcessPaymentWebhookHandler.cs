@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Travel_Explorer.Application.Features.DestinationBookings;
+using Travel_Explorer.Application.Features.FlightBookings;
 using Travel_Explorer.Domain.Entities;
 using Travel_Explorer.Domain.Enums;
 using Travel_Explorer.Domain.Interfaces;
@@ -51,26 +53,39 @@ namespace Travel_Explorer.Application.Features.Payments.Commands.ProcessPaymentW
                 paymentTx.TransactionReference = webhook.ProviderTransactionId;
 
                 _logger.LogInformation(
-                    "[{Provider}] Payment SUCCESS — TxId={TxId}, ProviderTxId={PTxId}",
+                    "[{Provider}] Payment SUCCESS - TxId={TxId}, ProviderTxId={PTxId}",
                     request.ProviderName, paymentTxId, webhook.ProviderTransactionId);
 
-                if (paymentTx.DestinationBookId.HasValue)
-                {
-                    var booking = await _unitOfWork.Repository<DestinationBooking>()
-                        .GetAsync(paymentTx.DestinationBookId.Value);
+                // Find DestinationBooking by PaymentId
+                var destSpec = new DestinationBookingSpecification(paymentTx.Id, isPayment: true);
+                var destBooking = await _unitOfWork.Repository<DestinationBooking>()
+                    .GenericEntitiesWithSpec(destSpec);
 
-                    if (booking is not null)
+                if (destBooking is not null)
+                {
+                    destBooking.Status = BookingStatus.Confirmed;
+                    _unitOfWork.Repository<DestinationBooking>().Update(destBooking);
+                    _logger.LogInformation("DestinationBooking {BookingId} confirmed", destBooking.Id);
+                }
+                else
+                {
+                    // Find FlightBooking by PaymentId
+                    var flightSpec = new FlightBookingSpecification(paymentTx.Id, isPayment: true);
+                    var flightBooking = await _unitOfWork.Repository<FlightBooking>()
+                        .GenericEntitiesWithSpec(flightSpec);
+
+                    if (flightBooking is not null)
                     {
-                        booking.Status = BookingStatus.Confirmed;
-                        _unitOfWork.Repository<DestinationBooking>().Update(booking);
-                        _logger.LogInformation("Booking {BookingId} confirmed", booking.Id);
+                        flightBooking.Status = BookingStatus.Confirmed;
+                        _unitOfWork.Repository<FlightBooking>().Update(flightBooking);
+                        _logger.LogInformation("FlightBooking {BookingId} confirmed", flightBooking.Id);
                     }
                 }
             }
             else
             {
                 paymentTx.Status = PaymentStatus.Failed;
-                _logger.LogWarning("[{Provider}] Payment FAILED — TxId={TxId}", request.ProviderName, paymentTxId);
+                _logger.LogWarning("[{Provider}] Payment FAILED - TxId={TxId}", request.ProviderName, paymentTxId);
             }
 
             _unitOfWork.Repository<PaymentTransaction>().Update(paymentTx);
