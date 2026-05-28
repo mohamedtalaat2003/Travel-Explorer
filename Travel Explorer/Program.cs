@@ -1,6 +1,13 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
+using Travel_Explorer.Application.Services;
+using Travel_Explorer.Application.Services.Payment;
 using Travel_Explorer.Infrastructure.DependencyInjection;
+using Travel_Explorer.Middleware;
 
 namespace Travel_Explorer
 {
@@ -9,6 +16,12 @@ namespace Travel_Explorer
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddCors(options => {
+                options.AddPolicy("AllowAll", policy => {
+                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
 
             // Add services to the container.
             builder.Services.AddApplicationServices();
@@ -25,26 +38,42 @@ namespace Travel_Explorer
             builder.Services.AddSwaggerGen();
 
             // Authentication & Authorization
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-                        System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "YourSecretKeyHere_MustBeAtLeast32CharsLong!"))
-                };
-            });
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
+            builder.Services.Configure<PaymobtSettings>(builder.Configuration.GetSection("PaymobSettings"));
+
+
+            builder.Services.AddAuthentication(
+                options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }).AddCookie("ExternalCookie")//temp cookie for google schema
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings.Issuer,
+                        ValidAudience = jwtSettings.Audience,
+                        ClockSkew = TimeSpan.Zero,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Token))
+                    };
+                })
+                .AddGoogle(Options =>
+                {
+                    Options.ClientId = jwtSettings.GoogleClientId;
+                    Options.ClientSecret = jwtSettings.GoogleClientSecret;
+                    Options.SignInScheme = "ExternalCookie";
+                });
+
+         
+
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddAuthorization();
 
             var app = builder.Build();
@@ -60,7 +89,9 @@ namespace Travel_Explorer
 
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseCors("AllowAll");
+            
+            app.UsePaymentWebhookVerification();
 
             app.MapControllers();
 

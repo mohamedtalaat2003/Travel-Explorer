@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Travel_Explorer.Infrastructure.Data;
@@ -12,16 +13,17 @@ using Travel_Explorer.Infrastructure.Data;
 namespace Travel_Explorer.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260525153228_addRequestToBeAuthorEnum")]
+    partial class addRequestToBeAuthorEnum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -597,14 +599,8 @@ namespace Travel_Explorer.Infrastructure.Migrations
                     b.Property<int>("FlightScheduleId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Gender")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("Nationality")
-                        .HasColumnType("text");
 
                     b.Property<int>("NumberOfPassengers")
                         .HasColumnType("integer");
@@ -663,13 +659,7 @@ namespace Travel_Explorer.Infrastructure.Migrations
                     b.Property<DateTime>("ArrivalTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("AvailableBusinessSeats")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("AvailableEconomySeats")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("AvailableFirstClassSeats")
+                    b.Property<int>("AvailableSeats")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("BusinessPrice")
@@ -802,10 +792,6 @@ namespace Travel_Explorer.Infrastructure.Migrations
 
                     b.Property<int>("DestinationId")
                         .HasColumnType("integer");
-
-                    b.Property<List<string>>("ImageUrls")
-                        .IsRequired()
-                        .HasColumnType("text[]");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
