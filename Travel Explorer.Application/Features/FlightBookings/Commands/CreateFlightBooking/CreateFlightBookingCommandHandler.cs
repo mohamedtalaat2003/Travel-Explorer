@@ -46,7 +46,7 @@ namespace Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFli
             decimal totalPrice = ticketPrice * request.NumberOfPassengers;
 
             var booking = _mapper.Map<FlightBooking>(request);
-            booking.UserId = _currentUserService.UserId ?? 0;
+            booking.UserId = _currentUserService.UserId ??0;
             booking.TotalPrice = totalPrice;
             booking.Status = BookingStatus.Pending;
             booking.CreatedAt = DateTime.UtcNow;

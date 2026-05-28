@@ -27,8 +27,6 @@ namespace Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFli
                 .WithMessage("A valid passenger gender is required.");
 
             RuleFor(x => x.Nationality)
-                .NotEmpty()
-                .WithMessage("Passenger nationality is required.")
                 .MaximumLength(50)
                 .WithMessage("Nationality must not exceed 50 characters.");
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Travel_Explorer.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>
@@ -29,6 +30,11 @@ namespace Travel_Explorer.Domain.Entities
         /// but still exists in the database. Default is false.
         /// </summary>
         public bool IsDeleted { get; set; } = false;
+        public DateTime? DeletedAt { get; set; }
+        public bool IsBlocked { get; set; } = false;
+        public AccountStatus Status { get; set; } = AccountStatus.Pending;
+        public Gender? Gender { get; set; }
+        public string Role { get; set; } = "Traveler";
 
         // ===== Navigation Properties =====
 

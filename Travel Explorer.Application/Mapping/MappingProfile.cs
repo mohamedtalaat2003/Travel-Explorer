@@ -140,6 +140,7 @@ namespace Travel_Explorer.Application.Mapping
                     opt => opt.MapFrom(src => src.FlightSchedule != null ? src.FlightSchedule.DepartureTime : default));
 
             CreateMap<CreateFlightBookingCommand, FlightBooking>();
+               
         }
 
     }

@@ -25,6 +25,7 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Crea
             RuleFor(x => x.Notes)
                 .MaximumLength(1000)
                 .WithMessage("Notes must not exceed 1000 characters.");
+            
         }
     }
 }

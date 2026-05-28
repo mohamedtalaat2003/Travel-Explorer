@@ -1,5 +1,4 @@
 using FluentValidation;
-using MediatR;
 
 namespace Travel_Explorer.Application.Common.Behaviors
 {
@@ -29,7 +28,7 @@ namespace Travel_Explorer.Application.Common.Behaviors
 
                 if (failures.Count != 0)
                 {
-                    throw new Travel_Explorer.Application.Common.Exceptions.ValidationException(failures);
+                    throw new Exceptions.ValidationException(failures);
                 }
             }
 

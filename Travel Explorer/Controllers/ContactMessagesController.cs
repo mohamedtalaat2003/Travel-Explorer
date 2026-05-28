@@ -15,6 +15,7 @@ namespace Travel_Explorer.Controllers
     [ApiController]
     [Route("api/ContactMessages")]
     [Produces("application/json")]
+    [Authorize(Roles = "Admin")]
     public class ContactMessagesController(IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
@@ -25,7 +26,7 @@ namespace Travel_Explorer.Controllers
         /// </summary>
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(PaginatedResult<ContactMessageDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] ContactMessageSpecParams p)
         {

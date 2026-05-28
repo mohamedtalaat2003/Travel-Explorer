@@ -1,9 +1,6 @@
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
-using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 using Travel_Explorer.Application.Common.Exceptions;
-
 
 namespace Travel_Explorer.Middleware
 {
@@ -21,7 +18,7 @@ namespace Travel_Explorer.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "{Message}", ex.Message);
                 await HandleExceptionAsync(context, ex);
             }
         }
@@ -29,33 +26,32 @@ namespace Travel_Explorer.Middleware
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
-            var statusCode = HttpStatusCode.InternalServerError;
             string result;
 
+            // 🛠️ استخدام الـ Switch Expression لتحديد الـ StatusCode والـ Response بشكل ذكي ونظيف
+            var statusCode = exception switch
+            {
+                NotFoundException => HttpStatusCode.NotFound,
+                BadRequestException => HttpStatusCode.BadRequest,
+                ForbiddenAccessException => HttpStatusCode.Forbidden,
+
+                // 🔒 حل ثغرة الـ 500: معالجة استثناءات الأمان الرسمية لـ دوت نت
+                UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+
+                Travel_Explorer.Application.Common.Exceptions.ValidationException => HttpStatusCode.BadRequest,
+                FluentValidation.ValidationException => HttpStatusCode.BadRequest,
+
+                _ => HttpStatusCode.InternalServerError
+            };
+
+            // 📑 صياغة الـ JSON الناتج بناءً على نوع الـ Exception
             switch (exception)
             {
-                case NotFoundException:
-                    statusCode = HttpStatusCode.NotFound;
-                    result = SerializeProblem(statusCode, exception, context);
-                    break;
-
-                case ForbiddenAccessException:
-                    statusCode = HttpStatusCode.Forbidden;
-                    result = SerializeProblem(statusCode, exception, context);
-                    break;
-
-                case BadRequestException:
-                    statusCode = HttpStatusCode.BadRequest;
-                    result = SerializeProblem(statusCode, exception, context);
-                    break;
-
                 case Travel_Explorer.Application.Common.Exceptions.ValidationException customEx:
-                    statusCode = HttpStatusCode.BadRequest;
                     result = SerializeValidationErrors(statusCode, customEx.Errors, context);
                     break;
 
                 case FluentValidation.ValidationException fluentEx:
-                    statusCode = HttpStatusCode.BadRequest;
                     var errors = fluentEx.Errors
                         .GroupBy(e => e.PropertyName)
                         .ToDictionary(
@@ -76,13 +72,13 @@ namespace Travel_Explorer.Middleware
 
         private string SerializeProblem(HttpStatusCode statusCode, Exception exception, HttpContext context)
         {
-            var problemDetails = new ProblemDetails
+            var problemDetails = new
             {
                 Status = (int)statusCode,
                 Type = exception.GetType().Name,
                 Title = exception.Message,
                 Detail = _env.IsDevelopment() ? exception.StackTrace : null,
-                Instance = context.Request.Path
+                Instance = context.Request.Path.Value
             };
             return JsonSerializer.Serialize(problemDetails);
         }
