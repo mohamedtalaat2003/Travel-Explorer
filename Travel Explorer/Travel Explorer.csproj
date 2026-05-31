@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>annotations</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Travel_Explorer</RootNamespace>
     <UserSecretsId>647faf90-7043-4fee-a5bf-8545948694f4</UserSecretsId>

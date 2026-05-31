@@ -62,7 +62,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync(cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the exception (you can use a logging framework like Serilog, NLog, etc.)
                 throw;
@@ -121,6 +121,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         private async Task<string> CreateToken(ApplicationUser user)
         {
+            await Task.CompletedTask;
             var claims = new List<Claim>
             {
                 new Claim (ClaimTypes.Name , user.UserName),
