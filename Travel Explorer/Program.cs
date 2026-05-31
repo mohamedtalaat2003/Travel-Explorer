@@ -7,8 +7,10 @@ using Travel_Explorer.Application.DependencyInjection;
 using Travel_Explorer.Application.Services;
 using Travel_Explorer.Application.Services.Payment;
 using Travel_Explorer.Infrastructure.DependencyInjection;
+using Travel_Explorer.Infrastructure.Data;
 using Travel_Explorer.Middleware;
 using Microsoft.AspNetCore.Identity;
+using Travel_Explorer.Domain.Entities;
 using Travel_Explorer.Infrastructure.Persistence.Seed;
 
 namespace Travel_Explorer
@@ -142,7 +144,7 @@ namespace Travel_Explorer
             app.UsePaymentWebhookVerification();
             app.MapControllers();
 
-            // Seed Roles
+            // Seed Roles & Data
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -150,6 +152,14 @@ namespace Travel_Explorer
                 {
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
                     RoleSeeder.SeedRolesAsync(roleManager).GetAwaiter().GetResult();
+
+                    // Seed Data (Categories, Destinations, Activities, Flights, Messages)
+                    var dbContext = services.GetRequiredService<ApplicationDbContext>();
+                    DataSeeder.SeedDataAsync(dbContext).GetAwaiter().GetResult();
+
+                    // Seed Users (2 Admin, 5 Traveler, 3 Author)
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                    DataSeeder.SeedUsersAsync(userManager).GetAwaiter().GetResult();
                 }
                 catch (Exception)
                 {

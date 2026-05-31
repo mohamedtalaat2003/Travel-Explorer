@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using Travel_Explorer.Domain.Entities;
 using Travel_Explorer.Application.Common.Interfaces;
 using Polly;
 using Travel_Explorer.Infrastructure.Data;
