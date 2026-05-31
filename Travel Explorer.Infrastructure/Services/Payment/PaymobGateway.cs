@@ -92,6 +92,10 @@ namespace Travel_Explorer.Infrastructure.Services.Payment
                 var doc = JsonDocument.Parse(body);
                 var obj = doc.RootElement.GetProperty("obj");
 
+                // Paymob HMAC is computed from this exact ordered set of fields.
+                var orderObj = obj.GetProperty("order");
+                var sourceData = obj.GetProperty("source_data");
+
                 var fields = new[]
                 {
                     obj.GetProperty("amount_cents").GetInt64().ToString(),
@@ -106,8 +110,12 @@ namespace Travel_Explorer.Infrastructure.Services.Payment
                     obj.GetProperty("is_capture").GetBoolean().ToString().ToLower(),
                     obj.GetProperty("is_refunded").GetBoolean().ToString().ToLower(),
                     obj.GetProperty("is_standalone_payment").GetBoolean().ToString().ToLower(),
-                    obj.GetProperty("id").GetInt64().ToString(),
-                    obj.GetProperty("pending").GetBoolean().ToString().ToLower(),
+                    obj.GetProperty("is_voided").GetBoolean().ToString().ToLower(),
+                    orderObj.GetProperty("id").GetInt64().ToString(),
+                    obj.GetProperty("owner").GetInt64().ToString(),
+                    sourceData.GetProperty("pan").GetString()!,
+                    sourceData.GetProperty("sub_type").GetString()!,
+                    sourceData.GetProperty("type").GetString()!,
                     obj.GetProperty("success").GetBoolean().ToString().ToLower()
                 };
 

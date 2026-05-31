@@ -20,9 +20,11 @@ namespace Travel_Explorer.Application.Common.Behaviors
                 var spec = new BaseSpecification<ApplicationUser>(u => u.Id == userId.Value);
                 var user = await _unitOfWork.Repository<ApplicationUser>().GenericEntitiesWithSpec(spec);
 
-                if (user != null && (user.IsBlocked || user.IsDeleted))
+                // A null result means the token points at a soft-deleted/nonexistent account
+                // (the global query filter hides IsDeleted users), which must also be rejected.
+                if (user is null || user.IsBlocked || user.IsDeleted)
                 {
-                    throw new UnauthorizedAccessException("This account not active in system");
+                    throw new UnauthorizedAccessException("This account is not active in the system.");
                 }
             }
 

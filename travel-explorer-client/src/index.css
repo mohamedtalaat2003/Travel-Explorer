@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-cream-50 text-ink-600 antialiased;
+  font-feature-settings: 'ss01', 'cv01';
+}
+
+::selection {
+  background-color: #d97757;
+  color: #faf9f5;
+}
+
+@layer utilities {
+  /* Clay-tinted gradient text for editorial highlights. */
+  .text-gradient-clay {
+    background-image: linear-gradient(120deg, #d97757 0%, #c0573a 55%, #9f4730 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Subtle paper grain for warm, premium surfaces. */
+  .bg-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  }
+
+  /* Faint dotted grid for hero backgrounds. */
+  .bg-dotgrid {
+    background-image: radial-gradient(rgba(20, 20, 19, 0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  /* Pause marquee on hover for accessibility/legibility. */
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
