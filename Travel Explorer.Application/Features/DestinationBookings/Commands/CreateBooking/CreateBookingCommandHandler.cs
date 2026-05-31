@@ -24,6 +24,10 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Crea
             booking.Status = Domain.Enums.BookingStatus.Pending;
             booking.CreatedAt = DateTime.UtcNow;
 
+            // Treat the client-supplied dates as UTC (required by 'timestamp with time zone').
+            booking.CheckInDate = DateTime.SpecifyKind(request.CheckInDate, DateTimeKind.Utc);
+            booking.CheckOutDate = DateTime.SpecifyKind(request.CheckOutDate, DateTimeKind.Utc);
+
             await _unitOfWork.Repository<DestinationBooking>().AddAsync(booking);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

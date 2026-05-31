@@ -1,332 +1,344 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Travel_Explorer.Domain.Entities;
 using Travel_Explorer.Domain.Enums;
 using Travel_Explorer.Infrastructure.Data;
 
 namespace Travel_Explorer.Infrastructure.Persistence.Seed
 {
-    public class DataSeeder
+    /// <summary>
+    /// Seeds realistic demo content (categories, destinations, activities, reviews,
+    /// flights, and blog posts) the first time the app runs against an empty database,
+    /// so the site looks alive out of the box. Images are real, hot-linkable Unsplash
+    /// photos of the actual places. Runs only when there are no destinations yet.
+    /// </summary>
+    public static class DataSeeder
     {
-        public static async Task SeedDataAsync(ApplicationDbContext context)
+        private static string Img(string photoId) =>
+            $"https://images.unsplash.com/{photoId}?auto=format&fit=crop&w=1400&q=80";
+
+        private record ActivitySeed(string Name, string Icon, string Description);
+
+        private record DestinationSeed(
+            string Name,
+            string City,
+            string Country,
+            string Category,
+            decimal Price,
+            string PhotoId,
+            string Description,
+            ActivitySeed[] Activities);
+
+        private static readonly DestinationSeed[] Destinations =
+        [
+            new("Santorini Sunset", "Oia", "Greece", "Island", 260m, "photo-1761755889797-5e709dc9ce6e",
+                "Whitewashed houses tumble down volcanic cliffs, framing the Aegean's most iconic sunsets. Savor fresh seafood by the caldera and explore hidden beaches of black sand.",
+                [
+                    new("Sunset caldera cruise", "Ship", "Sail beneath the cliffs as the sky turns to fire."),
+                    new("Vineyard wine tasting", "Wine", "Sample volcanic-soil wines unique to the island."),
+                    new("Red Beach swim", "Waves", "Snorkel the dramatic red volcanic shoreline."),
+                ]),
+            new("Machu Picchu", "Aguas Calientes", "Peru", "Historical", 185m, "photo-1747607471502-5312316792c5",
+                "Perched high in the Andes, the ancient Inca citadel greets the dawn with mist-kissed stone terraces. Walk the legendary trail and feel the awe of a lost empire.",
+                [
+                    new("Sunrise citadel trek", "Mountain", "Reach the ruins as first light spills over the peaks."),
+                    new("Temple of the Sun tour", "Landmark", "Explore the astronomy-aligned sacred sanctuary."),
+                    new("Sun Gate hike", "Footprints", "Follow the final stretch of the classic Inca Trail."),
+                ]),
+            new("Great Barrier Reef", "Cairns", "Australia", "Beach", 310m, "photo-1638580591001-8c07e6f54097",
+                "The world's largest coral kingdom bursts with color beneath crystal-clear water. Snorkel and dive among vibrant marine life, then unwind in a tropical resort.",
+                [
+                    new("Reef snorkeling", "Waves", "Drift over living coral gardens teeming with fish."),
+                    new("Scuba diving", "Anchor", "Descend to explore the reef's deeper wonders."),
+                    new("Sunset reef dinner", "UtensilsCrossed", "Dine on the water as the reef glows at dusk."),
+                ]),
+            new("Sahara Dunes", "Merzouga", "Morocco", "Desert", 150m, "photo-1706804198725-fa51050a1047",
+                "Golden dunes stretch endlessly, a playground for explorers by day and a theater of stars by night. Trade city noise for the hush of the desert and a fireside sky.",
+                [
+                    new("Camel caravan trek", "Compass", "Cross the dunes on camelback at golden hour."),
+                    new("4x4 dune bashing", "Car", "Race over towering sand ridges in a 4x4."),
+                    new("Desert stargazing camp", "Stars", "Sleep under a blanket of Saharan stars."),
+                ]),
+            new("Kyoto Temples", "Kyoto", "Japan", "Historical", 210m, "photo-1746059256049-3610f0c2e1a0",
+                "Ancient temples and tea houses are framed by clouds of cherry blossom in spring. Soak in centuries of culture along the lantern-lit lanes of old Japan.",
+                [
+                    new("Golden Pavilion visit", "Landmark", "Marvel at Kinkaku-ji mirrored on its pond."),
+                    new("Tea ceremony", "Coffee", "Take part in a traditional matcha ritual."),
+                    new("Cherry blossom walk", "Flower", "Stroll the Philosopher's Path in full bloom."),
+                ]),
+            new("Patagonia Glaciers", "El Calafate", "Argentina", "Mountain", 225m, "photo-1561990975-380e6ab97f62",
+                "Towering walls of blue ice dominate the Patagonian skyline at Perito Moreno. Hike the glacier's edge and cruise among drifting icebergs in pristine silence.",
+                [
+                    new("Glacier trekking", "Mountain", "Strap on crampons and walk on ancient ice."),
+                    new("Iceberg boat tour", "Ship", "Cruise the glacial lake past floating blue ice."),
+                    new("Wildlife safari", "Binoculars", "Spot condors and guanacos in the national park."),
+                ]),
+            new("New York City", "New York", "USA", "City", 350m, "photo-1518235506717-e1ed3306a89b",
+                "The city that never sleeps dazzles with soaring skyscrapers and world-class culture. From Broadway lights to Central Park's calm, every block hums with energy.",
+                [
+                    new("Broadway show", "Drama", "Catch a world-class performance in the theater district."),
+                    new("Liberty Island ferry", "Ship", "Sail past the Statue of Liberty and the harbor."),
+                    new("Central Park bike ride", "Bike", "Pedal through the city's green heart."),
+                ]),
+            new("Table Mountain", "Cape Town", "South Africa", "Mountain", 190m, "photo-1759440038373-5c8a325c5c01",
+                "A flat-topped giant watches over a vibrant coastal city and two oceans. Pair mountaintop panoramas with world-renowned vineyards just beyond town.",
+                [
+                    new("Cableway to the summit", "MountainSnow", "Ride to the top for sweeping ocean views."),
+                    new("Platteklip Gorge hike", "Footprints", "Climb the classic trail straight up the face."),
+                    new("Winelands tasting", "Wine", "Sip award-winning wines in nearby Stellenbosch."),
+                ]),
+            new("Bali Paradise", "Ubud", "Indonesia", "Island", 130m, "photo-1559628233-eb1b1a45564b",
+                "Lush rice terraces cascade down volcanic hills while temples whisper ancient myths. Balance serene spirituality with surf-ready beaches and jungle hideaways.",
+                [
+                    new("Monkey Forest visit", "Trees", "Wander a sacred sanctuary alive with macaques."),
+                    new("Rice terrace trek", "Sprout", "Hike the emerald steps of Tegallalang."),
+                    new("Beach surf lesson", "Waves", "Catch your first wave on Bali's golden coast."),
+                ]),
+            new("Paris Romance", "Paris", "France", "City", 420m, "photo-1694716021376-d44da3f54e8a",
+                "Elegant boulevards and iconic landmarks set a timeless stage for love-filled wandering. From candlelit cafés to glittering river cruises, the city exudes romance.",
+                [
+                    new("Eiffel Tower summit", "Landmark", "Ascend for the city's most famous panorama."),
+                    new("Seine dinner cruise", "Ship", "Glide past lit monuments over a French dinner."),
+                    new("Louvre Museum", "Palette", "Stand before the world's most celebrated art."),
+                ]),
+            new("Dubai Luxury", "Dubai", "UAE", "Desert", 380m, "photo-1746731341047-76b2652ea843",
+                "Sleek skyscrapers rise beside endless dunes, blending ultramodern opulence with desert adventure. Soar over the sand at dawn, then shop beneath the world's tallest tower.",
+                [
+                    new("Desert safari", "Car", "Dune-bash and dine under the open desert sky."),
+                    new("Burj Khalifa deck", "Building2", "Take in the skyline from the world's tallest tower."),
+                    new("Dhow creek cruise", "Ship", "Sail an illuminated traditional boat at night."),
+                ]),
+            new("Rio de Janeiro", "Rio de Janeiro", "Brazil", "Beach", 260m, "photo-1649405409422-0f6128419bf9",
+                "Sun-kissed Copacabana meets the rhythm of samba in a city famed for its festivals. Sugarloaf Mountain frames the bay for unforgettable beachside days.",
+                [
+                    new("Copacabana beach day", "Waves", "Relax on the world's most famous beach."),
+                    new("Sugarloaf cable car", "MountainSnow", "Ride to the summit for breathtaking bay views."),
+                    new("Live samba night", "Music", "Feel the city's heartbeat at a samba show."),
+                ]),
+        ];
+
+        private static readonly (int Rating, string Text)[] ReviewPool =
+        [
+            (5, "Absolutely unforgettable. Every detail went beyond our expectations."),
+            (5, "One of the best trips of my life — I'd book it again tomorrow."),
+            (4, "Stunning views and warm service. A couple of small hiccups, still worth every penny."),
+            (5, "Booked in minutes and everything went perfectly. Highly recommend."),
+            (4, "Beautiful place and friendly people. We'll definitely be back."),
+            (5, "Photos don't do it justice — magical from start to finish."),
+            (4, "Great value for such an incredible experience."),
+            (5, "The kind of place you keep talking about long after you're home."),
+        ];
+
+        public static async Task SeedAsync(IServiceProvider services)
         {
-            // ===== 1. Seed Categories =====
-            if (!context.Categories.Any())
+            var db = services.GetRequiredService<ApplicationDbContext>();
+            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+            // Idempotent: only seed demo content into a fresh database.
+            if (await db.Destinations.AnyAsync())
+                return;
+
+            var author = await EnsureUserAsync(userManager, "maya.lawson", "maya@travelexplorer.com",
+                "Maya Lawson", "Author", RequestToBeAuthor.Approved);
+
+            var travelerSeeds = new[]
             {
-                var categories = new List<Category>
-                {
-                    new Category { Name = "Beach", Description = "Sun, sand, and sea — tropical beach destinations for ultimate relaxation.", IconUrl = "https://img.icons8.com/fluency/96/beach.png", CreatedAt = DateTime.UtcNow },
-                    new Category { Name = "Mountain", Description = "Breathtaking mountain retreats with stunning views and hiking trails.", IconUrl = "https://img.icons8.com/fluency/96/mountain.png", CreatedAt = DateTime.UtcNow },
-                    new Category { Name = "Historical", Description = "Explore ancient civilizations, monuments, and world heritage sites.", IconUrl = "https://img.icons8.com/fluency/96/historical.png", CreatedAt = DateTime.UtcNow },
-                    new Category { Name = "Adventure", Description = "Thrilling outdoor experiences — desert safaris, diving, and extreme sports.", IconUrl = "https://img.icons8.com/fluency/96/adventure.png", CreatedAt = DateTime.UtcNow },
-                    new Category { Name = "City", Description = "Vibrant urban destinations — nightlife, shopping, and cultural attractions.", IconUrl = "https://img.icons8.com/fluency/96/city.png", CreatedAt = DateTime.UtcNow },
-                    new Category { Name = "Nature", Description = "Lush forests, national parks, and wildlife sanctuaries.", IconUrl = "https://img.icons8.com/fluency/96/forest.png", CreatedAt = DateTime.UtcNow },
-                    new Category { Name = "Island", Description = "Secluded island getaways surrounded by crystal-clear waters.", IconUrl = "https://img.icons8.com/fluency/96/island-on-water.png", CreatedAt = DateTime.UtcNow },
-                    new Category { Name = "Desert", Description = "Vast golden dunes, oasis retreats, and stargazing under clear skies.", IconUrl = "https://img.icons8.com/fluency/96/desert.png", CreatedAt = DateTime.UtcNow },
-                    new Category { Name = "Cultural", Description = "Immerse yourself in local traditions, art, food, and heritage.", IconUrl = "https://img.icons8.com/fluency/96/museum.png", CreatedAt = DateTime.UtcNow },
-                    new Category { Name = "Luxury", Description = "Premium five-star resorts, private villas, and exclusive experiences.", IconUrl = "https://img.icons8.com/fluency/96/5-star-hotel.png", CreatedAt = DateTime.UtcNow }
-                };
+                ("liam.carter", "liam@example.com", "Liam Carter"),
+                ("ava.rossi", "ava@example.com", "Ava Rossi"),
+                ("noah.kim", "noah@example.com", "Noah Kim"),
+                ("emma.silva", "emma@example.com", "Emma Silva"),
+                ("omar.hassan", "omar@example.com", "Omar Hassan"),
+                ("yuki.tanaka", "yuki@example.com", "Yuki Tanaka"),
+            };
+            var travelers = new List<ApplicationUser>();
+            foreach (var (userName, email, fullName) in travelerSeeds)
+                travelers.Add(await EnsureUserAsync(userManager, userName, email, fullName, "Traveler", RequestToBeAuthor.Pending));
 
-                await context.Categories.AddRangeAsync(categories);
-                await context.SaveChangesAsync();
-            }
+            var now = DateTime.UtcNow;
 
-            // ===== 2. Seed Destinations =====
-            if (!context.Destinations.Any())
+            // ---- Categories ----
+            var categoryNames = new (string Name, string Description)[]
             {
-                var cats = context.Categories.ToList();
-                int beach = cats.First(c => c.Name == "Beach").Id;
-                int mountain = cats.First(c => c.Name == "Mountain").Id;
-                int historical = cats.First(c => c.Name == "Historical").Id;
-                int adventure = cats.First(c => c.Name == "Adventure").Id;
-                int city = cats.First(c => c.Name == "City").Id;
-                int nature = cats.First(c => c.Name == "Nature").Id;
-                int island = cats.First(c => c.Name == "Island").Id;
-                int desert = cats.First(c => c.Name == "Desert").Id;
-                int cultural = cats.First(c => c.Name == "Cultural").Id;
-                int luxury = cats.First(c => c.Name == "Luxury").Id;
+                ("Beach", "Sun, sand, and crystal-clear water."),
+                ("Island", "Escapes wrapped in sea and serenity."),
+                ("Mountain", "Peaks, trails, and crisp mountain air."),
+                ("City", "Skylines, culture, and nonstop energy."),
+                ("Historical", "Ancient wonders and timeless heritage."),
+                ("Desert", "Golden dunes and endless horizons."),
+                ("Adventure", "Adrenaline and the great outdoors."),
+            };
+            var categories = categoryNames
+                .Select(c => new Category { Name = c.Name, Description = c.Description, CreatedAt = now })
+                .ToList();
+            db.Categories.AddRange(categories);
+            await db.SaveChangesAsync();
+            var categoryId = categories.ToDictionary(c => c.Name, c => c.Id);
 
-                var destinations = new List<Destination>
+            // ---- Destinations ----
+            var destinations = Destinations
+                .Select(d => new Destination
                 {
-                    // ---- Beach ----
-                    new Destination { Name = "Sharm El Sheikh Resort", Description = "A world-class beach resort on the Red Sea coast, offering crystal-clear waters, vibrant coral reefs, and luxury accommodations. Perfect for snorkeling, diving, and relaxation.", Location = "Sharm El Sheikh, South Sinai, Egypt", PricePerNight = 120m, AverageRating = 4.7, ReviewCount = 234, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?w=800", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800" }, CategoryId = beach, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Maldives Paradise Island", Description = "Overwater bungalows surrounded by turquoise lagoons. Experience world-famous snorkeling spots and pristine white sand beaches.", Location = "Malé, Maldives", PricePerNight = 450m, AverageRating = 4.9, ReviewCount = 512, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800", "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800" }, CategoryId = beach, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Hurghada Beach Resort", Description = "A popular Egyptian Red Sea destination known for warm weather, beautiful beaches, and affordable luxury. Great for families and water sports enthusiasts.", Location = "Hurghada, Red Sea, Egypt", PricePerNight = 85m, AverageRating = 4.3, ReviewCount = 189, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800" }, CategoryId = beach, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Cancún Beach Paradise", Description = "Mexico's premier beach destination with turquoise Caribbean waters, ancient Mayan ruins nearby, and world-famous nightlife.", Location = "Cancún, Quintana Roo, Mexico", PricePerNight = 200m, AverageRating = 4.5, ReviewCount = 678, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1552074284-5e88ef1aef18?w=800" }, CategoryId = beach, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Marsa Alam Eco Beach", Description = "An eco-friendly beach destination on Egypt's southern Red Sea coast. Pristine reefs, sea turtles, and dolphins in their natural habitat.", Location = "Marsa Alam, Red Sea, Egypt", PricePerNight = 70m, AverageRating = 4.4, ReviewCount = 112, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800" }, CategoryId = beach, CreatedAt = DateTime.UtcNow },
+                    Name = d.Name,
+                    Description = d.Description,
+                    Location = $"{d.City}, {d.Country}",
+                    PricePerNight = d.Price,
+                    CategoryId = categoryId[d.Category],
+                    ImageUrls = [Img(d.PhotoId)],
+                    CreatedAt = now,
+                })
+                .ToList();
+            db.Destinations.AddRange(destinations);
+            await db.SaveChangesAsync();
 
-                    // ---- Mountain ----
-                    new Destination { Name = "Swiss Alps Chalet", Description = "A cozy mountain chalet nestled in the Swiss Alps with panoramic views. World-class skiing in winter and breathtaking hiking in summer.", Location = "Interlaken, Switzerland", PricePerNight = 320m, AverageRating = 4.8, ReviewCount = 178, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800", "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800" }, CategoryId = mountain, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Mount Sinai Retreat", Description = "A spiritual experience at the foot of Mount Sinai. Hike to the summit for a legendary sunrise and explore St. Catherine's Monastery.", Location = "Saint Catherine, South Sinai, Egypt", PricePerNight = 65m, AverageRating = 4.5, ReviewCount = 98, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800" }, CategoryId = mountain, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Himalayan Mountain Lodge", Description = "Wake up to the majestic Himalayan peaks. Trekking, meditation retreats, and authentic Nepali cuisine in a serene environment.", Location = "Pokhara, Nepal", PricePerNight = 90m, AverageRating = 4.6, ReviewCount = 145, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=800" }, CategoryId = mountain, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Aspen Mountain Resort", Description = "America's premier mountain destination for skiing, snowboarding, and luxury après-ski experiences in the heart of Colorado.", Location = "Aspen, Colorado, USA", PricePerNight = 400m, AverageRating = 4.7, ReviewCount = 267, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1551524559-8af4e6624178?w=800" }, CategoryId = mountain, CreatedAt = DateTime.UtcNow },
+            // ---- Activities + Reviews (and denormalized rating) ----
+            var activities = new List<Activity>();
+            var reviews = new List<Review>();
+            var random = new Random(42);
 
-                    // ---- Historical ----
-                    new Destination { Name = "Pyramids of Giza", Description = "Visit the last remaining wonder of the ancient world. The Great Pyramids and the Sphinx have stood for over 4,500 years.", Location = "Giza, Cairo, Egypt", PricePerNight = 95m, AverageRating = 4.6, ReviewCount = 876, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=800", "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?w=800" }, CategoryId = historical, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Luxor Temple & Valley of Kings", Description = "Explore the open-air museum of Luxor — Valley of the Kings, Karnak Temple, and Hatshepsut's Mortuary Temple.", Location = "Luxor, Upper Egypt", PricePerNight = 75m, AverageRating = 4.7, ReviewCount = 543, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1568322445389-f64b0f5c7a28?w=800" }, CategoryId = historical, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Colosseum & Roman Forum", Description = "Step back in time to the heart of the Roman Empire. The Colosseum, Roman Forum, and Palatine Hill await history enthusiasts.", Location = "Rome, Italy", PricePerNight = 180m, AverageRating = 4.8, ReviewCount = 1024, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800" }, CategoryId = historical, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Petra - The Rose City", Description = "Discover Jordan's ancient Nabataean city carved into rose-red cliffs. A UNESCO World Heritage Site and one of the New Seven Wonders.", Location = "Petra, Ma'an, Jordan", PricePerNight = 110m, AverageRating = 4.9, ReviewCount = 432, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1579606032821-4e6161c81571?w=800" }, CategoryId = historical, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Aswan & Abu Simbel", Description = "Cruise the Nile to Aswan and witness the colossal temples of Abu Simbel, Philae Temple, and the beautiful Nubian villages.", Location = "Aswan, Upper Egypt", PricePerNight = 80m, AverageRating = 4.5, ReviewCount = 312, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=800" }, CategoryId = historical, CreatedAt = DateTime.UtcNow },
-
-                    // ---- Adventure ----
-                    new Destination { Name = "Sahara Desert Safari Camp", Description = "Experience the Sahara — camel treks at sunset, stargazing in the dunes, and traditional Bedouin campfire nights.", Location = "Siwa Oasis, Western Desert, Egypt", PricePerNight = 55m, AverageRating = 4.4, ReviewCount = 167, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=800" }, CategoryId = adventure, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Queenstown Adventure Base", Description = "The adventure capital of the world! Bungee jumping, skydiving, jet boating, and mountain biking in stunning landscapes.", Location = "Queenstown, New Zealand", PricePerNight = 200m, AverageRating = 4.8, ReviewCount = 321, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1469521669194-babb45599def?w=800" }, CategoryId = adventure, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Costa Rica Rainforest Lodge", Description = "Zip-lining through the canopy, white-water rafting, volcano hiking, and wildlife spotting in one of the most biodiverse places on Earth.", Location = "La Fortuna, Costa Rica", PricePerNight = 160m, AverageRating = 4.6, ReviewCount = 234, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800" }, CategoryId = adventure, CreatedAt = DateTime.UtcNow },
-
-                    // ---- City ----
-                    new Destination { Name = "Dubai Marina Hotel", Description = "The glitz of Dubai — towering skyscrapers, luxury shopping, fine dining, and the iconic Burj Khalifa.", Location = "Dubai Marina, Dubai, UAE", PricePerNight = 280m, AverageRating = 4.6, ReviewCount = 445, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800" }, CategoryId = city, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Istanbul Old City Stay", Description = "Where East meets West — Blue Mosque, Hagia Sophia, Grand Bazaar, and Bosphorus cruises.", Location = "Sultanahmet, Istanbul, Turkey", PricePerNight = 110m, AverageRating = 4.5, ReviewCount = 398, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800" }, CategoryId = city, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Paris City Center", Description = "The City of Light — Eiffel Tower, Louvre Museum, Champs-Élysées, and world-class French cuisine await you.", Location = "1st Arrondissement, Paris, France", PricePerNight = 250m, AverageRating = 4.7, ReviewCount = 890, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800" }, CategoryId = city, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Tokyo Urban Experience", Description = "Ancient temples alongside neon-lit streets. Experience sushi, anime culture, cherry blossoms, and cutting-edge technology.", Location = "Shibuya, Tokyo, Japan", PricePerNight = 180m, AverageRating = 4.8, ReviewCount = 567, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800" }, CategoryId = city, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Barcelona Beach & City", Description = "Gaudí's masterpieces, La Rambla street life, tapas bars, and Mediterranean beaches all in one vibrant city.", Location = "Barcelona, Catalonia, Spain", PricePerNight = 170m, AverageRating = 4.6, ReviewCount = 712, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800" }, CategoryId = city, CreatedAt = DateTime.UtcNow },
-
-                    // ---- Nature ----
-                    new Destination { Name = "Bali Rainforest Retreat", Description = "A serene escape in Bali's lush rainforest. Yoga, rice terrace walks, waterfall excursions, and Balinese spa treatments.", Location = "Ubud, Bali, Indonesia", PricePerNight = 150m, AverageRating = 4.7, ReviewCount = 289, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800" }, CategoryId = nature, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Amazon Jungle Expedition", Description = "Navigate the Amazon River, spot exotic wildlife, and stay in eco-lodges deep in the world's largest rainforest.", Location = "Manaus, Amazonas, Brazil", PricePerNight = 130m, AverageRating = 4.5, ReviewCount = 156, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800" }, CategoryId = nature, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Norwegian Fjords Cruise", Description = "Sail through spectacular fjords surrounded by towering cliffs, cascading waterfalls, and charming fishing villages.", Location = "Bergen, Norway", PricePerNight = 350m, AverageRating = 4.9, ReviewCount = 198, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1513519245088-0e12902e35a6?w=800" }, CategoryId = nature, CreatedAt = DateTime.UtcNow },
-
-                    // ---- Island ----
-                    new Destination { Name = "Santorini Caldera View", Description = "Iconic white-washed buildings with blue domes overlooking the Aegean Sea. Stunning sunsets and volcanic beaches.", Location = "Oia, Santorini, Greece", PricePerNight = 300m, AverageRating = 4.8, ReviewCount = 634, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800" }, CategoryId = island, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Zanzibar Spice Island", Description = "Pristine beaches, historic Stone Town, spice plantations, and incredible seafood on Tanzania's exotic island.", Location = "Zanzibar, Tanzania", PricePerNight = 120m, AverageRating = 4.5, ReviewCount = 187, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=800" }, CategoryId = island, CreatedAt = DateTime.UtcNow },
-
-                    // ---- Desert ----
-                    new Destination { Name = "Wadi Rum Mars Camp", Description = "Sleep under the stars in the Martian-like landscape of Wadi Rum. Jeep tours, rock climbing, and Bedouin culture.", Location = "Wadi Rum, Aqaba, Jordan", PricePerNight = 70m, AverageRating = 4.7, ReviewCount = 278, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1548820955-ac84e2b61be8?w=800" }, CategoryId = desert, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "White Desert Egypt", Description = "Surreal chalk-white rock formations in Egypt's Western Desert. Camping, stargazing, and a landscape from another planet.", Location = "Farafra, New Valley, Egypt", PricePerNight = 50m, AverageRating = 4.6, ReviewCount = 89, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=800" }, CategoryId = desert, CreatedAt = DateTime.UtcNow },
-
-                    // ---- Cultural ----
-                    new Destination { Name = "Marrakech Medina Riad", Description = "Get lost in the vibrant souks, taste authentic Moroccan tagine, and relax in a traditional riad with a rooftop terrace.", Location = "Medina, Marrakech, Morocco", PricePerNight = 95m, AverageRating = 4.5, ReviewCount = 356, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800" }, CategoryId = cultural, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Kyoto Temple Trail", Description = "Walk through thousands of vermillion torii gates, visit zen gardens, and witness traditional geisha culture.", Location = "Kyoto, Kansai, Japan", PricePerNight = 160m, AverageRating = 4.8, ReviewCount = 423, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800" }, CategoryId = cultural, CreatedAt = DateTime.UtcNow },
-
-                    // ---- Luxury ----
-                    new Destination { Name = "Burj Al Arab Suite", Description = "The world's most luxurious hotel. Private beach, helicopter transfers, gold-leaf interiors, and underwater restaurant.", Location = "Jumeirah, Dubai, UAE", PricePerNight = 1500m, AverageRating = 4.9, ReviewCount = 156, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800" }, CategoryId = luxury, CreatedAt = DateTime.UtcNow },
-                    new Destination { Name = "Four Seasons Bora Bora", Description = "Ultimate luxury overwater bungalows with glass floors, Mount Otemanu views, and a private lagoon sanctuary.", Location = "Bora Bora, French Polynesia", PricePerNight = 2000m, AverageRating = 5.0, ReviewCount = 89, ImageUrls = new List<string>{ "https://images.unsplash.com/photo-1559628233-100c798642d4?w=800" }, CategoryId = luxury, CreatedAt = DateTime.UtcNow }
-                };
-
-                await context.Destinations.AddRangeAsync(destinations);
-                await context.SaveChangesAsync();
-            }
-
-            // ===== 3. Seed Activities =====
-            if (!context.Activities.Any())
+            for (var i = 0; i < Destinations.Length; i++)
             {
-                var dests = context.Destinations.ToList();
-                var activities = new List<Activity>();
+                var seed = Destinations[i];
+                var dest = destinations[i];
 
-                void AddAct(string destKeyword, string name, string desc, string icon, string img)
+                foreach (var act in seed.Activities)
                 {
-                    var d = dests.FirstOrDefault(x => x.Name.Contains(destKeyword));
-                    if (d != null) activities.Add(new Activity { Name = name, Description = desc, Icon = icon, ImageUrls = new List<string>{ img }, DestinationId = d.Id, CreatedAt = DateTime.UtcNow });
+                    activities.Add(new Activity
+                    {
+                        Name = act.Name,
+                        Description = act.Description,
+                        Icon = act.Icon,
+                        ImageUrls = [Img(seed.PhotoId)],
+                        DestinationId = dest.Id,
+                        CreatedAt = now,
+                    });
                 }
 
-                // Sharm El Sheikh
-                AddAct("Sharm", "Scuba Diving", "Explore vibrant coral reefs of Ras Mohammed and Tiran Island with certified diving instructors.", "🤿", "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800");
-                AddAct("Sharm", "Snorkeling Tour", "Swim with colorful fish and sea turtles in the crystal-clear waters of Naama Bay.", "🐠", "https://images.unsplash.com/photo-1560275619-4662e36fa65c?w=800");
-                AddAct("Sharm", "Quad Biking in the Desert", "Ride through the Sinai desert on a quad bike and visit a Bedouin village for traditional tea.", "🏍️", "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800");
-                AddAct("Sharm", "Glass Bottom Boat", "See the underwater world without getting wet! A family-friendly glass bottom boat tour.", "🚤", "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800");
-
-                // Maldives
-                AddAct("Maldives", "Sunset Dolphin Cruise", "Sail into the sunset and watch dolphins playing in the Indian Ocean.", "🐬", "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800");
-                AddAct("Maldives", "Private Island Picnic", "A secluded sandbank picnic with champagne and fresh seafood, just for you.", "🏝️", "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800");
-                AddAct("Maldives", "Underwater Dining", "Dine 5 meters below sea level surrounded by vibrant marine life.", "🍽️", "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800");
-
-                // Pyramids
-                AddAct("Pyramids", "Camel Ride Around Pyramids", "Ride a camel across the Giza plateau with a panoramic pyramid view.", "🐪", "https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=800");
-                AddAct("Pyramids", "Sound & Light Show", "Watch the Pyramids come alive at night with a spectacular sound and light show.", "🎆", "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=800");
-                AddAct("Pyramids", "Egyptian Museum Tour", "Explore King Tutankhamun's treasures and 5,000 years of Egyptian civilization.", "🏛️", "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=800");
-
-                // Dubai
-                AddAct("Dubai Marina", "Burj Khalifa Observation Deck", "Visit the 148th floor of the world's tallest building for a 360° view of Dubai.", "🏙️", "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800");
-                AddAct("Dubai Marina", "Desert Safari with BBQ", "Dune bashing, sandboarding, camel rides, and a BBQ dinner under the stars.", "🏜️", "https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?w=800");
-                AddAct("Dubai Marina", "Dhow Cruise Dinner", "A traditional Arabian dhow cruise along Dubai Marina with a buffet dinner.", "⛵", "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800");
-                AddAct("Dubai Marina", "Dubai Mall & Aquarium", "Visit the world's largest mall and its incredible aquarium with 33,000 marine animals.", "🦈", "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800");
-
-                // Bali
-                AddAct("Bali", "Rice Terrace Trekking", "Walk through the stunning Tegallalang rice terraces — one of Bali's most iconic landscapes.", "🌾", "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800");
-                AddAct("Bali", "Waterfall Excursion", "Visit the breathtaking Tegenungan and Sekumpul waterfalls hidden in Bali's jungle.", "💧", "https://images.unsplash.com/photo-1432405972618-c6b0cfba5849?w=800");
-                AddAct("Bali", "Monkey Forest Sanctuary", "Walk among hundreds of long-tailed macaques in the sacred Ubud Monkey Forest.", "🐒", "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800");
-
-                // Swiss Alps
-                AddAct("Swiss Alps", "Paragliding Over Interlaken", "Soar above the Swiss Alps with a tandem paragliding flight over lakes and mountains.", "🪂", "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800");
-                AddAct("Swiss Alps", "Jungfraujoch Train", "Take the iconic train ride to the Top of Europe at 3,454 meters altitude.", "🚂", "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800");
-
-                // Luxor
-                AddAct("Luxor", "Hot Air Balloon at Sunrise", "Float over the Valley of the Kings at sunrise for a once-in-a-lifetime view.", "🎈", "https://images.unsplash.com/photo-1568322445389-f64b0f5c7a28?w=800");
-                AddAct("Luxor", "Felucca Nile Sailing", "Sail the ancient Nile on a traditional Egyptian felucca at sunset.", "⛵", "https://images.unsplash.com/photo-1568322445389-f64b0f5c7a28?w=800");
-
-                // Istanbul
-                AddAct("Istanbul", "Bosphorus Cruise", "Cruise between Europe and Asia on a scenic Bosphorus boat tour.", "🚢", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800");
-                AddAct("Istanbul", "Turkish Bath Experience", "Relax in a centuries-old Ottoman hammam with a full scrub and foam massage.", "🛁", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800");
-
-                // Paris
-                AddAct("Paris", "Eiffel Tower Summit", "Skip the line and ascend to the summit of the Eiffel Tower for breathtaking views.", "🗼", "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800");
-                AddAct("Paris", "Louvre Museum Guided Tour", "Explore the world's largest art museum with an expert guide — see the Mona Lisa and more.", "🎨", "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800");
-                AddAct("Paris", "Seine River Dinner Cruise", "A romantic dinner cruise along the Seine with views of illuminated Parisian landmarks.", "🥂", "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800");
-
-                // Tokyo
-                AddAct("Tokyo", "Tsukiji Fish Market Tour", "Experience the world's largest fish market and taste the freshest sushi for breakfast.", "🍣", "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800");
-                AddAct("Tokyo", "Shibuya Crossing & Akihabara", "Walk the world's busiest crossing and explore Tokyo's famous electronics and anime district.", "🎮", "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800");
-
-                // Queenstown
-                AddAct("Queenstown", "Bungee Jumping", "Jump from the original AJ Hackett Kawarau Bridge — 43 meters of pure adrenaline!", "🤸", "https://images.unsplash.com/photo-1469521669194-babb45599def?w=800");
-                AddAct("Queenstown", "Milford Sound Cruise", "Cruise through the stunning Milford Sound fiord with waterfalls and wildlife.", "🛥️", "https://images.unsplash.com/photo-1469521669194-babb45599def?w=800");
-
-                // Santorini
-                AddAct("Santorini", "Caldera Sunset Sail", "Sail along the Santorini caldera and watch the legendary Oia sunset from the water.", "🌅", "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800");
-                AddAct("Santorini", "Wine Tasting Tour", "Sample unique volcanic wines from Santorini's centuries-old vineyards.", "🍷", "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800");
-
-                // Petra
-                AddAct("Petra", "Petra by Night", "Walk through the Siq to the Treasury illuminated by 1,500 candles — a magical experience.", "🕯️", "https://images.unsplash.com/photo-1579606032821-4e6161c81571?w=800");
-
-                // Marrakech
-                AddAct("Marrakech", "Cooking Class", "Learn to make authentic Moroccan tagine, couscous, and mint tea with a local chef.", "👨‍🍳", "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800");
-                AddAct("Marrakech", "Souk Shopping Tour", "Navigate the maze-like souks with a local guide to find the best deals on spices and crafts.", "🛍️", "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800");
-
-                if (activities.Any())
+                var reviewCount = 4 + (i % 3); // 4..6 reviews per destination
+                var ratings = new List<int>();
+                for (var r = 0; r < reviewCount; r++)
                 {
-                    await context.Activities.AddRangeAsync(activities);
-                    await context.SaveChangesAsync();
+                    var pick = ReviewPool[(i + r) % ReviewPool.Length];
+                    ratings.Add(pick.Rating);
+                    reviews.Add(new Review
+                    {
+                        Rating = pick.Rating,
+                        Comment = pick.Text,
+                        UserId = travelers[(i + r) % travelers.Count].Id,
+                        DestinationId = dest.Id,
+                        CreatedAt = now.AddDays(-random.Next(1, 90)),
+                    });
                 }
+
+                dest.ReviewCount = reviewCount;
+                dest.AverageRating = Math.Round(ratings.Average(), 1);
             }
 
-            // ===== 4. Seed Flight Schedules =====
-            if (!context.FlightSchedules.Any())
+            db.Activities.AddRange(activities);
+            db.Reviews.AddRange(reviews);
+            db.Destinations.UpdateRange(destinations);
+            await db.SaveChangesAsync();
+
+            // ---- Flights ----
+            var flights = new List<FlightSchedule>
             {
-                var flights = new List<FlightSchedule>
-                {
-                    new FlightSchedule { Airline = "EgyptAir", FlightNumber = "MS800", DepartureCity = "Cairo", ArrivalCity = "Dubai", DepartureTime = DateTime.UtcNow.AddDays(7).Date.AddHours(8), ArrivalTime = DateTime.UtcNow.AddDays(7).Date.AddHours(12), EconomyPrice = 350m, BusinessPrice = 750m, FirstClassPrice = 1500m, AvailableEconomySeats = 150, AvailableBusinessSeats = 30, AvailableFirstClassSeats = 10, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "Emirates", FlightNumber = "EK924", DepartureCity = "Dubai", ArrivalCity = "Cairo", DepartureTime = DateTime.UtcNow.AddDays(7).Date.AddHours(14), ArrivalTime = DateTime.UtcNow.AddDays(7).Date.AddHours(16).AddMinutes(30), EconomyPrice = 380m, BusinessPrice = 800m, FirstClassPrice = 1600m, AvailableEconomySeats = 200, AvailableBusinessSeats = 40, AvailableFirstClassSeats = 12, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "Turkish Airlines", FlightNumber = "TK694", DepartureCity = "Cairo", ArrivalCity = "Istanbul", DepartureTime = DateTime.UtcNow.AddDays(10).Date.AddHours(6), ArrivalTime = DateTime.UtcNow.AddDays(10).Date.AddHours(9).AddMinutes(45), EconomyPrice = 280m, BusinessPrice = 650m, FirstClassPrice = 1200m, AvailableEconomySeats = 180, AvailableBusinessSeats = 35, AvailableFirstClassSeats = 8, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "EgyptAir", FlightNumber = "MS955", DepartureCity = "Cairo", ArrivalCity = "London", DepartureTime = DateTime.UtcNow.AddDays(14).Date.AddHours(22), ArrivalTime = DateTime.UtcNow.AddDays(15).Date.AddHours(2).AddMinutes(30), EconomyPrice = 520m, BusinessPrice = 1100m, FirstClassPrice = 2200m, AvailableEconomySeats = 160, AvailableBusinessSeats = 25, AvailableFirstClassSeats = 6, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "Nile Air", FlightNumber = "NP420", DepartureCity = "Cairo", ArrivalCity = "Sharm El Sheikh", DepartureTime = DateTime.UtcNow.AddDays(3).Date.AddHours(7), ArrivalTime = DateTime.UtcNow.AddDays(3).Date.AddHours(8), EconomyPrice = 80m, BusinessPrice = 180m, FirstClassPrice = 350m, AvailableEconomySeats = 120, AvailableBusinessSeats = 20, AvailableFirstClassSeats = 0, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "Qatar Airways", FlightNumber = "QR1302", DepartureCity = "Cairo", ArrivalCity = "Doha", DepartureTime = DateTime.UtcNow.AddDays(5).Date.AddHours(10), ArrivalTime = DateTime.UtcNow.AddDays(5).Date.AddHours(13).AddMinutes(15), EconomyPrice = 320m, BusinessPrice = 700m, FirstClassPrice = 1400m, AvailableEconomySeats = 190, AvailableBusinessSeats = 42, AvailableFirstClassSeats = 14, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "EgyptAir", FlightNumber = "MS777", DepartureCity = "Cairo", ArrivalCity = "Luxor", DepartureTime = DateTime.UtcNow.AddDays(2).Date.AddHours(9), ArrivalTime = DateTime.UtcNow.AddDays(2).Date.AddHours(10).AddMinutes(15), EconomyPrice = 65m, BusinessPrice = 150m, FirstClassPrice = 300m, AvailableEconomySeats = 140, AvailableBusinessSeats = 18, AvailableFirstClassSeats = 4, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "Etihad Airways", FlightNumber = "EY654", DepartureCity = "Cairo", ArrivalCity = "Abu Dhabi", DepartureTime = DateTime.UtcNow.AddDays(8).Date.AddHours(15), ArrivalTime = DateTime.UtcNow.AddDays(8).Date.AddHours(20).AddMinutes(30), EconomyPrice = 400m, BusinessPrice = 850m, FirstClassPrice = 1700m, AvailableEconomySeats = 170, AvailableBusinessSeats = 32, AvailableFirstClassSeats = 10, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "Air France", FlightNumber = "AF502", DepartureCity = "Cairo", ArrivalCity = "Paris", DepartureTime = DateTime.UtcNow.AddDays(12).Date.AddHours(11), ArrivalTime = DateTime.UtcNow.AddDays(12).Date.AddHours(15).AddMinutes(45), EconomyPrice = 480m, BusinessPrice = 1050m, FirstClassPrice = 2100m, AvailableEconomySeats = 175, AvailableBusinessSeats = 28, AvailableFirstClassSeats = 8, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "Lufthansa", FlightNumber = "LH581", DepartureCity = "Cairo", ArrivalCity = "Frankfurt", DepartureTime = DateTime.UtcNow.AddDays(9).Date.AddHours(13), ArrivalTime = DateTime.UtcNow.AddDays(9).Date.AddHours(17).AddMinutes(30), EconomyPrice = 460m, BusinessPrice = 980m, FirstClassPrice = 1950m, AvailableEconomySeats = 165, AvailableBusinessSeats = 30, AvailableFirstClassSeats = 7, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "Royal Jordanian", FlightNumber = "RJ502", DepartureCity = "Cairo", ArrivalCity = "Amman", DepartureTime = DateTime.UtcNow.AddDays(4).Date.AddHours(16), ArrivalTime = DateTime.UtcNow.AddDays(4).Date.AddHours(17).AddMinutes(45), EconomyPrice = 180m, BusinessPrice = 420m, FirstClassPrice = 850m, AvailableEconomySeats = 130, AvailableBusinessSeats = 22, AvailableFirstClassSeats = 6, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "Saudia", FlightNumber = "SV312", DepartureCity = "Cairo", ArrivalCity = "Jeddah", DepartureTime = DateTime.UtcNow.AddDays(6).Date.AddHours(5), ArrivalTime = DateTime.UtcNow.AddDays(6).Date.AddHours(7).AddMinutes(30), EconomyPrice = 250m, BusinessPrice = 580m, FirstClassPrice = 1100m, AvailableEconomySeats = 200, AvailableBusinessSeats = 36, AvailableFirstClassSeats = 12, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "EgyptAir", FlightNumber = "MS903", DepartureCity = "Cairo", ArrivalCity = "Hurghada", DepartureTime = DateTime.UtcNow.AddDays(1).Date.AddHours(6).AddMinutes(30), ArrivalTime = DateTime.UtcNow.AddDays(1).Date.AddHours(7).AddMinutes(30), EconomyPrice = 70m, BusinessPrice = 160m, FirstClassPrice = 320m, AvailableEconomySeats = 135, AvailableBusinessSeats = 16, AvailableFirstClassSeats = 0, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "FlyDubai", FlightNumber = "FZ8192", DepartureCity = "Dubai", ArrivalCity = "Sharm El Sheikh", DepartureTime = DateTime.UtcNow.AddDays(11).Date.AddHours(9), ArrivalTime = DateTime.UtcNow.AddDays(11).Date.AddHours(11).AddMinutes(30), EconomyPrice = 200m, BusinessPrice = 450m, FirstClassPrice = 0m, AvailableEconomySeats = 180, AvailableBusinessSeats = 24, AvailableFirstClassSeats = 0, CreatedAt = DateTime.UtcNow },
-                    new FlightSchedule { Airline = "British Airways", FlightNumber = "BA155", DepartureCity = "London", ArrivalCity = "Cairo", DepartureTime = DateTime.UtcNow.AddDays(15).Date.AddHours(21), ArrivalTime = DateTime.UtcNow.AddDays(16).Date.AddHours(3).AddMinutes(15), EconomyPrice = 550m, BusinessPrice = 1200m, FirstClassPrice = 2400m, AvailableEconomySeats = 155, AvailableBusinessSeats = 28, AvailableFirstClassSeats = 10, CreatedAt = DateTime.UtcNow }
-                };
+                NewFlight("EgyptAir", "MS801", "Cairo", "Paris", now.AddDays(6).AddHours(2), 5, 240m, 720m, 1450m),
+                NewFlight("Emirates", "EK231", "Dubai", "New York", now.AddDays(8).AddHours(3), 14, 690m, 2100m, 4200m),
+                NewFlight("Qatar Airways", "QR920", "Doha", "Tokyo", now.AddDays(9).AddHours(1), 10, 540m, 1650m, 3300m),
+                NewFlight("Turkish Airlines", "TK45", "Istanbul", "Cape Town", now.AddDays(11).AddHours(4), 11, 470m, 1400m, 2800m),
+                NewFlight("Singapore Airlines", "SQ22", "Singapore", "New York", now.AddDays(13).AddHours(6), 18, 980m, 3200m, 6400m),
+                NewFlight("British Airways", "BA247", "London", "Rio de Janeiro", now.AddDays(15).AddHours(5), 12, 610m, 1850m, 3700m),
+                NewFlight("Air France", "AF459", "Paris", "Santiago", now.AddDays(17).AddHours(7), 14, 720m, 2150m, 4300m),
+                NewFlight("Qantas", "QF50", "Sydney", "Cairns", now.AddDays(5).AddHours(1), 3, 180m, 540m, 1080m),
+                NewFlight("LATAM", "LA2470", "Lima", "Cusco", now.AddDays(7).AddHours(1), 1, 130m, 390m, 780m),
+                NewFlight("Garuda Indonesia", "GA407", "Jakarta", "Denpasar", now.AddDays(10).AddHours(2), 2, 110m, 330m, 660m),
+            };
+            db.FlightSchedules.AddRange(flights);
 
-                await context.FlightSchedules.AddRangeAsync(flights);
-                await context.SaveChangesAsync();
-            }
-
-            // ===== 5. Seed Contact Messages =====
-            if (!context.ContactMessages.Any())
+            // ---- Blogs ----
+            var blogs = new List<Blog>
             {
-                var messages = new List<ContactMessage>
-                {
-                    new ContactMessage { FullName = "Sara Ahmed", Email = "sara.ahmed@gmail.com", Subject = "Booking Inquiry", Message = "Hi, I'm interested in booking the Sharm El Sheikh Resort for 5 nights in July. Are there any special offers?", IsRead = false, CreatedAt = DateTime.UtcNow.AddDays(-3) },
-                    new ContactMessage { FullName = "Mohamed Hassan", Email = "m.hassan@outlook.com", Subject = "Partnership Opportunity", Message = "We are a travel agency based in Alexandria and we'd like to discuss a partnership opportunity with Travel Explorer.", IsRead = true, CreatedAt = DateTime.UtcNow.AddDays(-7) },
-                    new ContactMessage { FullName = "Fatima Al-Zahra", Email = "fatima.z@yahoo.com", Subject = "Payment Issue", Message = "I tried to pay for my flight booking but the payment page keeps timing out. My booking reference is #FL-2024-0892.", IsRead = false, CreatedAt = DateTime.UtcNow.AddDays(-1) },
-                    new ContactMessage { FullName = "John Smith", Email = "john.smith@email.com", Subject = "Group Booking", Message = "I want to book for a group of 20 people for a corporate retreat to the Swiss Alps. Can you provide a group discount?", IsRead = false, CreatedAt = DateTime.UtcNow.AddDays(-2) },
-                    new ContactMessage { FullName = "Amira Khalil", Email = "amira.k@gmail.com", Subject = "Cancellation Request", Message = "I need to cancel my booking #DB-2024-1456 due to a family emergency. What is your refund policy?", IsRead = true, CreatedAt = DateTime.UtcNow.AddDays(-5) },
-                    new ContactMessage { FullName = "Ahmed Mansour", Email = "ahmed.m@live.com", Subject = "Feedback", Message = "I just came back from the Maldives trip booked through your platform. It was absolutely amazing! Thank you so much.", IsRead = true, CreatedAt = DateTime.UtcNow.AddDays(-10) },
-                    new ContactMessage { FullName = "Nour El-Din", Email = "nour.eldin@hotmail.com", Subject = "Flight Change Request", Message = "Can I change my flight from MS800 on June 7th to June 10th? Same route Cairo to Dubai.", IsRead = false, CreatedAt = DateTime.UtcNow.AddHours(-12) }
-                };
+                NewBlog(author.Id, categoryId["Island"], "10 Ways to Fall for Santorini Beyond the Sunset",
+                    "photo-1761755889797-5e709dc9ce6e", now.AddDays(-4),
+                    "Everyone comes to Oia for the sunset, and yes, it deserves the hype. But the island rewards travelers who linger.\n\nStart your mornings early, before the cruise crowds arrive, and wander the cliff paths with a coffee in hand. Spend an afternoon in Pyrgos, the quiet old capital, where blue-domed churches outnumber tourists. Then trade the postcard beaches for the volcanic black sand of Perissa.\n\nThe secret to Santorini isn't a single view — it's the slow rhythm of a place that has perfected the art of doing very little, beautifully."),
+                NewBlog(author.Id, categoryId["Historical"], "A First-Timer's Guide to Machu Picchu",
+                    "photo-1747607471502-5312316792c5", now.AddDays(-8),
+                    "Few places live up to their photographs. Machu Picchu somehow exceeds them.\n\nGo for the first entry slot and you may have the terraces nearly to yourself as the mist lifts. Acclimatize in the Sacred Valley for a day or two before you climb — the altitude is no joke. Hire a guide for at least the first hour; the stories turn piles of stone into a living city.\n\nBring layers, water, and patience. The Andes set the pace, and the reward is a morning you will never forget."),
+                NewBlog(author.Id, categoryId["Desert"], "How to Pack for a Night in the Sahara",
+                    "photo-1706804198725-fa51050a1047", now.AddDays(-12),
+                    "The desert is a study in extremes: scorching by day, surprisingly cold by night.\n\nPack light, breathable layers and a warm jacket for the evening. A scarf does double duty against sun and blowing sand. Closed shoes beat sandals once the dunes cool. Don't forget a power bank — there are no outlets under the stars.\n\nWhat you won't need is your phone. Once the campfire dies down and the Milky Way appears, you'll understand why people cross the world for a single Saharan night."),
+                NewBlog(author.Id, categoryId["Historical"], "Kyoto in Cherry Blossom Season",
+                    "photo-1746059256049-3610f0c2e1a0", now.AddDays(-16),
+                    "For two short weeks each spring, Kyoto turns pink and the whole city seems to exhale.\n\nBeat the crowds with a dawn visit to Fushimi Inari, then drift along the Philosopher's Path as petals fall into the canal. Reserve a tea ceremony in advance — it's the calmest hour you'll spend all trip.\n\nSeason is everything here. Book early, watch the bloom forecasts, and build your days around mornings. Kyoto rewards the patient and the punctual."),
+                NewBlog(author.Id, categoryId["Island"], "Why Bali Belongs on Your Next Itinerary",
+                    "photo-1559628233-eb1b1a45564b", now.AddDays(-21),
+                    "Bali manages to be many trips at once: a surf town, a jungle retreat, a temple pilgrimage, a wellness escape.\n\nBase yourself in Ubud for rice terraces and craft markets, then swap to the coast for sunsets and waves. Rent a scooter only if you're confident; otherwise drivers are cheap and full of recommendations.\n\nGo with a loose plan. The island has a way of rearranging your priorities toward slower mornings and longer dinners."),
+                NewBlog(author.Id, categoryId["City"], "48 Hours in Paris: A Local-Approved Itinerary",
+                    "photo-1694716021376-d44da3f54e8a", now.AddDays(-27),
+                    "Two days in Paris is never enough, but it's enough to fall in love.\n\nStart in the Marais with pastries and small museums, then cross to the Left Bank for booksellers and the Luxembourg Gardens. Save the Eiffel Tower for the evening, when it sparkles on the hour. Day two belongs to the Louvre — go early — and a slow Seine cruise to end.\n\nWalk more than you think you should. In Paris, the streets between the landmarks are the real attraction."),
+            };
+            db.Blogs.AddRange(blogs);
 
-                await context.ContactMessages.AddRangeAsync(messages);
-                await context.SaveChangesAsync();
-            }
+            await db.SaveChangesAsync();
         }
 
-        // ===== 6. Seed Users (2 Admin, 5 Traveler, 3 Author) =====
-        public static async Task SeedUsersAsync(UserManager<ApplicationUser> userManager)
+        private static FlightSchedule NewFlight(
+            string airline, string flightNo, string from, string to,
+            DateTime departure, int durationHours, decimal economy, decimal business, decimal first) =>
+            new()
+            {
+                Airline = airline,
+                FlightNumber = flightNo,
+                DepartureCity = from,
+                ArrivalCity = to,
+                DepartureTime = departure,
+                ArrivalTime = departure.AddHours(durationHours),
+                EconomyPrice = economy,
+                BusinessPrice = business,
+                FirstClassPrice = first,
+                AvailableEconomySeats = 120,
+                AvailableBusinessSeats = 24,
+                AvailableFirstClassSeats = 8,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+        private static Blog NewBlog(int authorId, int categoryId, string title, string photoId, DateTime createdAt, string content) =>
+            new()
+            {
+                Title = title,
+                Content = content,
+                ImageUrl = Img(photoId),
+                IsPublished = true,
+                AuthorId = authorId,
+                CategoryId = categoryId,
+                CreatedAt = createdAt,
+            };
+
+        private static async Task<ApplicationUser> EnsureUserAsync(
+            UserManager<ApplicationUser> userManager,
+            string userName, string email, string fullName, string role, RequestToBeAuthor authorStatus)
         {
-            var defaultPassword = "Pass@123";
+            var existing = await userManager.FindByNameAsync(userName);
+            if (existing is not null)
+                return existing;
 
-            // ---------- 2 Admins ----------
-            var admins = new List<(string Email, string FullName, Gender Gender)>
+            var user = new ApplicationUser
             {
-                ("admin@travelexplorer.com", "Admin Mohamed", Gender.Male),
-                ("admin2@travelexplorer.com", "Admin Sara", Gender.Female)
+                UserName = userName,
+                Email = email,
+                FullName = fullName,
+                Role = role,
+                Status = AccountStatus.Approved,
+                requestToBeAuthor = authorStatus,
+                EmailConfirmed = true,
+                CreatedAt = DateTime.UtcNow,
             };
 
-            foreach (var (email, fullName, gender) in admins)
-            {
-                if (await userManager.FindByEmailAsync(email) == null)
-                {
-                    var user = new ApplicationUser
-                    {
-                        UserName = email,
-                        Email = email,
-                        FullName = fullName,
-                        EmailConfirmed = true,
-                        Gender = gender,
-                        Role = "Admin",
-                        Status = AccountStatus.Approved,
-                        requestToBeAuthor = RequestToBeAuthor.Approved,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    var result = await userManager.CreateAsync(user, defaultPassword);
-                    if (result.Succeeded)
-                        await userManager.AddToRoleAsync(user, "Admin");
-                }
-            }
+            var result = await userManager.CreateAsync(user, "Password@123");
+            if (result.Succeeded)
+                await userManager.AddToRoleAsync(user, role);
 
-            // ---------- 5 Travelers ----------
-            var travelers = new List<(string Email, string FullName, Gender Gender)>
-            {
-                ("ahmed.traveler@gmail.com", "Ahmed Ali", Gender.Male),
-                ("fatma.traveler@gmail.com", "Fatma Ibrahim", Gender.Female),
-                ("omar.traveler@gmail.com", "Omar Khaled", Gender.Male),
-                ("nada.traveler@gmail.com", "Nada Youssef", Gender.Female),
-                ("hassan.traveler@gmail.com", "Hassan Mahmoud", Gender.Male)
-            };
-
-            foreach (var (email, fullName, gender) in travelers)
-            {
-                if (await userManager.FindByEmailAsync(email) == null)
-                {
-                    var user = new ApplicationUser
-                    {
-                        UserName = email,
-                        Email = email,
-                        FullName = fullName,
-                        EmailConfirmed = true,
-                        Gender = gender,
-                        Role = "Traveler",
-                        Status = AccountStatus.Approved,
-                        requestToBeAuthor = RequestToBeAuthor.Pending,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    var result = await userManager.CreateAsync(user, defaultPassword);
-                    if (result.Succeeded)
-                        await userManager.AddToRoleAsync(user, "Traveler");
-                }
-            }
-
-            // ---------- 3 Authors ----------
-            var authors = new List<(string Email, string FullName, Gender Gender)>
-            {
-                ("mona.author@gmail.com", "Mona Saeed", Gender.Female),
-                ("karim.author@gmail.com", "Karim Adel", Gender.Male),
-                ("layla.author@gmail.com", "Layla Nabil", Gender.Female)
-            };
-
-            foreach (var (email, fullName, gender) in authors)
-            {
-                if (await userManager.FindByEmailAsync(email) == null)
-                {
-                    var user = new ApplicationUser
-                    {
-                        UserName = email,
-                        Email = email,
-                        FullName = fullName,
-                        EmailConfirmed = true,
-                        Gender = gender,
-                        Role = "Author",
-                        Status = AccountStatus.Approved,
-                        requestToBeAuthor = RequestToBeAuthor.Approved,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    var result = await userManager.CreateAsync(user, defaultPassword);
-                    if (result.Succeeded)
-                        await userManager.AddToRoleAsync(user, "Author");
-                }
-            }
+            return user;
         }
     }
 }

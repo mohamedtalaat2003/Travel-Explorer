@@ -11,7 +11,7 @@ namespace Travel_Explorer.Application.Features.Destinations.Queries.GetDestinati
         public async Task<IReadOnlyList<ActivityDto>> Handle(
             GetDestinationActivitiesQuery request, CancellationToken cancellationToken)
         {
-            var spec = new ActivitySpecification(request.DestinationId);
+            var spec = new ActivitySpecification(destinationId: request.DestinationId);
             var activities = await _unitOfWork.Repository<Activity>().ListSpecAsync(spec);
 
             return _mapper.Map<IReadOnlyList<ActivityDto>>(activities);

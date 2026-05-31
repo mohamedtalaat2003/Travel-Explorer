@@ -15,7 +15,6 @@ namespace Travel_Explorer.Controllers
     [ApiController]
     [Route("api/ContactMessages")]
     [Produces("application/json")]
-    [Authorize(Roles = "Admin")]
     public class ContactMessagesController(IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;

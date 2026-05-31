@@ -33,6 +33,7 @@ namespace Travel_Explorer.Middleware
             {
                 NotFoundException => HttpStatusCode.NotFound,
                 BadRequestException => HttpStatusCode.BadRequest,
+                ConflictException => HttpStatusCode.Conflict,
                 ForbiddenAccessException => HttpStatusCode.Forbidden,
 
                 // 🔒 حل ثغرة الـ 500: معالجة استثناءات الأمان الرسمية لـ دوت نت

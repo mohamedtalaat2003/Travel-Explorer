@@ -1,48 +1,42 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
 using Travel_Explorer.Application.Services;
 using Travel_Explorer.Application.Services.Payment;
-using Travel_Explorer.Infrastructure.DependencyInjection;
 using Travel_Explorer.Infrastructure.Data;
-using Travel_Explorer.Middleware;
-using Microsoft.AspNetCore.Identity;
-using Travel_Explorer.Domain.Entities;
+using Travel_Explorer.Infrastructure.DependencyInjection;
 using Travel_Explorer.Infrastructure.Persistence.Seed;
+using Travel_Explorer.Middleware;
 
 namespace Travel_Explorer
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            builder.Services.AddCors(options => {
-                options.AddPolicy("AllowAll", policy => {
-                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-                });
-            });
 
             // Add services to the container.
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddHttpContextAccessor();
-          
+
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
                 });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Travel Explorer API", Version = "v1" });
-                
+
                 // Add JWT Security Definition
                 options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
                 {
@@ -70,45 +64,36 @@ namespace Travel_Explorer
                 });
             });
 
-            // Register CORS policy
+            // CORS (single registration)
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
                     policy.AllowAnyOrigin()
                           .AllowAnyMethod()
-                          .AllowAnyHeader();
+                          .AllowAnyHeader()
+                          // Expose the pagination header so cross-origin browsers (e.g. the SPA in
+                          // production) can read it for the admin users list.
+                          .WithExposedHeaders("X-Pagination");
                 });
             });
 
             // Authentication & Authorization
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
-
-            if (string.IsNullOrEmpty(jwtSettings.Token))
-            {
-                jwtSettings.Token = "ThisIsAVeryLongAndSuperSecureSecretKeyThatIsAtLeast32BytesLongaslhafkafna;f;230982050345afba!!!!";
-            }
-            if (string.IsNullOrEmpty(jwtSettings.Issuer))
-            {
-                jwtSettings.Issuer = "http://travelexplorer.somee.com";
-            }
-            if (string.IsNullOrEmpty(jwtSettings.Audience))
-            {
-                jwtSettings.Audience = "MyAwesomeAudience";
-            }
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
+                ?? throw new InvalidOperationException("JwtSettings configuration section is missing.");
 
             builder.Services.Configure<PaymobtSettings>(builder.Configuration.GetSection("PaymobSettings"));
 
-            var authBuilder = builder.Services.AddAuthentication(
+            var authenticationBuilder = builder.Services.AddAuthentication(
                 options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                }).AddCookie("ExternalCookie") //temp cookie for google schema
+                }).AddCookie("ExternalCookie") // temp cookie for google schema
                 .AddJwtBearer(options =>
                 {
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
@@ -121,9 +106,13 @@ namespace Travel_Explorer
                     };
                 });
 
-            if (!string.IsNullOrEmpty(jwtSettings.GoogleClientId) && !string.IsNullOrEmpty(jwtSettings.GoogleClientSecret))
+            // The Google handler is an IAuthenticationRequestHandler whose options are validated on every
+            // request; registering it without a ClientId makes every request fail with
+            // "The 'ClientId' option must be provided." Only wire it up when credentials are configured.
+            if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) &&
+                !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
             {
-                authBuilder.AddGoogle(options =>
+                authenticationBuilder.AddGoogle(options =>
                 {
                     options.ClientId = jwtSettings.GoogleClientId;
                     options.ClientSecret = jwtSettings.GoogleClientSecret;
@@ -131,60 +120,43 @@ namespace Travel_Explorer
                 });
             }
 
-
-         
-
-            builder.Services.AddHttpContextAccessor();
             builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
+            // Apply pending EF Core migrations and seed roles + a default Admin account on startup.
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var db = services.GetRequiredService<ApplicationDbContext>();
+                await db.Database.MigrateAsync();
+
+                await RoleSeeder.SeedRolesAsync(services.GetRequiredService<RoleManager<IdentityRole<int>>>());
+                await AdminSeeder.SeedAsync(services);
+                await DataSeeder.SeedAsync(services);
+            }
+
             app.UseMiddleware<Middleware.ExceptionMiddleware>();
 
             // Configure the HTTP request pipeline.
-
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseCors("AllowAll");
-
-            
             if (app.Environment.IsDevelopment())
             {
                 app.UseHttpsRedirection();
             }
 
+            app.UseCors("AllowAll");
+
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors("AllowAll");
-            
+
             app.UsePaymentWebhookVerification();
+
             app.MapControllers();
 
-            // Seed Roles & Data
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
-                    RoleSeeder.SeedRolesAsync(roleManager).GetAwaiter().GetResult();
-
-                    // Seed Data (Categories, Destinations, Activities, Flights, Messages)
-                    var dbContext = services.GetRequiredService<ApplicationDbContext>();
-                    DataSeeder.SeedDataAsync(dbContext).GetAwaiter().GetResult();
-
-                    // Seed Users (2 Admin, 5 Traveler, 3 Author)
-                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-                    DataSeeder.SeedUsersAsync(userManager).GetAwaiter().GetResult();
-                }
-                catch (Exception)
-                {
-                    // Handle or log error
-                }
-            }
-
-            app.Run();
+            await app.RunAsync();
         }
     }
 }

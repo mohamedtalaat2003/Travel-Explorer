@@ -2,10 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>annotations</Nullable>
+    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Travel_Explorer</RootNamespace>
     <UserSecretsId>647faf90-7043-4fee-a5bf-8545948694f4</UserSecretsId>
+    <!-- NU1903: AutoMapper 13.0.1 DoS advisory (CVE-2026-32933), mitigated via global MaxDepth(64). -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
   </PropertyGroup>
 
 	<ItemGroup>

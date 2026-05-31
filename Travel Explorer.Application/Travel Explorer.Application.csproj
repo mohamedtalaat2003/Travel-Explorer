@@ -4,7 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Travel_Explorer.Application</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>annotations</Nullable>
+    <Nullable>enable</Nullable>
+    <!-- NU1903: AutoMapper 13.0.1 DoS advisory (CVE-2026-32933). Mitigated via global MaxDepth(64);
+         mappings are flat server-side DTOs, not untrusted deeply-nested graphs. Upgrade to 15.1.1/16.1.1
+         (commercial license) is the full fix. -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

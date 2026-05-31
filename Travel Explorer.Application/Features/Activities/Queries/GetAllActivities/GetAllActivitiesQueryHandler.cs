@@ -14,7 +14,7 @@ namespace Travel_Explorer.Application.Features.Activities.Queries.GetAllActiviti
             GetAllActivitiesQuery request, CancellationToken cancellationToken)
         {
            
-            var dataSpec = new ActivitySpecification(request.destinationId);
+            var dataSpec = new ActivitySpecification(request.destinationId, request.PageNumber, request.PageSize);
 
             var totalCount = await _unitOfWork.Repository<Activity>().CountAsync(dataSpec);
 

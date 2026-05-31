@@ -27,46 +27,36 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<ApplicationUser> RegisterAsync(RegisterDto request, CancellationToken cancellationToken = default)
         {
-            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))
+            // Username and email must both be unique.
+            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName, cancellationToken)
+                || await _context.Users.AnyAsync(u => u.Email == request.Email, cancellationToken))
             {
                 return null;
             }
 
             var user = new ApplicationUser();
 
-            try
-            {
-                var hashedPassword = new PasswordHasher<ApplicationUser>()
-                    .HashPassword(user, request.Password);
+            var hashedPassword = new PasswordHasher<ApplicationUser>()
+                .HashPassword(user, request.Password);
 
-                user.FullName = request.FullName;
-                user.UserName = request.UserName;
-                user.Email = request.Email;
-                user.PasswordHash = hashedPassword;
-                user.Role = "Traveler"; // by default
-                user.CreatedAt = DateTime.UtcNow;
+            user.FullName = request.FullName;
+            user.UserName = request.UserName;
+            user.NormalizedUserName = request.UserName.ToUpperInvariant();
+            user.Email = request.Email;
+            user.NormalizedEmail = request.Email.ToUpperInvariant();
+            user.PasswordHash = hashedPassword;
+            user.Role = "Traveler"; // by default
+            user.CreatedAt = DateTime.UtcNow;
 
-                // If the user is requesting to become an Author, mark as Pending for Admin approval.
-                // Otherwise, the Traveler is Approved automatically and doesn't need admin approval.
-                if (request.IWantToBeAuthor)
-                {
-                    user.requestToBeAuthor = RequestToBeAuthor.Pending;
-                    user.Status = AccountStatus.Pending;
-                }
-                else
-                {
-                    user.requestToBeAuthor = RequestToBeAuthor.Rejected;
-                    user.Status = AccountStatus.Approved;
-                }
+            // The account is usable immediately. Becoming an Author is gated separately
+            // (requestToBeAuthor + admin approval) and must NOT block login.
+            user.Status = AccountStatus.Approved;
+            user.requestToBeAuthor = request.IWantToBeAuthor
+                ? RequestToBeAuthor.Pending
+                : RequestToBeAuthor.Rejected;
 
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-            catch (Exception)
-            {
-                // Log the exception (you can use a logging framework like Serilog, NLog, etc.)
-                throw;
-            }
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return user;
         }
@@ -121,7 +111,6 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         private async Task<string> CreateToken(ApplicationUser user)
         {
-            await Task.CompletedTask;
             var claims = new List<Claim>
             {
                 new Claim (ClaimTypes.Name , user.UserName),
@@ -155,7 +144,8 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
             if (storedToken.IsUsed)
             {
-                await RevokeAllTokenForUserAsync(storedToken.UserId.Value);
+                if (storedToken.UserId.HasValue)
+                    await RevokeAllTokenForUserAsync(storedToken.UserId.Value);
                 return null;
             }
 
@@ -163,6 +153,10 @@ namespace Travel_Explorer.Infrastructure.Repositories
             {
                 return null;
             }
+
+            // The associated user may have been soft-deleted (filtered out of the include).
+            if (storedToken.User is null)
+                return null;
 
             storedToken.IsUsed = true;
             await _unitOfWork.SaveChangesAsync(cancellationToken);

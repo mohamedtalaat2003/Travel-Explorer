@@ -1,42 +1,30 @@
-using Microsoft.AspNetCore.Identity;
-
 namespace Travel_Explorer.Application.Features.Users.Commands.ChangeUserRole
 {
     public record ChangeUserRoleCommand(string Id, string NewRole) : IRequest<bool>;
-  
-    public class ChangeUserRoleCommandHandler : IRequestHandler<ChangeUserRoleCommand, bool>
-    {
-        private readonly UserManager<ApplicationUser> _userManager;
 
-      
-        public ChangeUserRoleCommandHandler(UserManager<ApplicationUser> userManager)
-        {
-            _userManager = userManager;
-        }
+    public class ChangeUserRoleCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<ChangeUserRoleCommand, bool>
+    {
+        private static readonly string[] AllowedRoles = ["Admin", "Traveler", "Author"];
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<bool> Handle(ChangeUserRoleCommand request, CancellationToken cancellationToken)
         {
-            
-            var user = await _userManager.FindByIdAsync(request.Id.ToString());
+            if (!int.TryParse(request.Id, out var userId))
+                return false;
+
+            if (string.IsNullOrWhiteSpace(request.NewRole) || !AllowedRoles.Contains(request.NewRole))
+                throw new BadRequestException($"Invalid role. Allowed roles: {string.Join(", ", AllowedRoles)}.");
+
+            var user = await _unitOfWork.Repository<ApplicationUser>().GetAsync(userId);
 
             if (user is null || user.IsDeleted)
                 return false;
 
-            var currentRoles = await _userManager.GetRolesAsync(user);
-            var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
-
-            if (!removeResult.Succeeded)
-                return false;
-
-           
-            var addResult = await _userManager.AddToRoleAsync(user, request.NewRole);
-
-            if (!addResult.Succeeded)
-                return false;
-
+            // Authorization runs off the string Role claim, so updating it here is sufficient.
             user.Role = request.NewRole;
-            await _userManager.UpdateAsync(user);
+            _unitOfWork.Repository<ApplicationUser>().Update(user);
 
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
         }
     }

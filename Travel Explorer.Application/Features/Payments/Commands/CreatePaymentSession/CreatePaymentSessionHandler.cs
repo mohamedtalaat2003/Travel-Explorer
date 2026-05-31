@@ -70,12 +70,22 @@ namespace Travel_Explorer.Application.Features.Payments.Commands.CreatePaymentSe
                 "PaymentTx {TxId} created via {Provider} for Booking {BookingId}",
                 paymentTx.Id, gateway.ProviderName, booking.Id);
 
+            var user = await _unitOfWork.Repository<ApplicationUser>().GetAsync(request.UserId);
+            var fullName = string.IsNullOrWhiteSpace(user?.FullName) ? "Traveler" : user!.FullName;
+            var nameParts = fullName.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+
             var context = new PaymentContext
             {
                 Amount = booking.TotalPrice,
                 Currency = "EGP",
                 MerchantOrderId = paymentTx.Id.ToString(),
-                Billing = new BillingData { Email = "user@travelexplorer.com" }
+                Billing = new BillingData
+                {
+                    FirstName = nameParts.Length > 0 ? nameParts[0] : "Traveler",
+                    LastName = nameParts.Length > 1 ? nameParts[1] : "NA",
+                    Email = string.IsNullOrWhiteSpace(user?.Email) ? "no-reply@travelexplorer.com" : user!.Email,
+                    PhoneNumber = string.IsNullOrWhiteSpace(user?.PhoneNumber) ? "NA" : user!.PhoneNumber
+                }
             };
 
             var result = await gateway.CreateCheckoutAsync(context, cancellationToken);
