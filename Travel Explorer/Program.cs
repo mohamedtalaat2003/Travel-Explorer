@@ -8,6 +8,8 @@ using Travel_Explorer.Application.Services;
 using Travel_Explorer.Application.Services.Payment;
 using Travel_Explorer.Infrastructure.DependencyInjection;
 using Travel_Explorer.Middleware;
+using Microsoft.AspNetCore.Identity;
+using Travel_Explorer.Infrastructure.Persistence.Seed;
 
 namespace Travel_Explorer
 {
@@ -138,8 +140,22 @@ namespace Travel_Explorer
             app.UseCors("AllowAll");
             
             app.UsePaymentWebhookVerification();
-
             app.MapControllers();
+
+            // Seed Roles
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+                    RoleSeeder.SeedRolesAsync(roleManager).GetAwaiter().GetResult();
+                }
+                catch (Exception)
+                {
+                    // Handle or log error
+                }
+            }
 
             app.Run();
         }
