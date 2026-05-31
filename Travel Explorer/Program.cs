@@ -83,17 +83,29 @@ namespace Travel_Explorer
 
             // Authentication & Authorization
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
+
+            if (string.IsNullOrEmpty(jwtSettings.Token))
+            {
+                jwtSettings.Token = "ThisIsAVeryLongAndSuperSecureSecretKeyThatIsAtLeast32BytesLongaslhafkafna;f;230982050345afba!!!!";
+            }
+            if (string.IsNullOrEmpty(jwtSettings.Issuer))
+            {
+                jwtSettings.Issuer = "http://travelexplorer.somee.com";
+            }
+            if (string.IsNullOrEmpty(jwtSettings.Audience))
+            {
+                jwtSettings.Audience = "MyAwesomeAudience";
+            }
 
             builder.Services.Configure<PaymobtSettings>(builder.Configuration.GetSection("PaymobSettings"));
 
-
-            builder.Services.AddAuthentication(
+            var authBuilder = builder.Services.AddAuthentication(
                 options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                }).AddCookie("ExternalCookie")//temp cookie for google schema
+                }).AddCookie("ExternalCookie") //temp cookie for google schema
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -107,13 +119,18 @@ namespace Travel_Explorer
                         ClockSkew = TimeSpan.Zero,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Token))
                     };
-                })
-                .AddGoogle(Options =>
-                {
-                    Options.ClientId = jwtSettings.GoogleClientId;
-                    Options.ClientSecret = jwtSettings.GoogleClientSecret;
-                    Options.SignInScheme = "ExternalCookie";
                 });
+
+            if (!string.IsNullOrEmpty(jwtSettings.GoogleClientId) && !string.IsNullOrEmpty(jwtSettings.GoogleClientSecret))
+            {
+                authBuilder.AddGoogle(options =>
+                {
+                    options.ClientId = jwtSettings.GoogleClientId;
+                    options.ClientSecret = jwtSettings.GoogleClientSecret;
+                    options.SignInScheme = "ExternalCookie";
+                });
+            }
+
 
          
 
