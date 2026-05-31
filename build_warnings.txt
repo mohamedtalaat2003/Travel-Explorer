@@ -1,0 +1,15 @@
+﻿D:\MVCProjects\Travel Explorer\Travel Explorer.Application\Travel Explorer.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [D:\MVCProjects\Travel Explorer\Travel Explorer.sln]
+D:\MVCProjects\Travel Explorer\Travel Explorer\Travel Explorer.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [D:\MVCProjects\Travel Explorer\Travel Explorer.sln]
+D:\MVCProjects\Travel Explorer\Travel Explorer.Application\Travel Explorer.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+D:\MVCProjects\Travel Explorer\Travel Explorer\Travel Explorer.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+
+Build succeeded.
+
+D:\MVCProjects\Travel Explorer\Travel Explorer.Application\Travel Explorer.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [D:\MVCProjects\Travel Explorer\Travel Explorer.sln]
+D:\MVCProjects\Travel Explorer\Travel Explorer\Travel Explorer.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [D:\MVCProjects\Travel Explorer\Travel Explorer.sln]
+D:\MVCProjects\Travel Explorer\Travel Explorer.Application\Travel Explorer.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+D:\MVCProjects\Travel Explorer\Travel Explorer\Travel Explorer.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+    4 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.50

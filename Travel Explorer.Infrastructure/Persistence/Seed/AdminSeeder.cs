@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Travel_Explorer.Domain.Entities;
 using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Infrastructure.Persistence.Seed
