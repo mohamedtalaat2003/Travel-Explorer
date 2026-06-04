@@ -16,7 +16,7 @@ namespace Travel_Explorer.Application.Features.Categories.Commands.UpdateCategor
                 throw new NotFoundException(nameof(Category), request.Id);
             }
 
-            // Map updated fields from request onto existing entity
+            
             _mapper.Map(request, existingCategory);
             existingCategory.UpdatedAt = DateTime.UtcNow;
 

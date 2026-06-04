@@ -3,9 +3,9 @@ using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Application.Features.Users.Commands.RequestAuthorRole
 {
-    /// <summary>
-    /// Command for a logged-in user to request upgrading their role to Author.
-    /// </summary>
+    
+    
+    
     public record RequestAuthorRoleCommand(int UserId) : IRequest<bool>;
 
     public class RequestAuthorRoleCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<RequestAuthorRoleCommand, bool>
@@ -19,12 +19,12 @@ namespace Travel_Explorer.Application.Features.Users.Commands.RequestAuthorRole
             if (user is null || user.IsDeleted)
                 return false;
 
-            // Only allow if not already pending or approved
+            
             if (user.requestToBeAuthor == RequestToBeAuthor.Pending)
-                return false; // Already has a pending request
+                return false; 
 
             if (user.Role == "Author")
-                return false; // Already an Author
+                return false; 
 
             user.requestToBeAuthor = RequestToBeAuthor.Pending;
             _unitOfWork.Repository<ApplicationUser>().Update(user);

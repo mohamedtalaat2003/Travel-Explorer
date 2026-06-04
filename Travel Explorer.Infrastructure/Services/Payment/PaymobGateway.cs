@@ -92,7 +92,7 @@ namespace Travel_Explorer.Infrastructure.Services.Payment
                 var doc = JsonDocument.Parse(body);
                 var obj = doc.RootElement.GetProperty("obj");
 
-                // Paymob HMAC is computed from this exact ordered set of fields.
+                
                 var orderObj = obj.GetProperty("order");
                 var sourceData = obj.GetProperty("source_data");
 

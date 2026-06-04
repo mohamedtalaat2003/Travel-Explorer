@@ -1,13 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Travel_Explorer.Infrastructure.Migrations
 {
-    /// <inheritdoc />
+    
     public partial class UserIdAllowNullInUserRefreshToken : Migration
     {
-        /// <inheritdoc />
+        
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<int>(
@@ -19,7 +19,7 @@ namespace Travel_Explorer.Infrastructure.Migrations
                 oldType: "integer");
         }
 
-        /// <inheritdoc />
+        
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<int>(

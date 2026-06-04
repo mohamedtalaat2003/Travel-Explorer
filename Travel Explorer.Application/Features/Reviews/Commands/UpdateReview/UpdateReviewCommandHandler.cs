@@ -15,7 +15,7 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.UpdateReview
             var spec = new ReviewSpecification(request.Id);
             var review = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(spec) ?? throw new NotFoundException(nameof(Review), request.Id);
 
-            // Only the review owner or an admin can update it
+            
             if (!_currentUserService.IsAdmin && review.UserId != _currentUserService.UserId)
                 throw new ForbiddenAccessException("You are not authorized to update this review.");
 
@@ -24,12 +24,12 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.UpdateReview
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Update destination rating
+            
             await RecalculateDestinationRating(review.DestinationId, cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Reload with includes
+            
             var reloadSpec = new ReviewSpecification(review.Id);
             var loaded = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(reloadSpec);
 

@@ -14,12 +14,12 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.CreateReview
         {
             var userId = _currentUserService.UserId ?? throw new UnauthorizedAccessException();
 
-            // The destination being reviewed must exist.
+            
             var destination = await _unitOfWork.Repository<Destination>().GetAsync(request.DestinationId);
             if (destination is null || destination.IsDeleted)
                 throw new NotFoundException(nameof(Destination), request.DestinationId);
 
-            // A user may review a given destination only once.
+            
             var duplicateSpec = new BaseSpecification<Review>(
                 r => r.UserId == userId && r.DestinationId == request.DestinationId);
             var existingReview = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(duplicateSpec);
@@ -33,12 +33,12 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.CreateReview
             await _unitOfWork.Repository<Review>().AddAsync(review);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Update destination average rating and review count
+            
             await RecalculateDestinationRating(request.DestinationId);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Reload with includes
+            
             var spec = new ReviewSpecification(review.Id);
             var loaded = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(spec);
 

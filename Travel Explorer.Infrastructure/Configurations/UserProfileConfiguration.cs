@@ -29,8 +29,8 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(p => !p.IsDeleted);
 
-            // One-to-one relationship is configured in ApplicationUserConfiguration, 
-            // but we can also define it here for clarity.
+            
+            
             builder.HasOne(p => p.User)
                 .WithOne(u => u.Profile)
                 .HasForeignKey<UserProfile>(p => p.UserId)

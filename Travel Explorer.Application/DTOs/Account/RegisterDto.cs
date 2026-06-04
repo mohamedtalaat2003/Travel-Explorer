@@ -33,10 +33,10 @@ namespace Travel_Explorer.Application.DTOs.Users
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         public string ConfirmPassword { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Optional. If true, the user is requesting to be assigned the Author role.
-        /// The request will be set to Pending and requires Admin approval.
-        /// </summary>
+        
+        
+        
+        
         public bool IWantToBeAuthor { get; set; } = false;
     }
 }

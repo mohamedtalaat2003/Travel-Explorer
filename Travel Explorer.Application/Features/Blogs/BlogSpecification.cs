@@ -3,13 +3,13 @@ using Travel_Explorer.Application.Common.Parameters;
 
 namespace Travel_Explorer.Application.Features.Blogs
 {
-    /// <summary>
-    /// Unified specification for querying Blogs.
-    /// Supports single lookup, filtering by author/category/keyword, and full pagination.
-    /// </summary>
+    
+    
+    
+    
     public class BlogSpecification : BaseSpecification<Blog>
     {
-        /// <summary>Single published blog by ID.</summary>
+        
         public BlogSpecification(int id)
             : base(b => b.Id == id  && b.IsPublished)
         {
@@ -17,10 +17,10 @@ namespace Travel_Explorer.Application.Features.Blogs
             AddInclude(b => b.Category);
         }
 
-        /// <summary>
-        /// Paginated, filtered list of published blogs.
-        /// Uses PostgreSQL ILIKE for case-insensitive fuzzy search (accelerated by GIN trigram indexes).
-        /// </summary>
+        
+        
+        
+        
         public BlogSpecification(BlogSpecParams p)
             : base(b =>  b.IsPublished)
         {

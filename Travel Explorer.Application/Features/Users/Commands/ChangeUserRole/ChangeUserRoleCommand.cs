@@ -20,7 +20,7 @@ namespace Travel_Explorer.Application.Features.Users.Commands.ChangeUserRole
             if (user is null || user.IsDeleted)
                 return false;
 
-            // Authorization runs off the string Role claim, so updating it here is sufficient.
+            
             user.Role = request.NewRole;
             _unitOfWork.Repository<ApplicationUser>().Update(user);
 

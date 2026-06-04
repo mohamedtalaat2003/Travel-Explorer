@@ -7,12 +7,12 @@ using Travel_Explorer.Infrastructure.Data;
 
 namespace Travel_Explorer.Infrastructure.Persistence.Seed
 {
-    /// <summary>
-    /// Seeds realistic demo content (categories, destinations, activities, reviews,
-    /// flights, and blog posts) the first time the app runs against an empty database,
-    /// so the site looks alive out of the box. Images are real, hot-linkable Unsplash
-    /// photos of the actual places. Runs only when there are no destinations yet.
-    /// </summary>
+    
+    
+    
+    
+    
+    
     public static class DataSeeder
     {
         private static string Img(string photoId) =>
@@ -135,7 +135,7 @@ namespace Travel_Explorer.Infrastructure.Persistence.Seed
             var db = services.GetRequiredService<ApplicationDbContext>();
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-            // Idempotent: only seed demo content into a fresh database.
+            
             if (await db.Destinations.AnyAsync())
                 return;
 
@@ -157,7 +157,7 @@ namespace Travel_Explorer.Infrastructure.Persistence.Seed
 
             var now = DateTime.UtcNow;
 
-            // ---- Categories ----
+            
             var categoryNames = new (string Name, string Description)[]
             {
                 ("Beach", "Sun, sand, and crystal-clear water."),
@@ -175,7 +175,7 @@ namespace Travel_Explorer.Infrastructure.Persistence.Seed
             await db.SaveChangesAsync();
             var categoryId = categories.ToDictionary(c => c.Name, c => c.Id);
 
-            // ---- Destinations ----
+            
             var destinations = Destinations
                 .Select(d => new Destination
                 {
@@ -191,7 +191,7 @@ namespace Travel_Explorer.Infrastructure.Persistence.Seed
             db.Destinations.AddRange(destinations);
             await db.SaveChangesAsync();
 
-            // ---- Activities + Reviews (and denormalized rating) ----
+            
             var activities = new List<Activity>();
             var reviews = new List<Review>();
             var random = new Random(42);
@@ -214,7 +214,7 @@ namespace Travel_Explorer.Infrastructure.Persistence.Seed
                     });
                 }
 
-                var reviewCount = 4 + (i % 3); // 4..6 reviews per destination
+                var reviewCount = 4 + (i % 3); 
                 var ratings = new List<int>();
                 for (var r = 0; r < reviewCount; r++)
                 {
@@ -239,7 +239,7 @@ namespace Travel_Explorer.Infrastructure.Persistence.Seed
             db.Destinations.UpdateRange(destinations);
             await db.SaveChangesAsync();
 
-            // ---- Flights ----
+            
             var flights = new List<FlightSchedule>
             {
                 NewFlight("EgyptAir", "MS801", "Cairo", "Paris", now.AddDays(6).AddHours(2), 5, 240m, 720m, 1450m),
@@ -255,7 +255,7 @@ namespace Travel_Explorer.Infrastructure.Persistence.Seed
             };
             db.FlightSchedules.AddRange(flights);
 
-            // ---- Blogs ----
+            
             var blogs = new List<Blog>
             {
                 NewBlog(author.Id, categoryId["Island"], "10 Ways to Fall for Santorini Beyond the Sunset",

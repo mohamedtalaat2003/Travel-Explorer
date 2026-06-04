@@ -18,7 +18,7 @@ namespace Travel_Explorer.Application.Features.Destinations.Commands.CreateDesti
             await _unitOfWork.Repository<Destination>().AddAsync(destination);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Reload with includes for the response
+            
             var spec = new DestinationSpecification(destination.Id);
             var loaded = await _unitOfWork.Repository<Destination>().GenericEntitiesWithSpec(spec);
 

@@ -2,9 +2,9 @@ using Travel_Explorer.Application.Common.Interfaces;
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Reusable controller for uploading files directly to Cloudinary.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/Upload")]
     [Produces("application/json")]
@@ -13,11 +13,11 @@ namespace Travel_Explorer.Controllers
     {
         private readonly IPhotoService _photoService = photoService;
         private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
-        private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
+        private const long MaxFileSize = 5 * 1024 * 1024; 
 
-        /// <summary>
-        /// Uploads a single image to Cloudinary and returns its URL.
-        /// </summary>
+        
+        
+        
         [HttpPost("image")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -43,9 +43,9 @@ namespace Travel_Explorer.Controllers
             return Ok(new { url = uploadResult.Url, publicId = uploadResult.PublicId });
         }
 
-        /// <summary>
-        /// Uploads multiple images to Cloudinary and returns a list of their URLs.
-        /// </summary>
+        
+        
+        
         [HttpPost("images")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

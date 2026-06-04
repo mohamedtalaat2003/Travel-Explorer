@@ -10,7 +10,7 @@ namespace Travel_Explorer.Application.Features.Categories.Commands.CreateCategor
             if (request == null) 
                 throw new ArgumentNullException(nameof(request));
 
-            // Efficiently check for unique name using CategorySpecification
+            
             var duplicateSpec = new CategorySpecification(request.Name);
             var existing = await _unitOfWork.Repository<Category>().GenericEntitiesWithSpec(duplicateSpec);
             if (existing != null)

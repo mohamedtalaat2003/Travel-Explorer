@@ -9,9 +9,9 @@ using Travel_Explorer.Application.Features.Blogs.Queries.GetAllBlogs;
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages blog posts and articles.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/Blogs")]
     [Produces("application/json")]
@@ -19,21 +19,21 @@ namespace Travel_Explorer.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        // ─── Reads (anonymous) ────────────────────────────────────────────────
+        
 
-        /// <summary>
-        /// Returns a paginated list of published blogs.
-        /// Filter by <paramref name="p"/>.AuthorId and/or <paramref name="p"/>.CategoryId.
-        /// </summary>
+        
+        
+        
+        
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(typeof(PaginatedResult<BlogDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] BlogSpecParams p)
             => Ok(await _mediator.Send(new GetAllBlogsQuery(p)));
 
-        /// <summary>
-        /// Returns a single published blog post by its ID.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(BlogDto), StatusCodes.Status200OK)]
@@ -41,11 +41,11 @@ namespace Travel_Explorer.Controllers
         public async Task<IActionResult> GetById(int id)
             => Ok(await _mediator.Send(new GetBlogByIdQuery(id)));
 
-        // ─── Writes (Author) ──────────────────────────────────────────────────
+        
 
-        /// <summary>
-        /// Submits a new blog post. Requires the Author role.
-        /// </summary>
+        
+        
+        
         [HttpPost]
         [Authorize(Roles = "Author")]
         [ProducesResponseType(typeof(BlogDto), StatusCodes.Status201Created)]
@@ -58,9 +58,9 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Updates the current user's own blog post. Requires the Author role.
-        /// </summary>
+        
+        
+        
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Author")]
         [ProducesResponseType(typeof(BlogDto), StatusCodes.Status200OK)]
@@ -74,9 +74,9 @@ namespace Travel_Explorer.Controllers
             return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>
-        /// Soft-deletes any blog post. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -21,9 +21,9 @@ namespace Travel_Explorer.Application.Features.Blogs.Commands.CreateBlog
             await _unitOfWork.Repository<Blog>().AddAsync(blog);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Map the saved entity directly. Reloading via BlogSpecification(id) filters by
-            // IsPublished and would return null for drafts (-> NullReferenceException).
-            // BlogDto carries no navigation fields, so no include is needed.
+            
+            
+            
             return _mapper.Map<BlogDto>(blog);
         }
     }

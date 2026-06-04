@@ -13,7 +13,7 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.DeleteReview
             review.IsDeleted = true;
             review.UpdatedAt = DateTime.UtcNow;
 
-            // Recalculate destination rating after soft-delete
+            
             var destination = await _unitOfWork.Repository<Destination>().GetAsync(review.DestinationId);
             if (destination != null)
             {

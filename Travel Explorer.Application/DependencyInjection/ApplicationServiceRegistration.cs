@@ -22,7 +22,7 @@ namespace Travel_Explorer.Application.DependencyInjection
             
             services.AddAutoMapper(cfg =>
             {
-                // Mitigate CVE-2026-32933 (DoS via uncontrolled recursion) by capping mapping depth.
+                
                 cfg.Internal().ForAllMaps((_, map) => map.MaxDepth(64));
             }, assembly);
             services.AddValidatorsFromAssembly(assembly);

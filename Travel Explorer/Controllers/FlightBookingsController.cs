@@ -11,9 +11,9 @@ using Travel_Explorer.Application.Features.FlightBookings.Commands.CancelFlightB
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages flight booking operations.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/FlightBookings")]
     [Produces("application/json")]
@@ -21,9 +21,9 @@ namespace Travel_Explorer.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        /// <summary>
-        /// Returns all flight bookings. Requires Admin role.
-        /// </summary>
+        
+        
+        
         [HttpGet]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(PaginatedResult<FlightBookingDto>), StatusCodes.Status200OK)]
@@ -35,9 +35,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Returns all flight bookings belonging to the currently authenticated Traveler.
-        /// </summary>
+        
+        
+        
         [HttpGet("my")]
         [Authorize(Roles = "Traveler")]
         [ProducesResponseType(typeof(PaginatedResult<FlightBookingDto>), StatusCodes.Status200OK)]
@@ -48,9 +48,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Returns a single flight booking by ID.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}")]
         [Authorize]
         [ProducesResponseType(typeof(FlightBookingDto), StatusCodes.Status200OK)]
@@ -63,9 +63,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Creates a new flight booking. Requires Traveler role.
-        /// </summary>
+        
+        
+        
         [HttpPost]
         [Authorize(Roles = "Traveler")]
         [ProducesResponseType(typeof(FlightBookingDto), StatusCodes.Status201Created)]
@@ -79,9 +79,9 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Updates the status of a booking. Requires Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPatch("{id:int}/status")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(FlightBookingDto), StatusCodes.Status200OK)]
@@ -95,9 +95,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Cancels a flight booking. Accessible by booking owner or Admin.
-        /// </summary>
+        
+        
+        
         [HttpPatch("{id:int}/cancel")]
         [Authorize]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]

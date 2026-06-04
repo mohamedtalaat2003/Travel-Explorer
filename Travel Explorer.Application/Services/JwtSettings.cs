@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,10 +14,10 @@ namespace Travel_Explorer.Application.Services
         public int AccessTokenExpirationMinutes { get; set; } = 15;
         public int RefreshTokenExpirationDays { get; set; } = 7;
 
-        //GOOGLE AUTH (OIDC)
+        
         public string GoogleClientId { get; set; }
         public string GoogleClientSecret { get; set; }
-        public string GoogleFrontendRedirectURl { get; set; }//successful rgister
+        public string GoogleFrontendRedirectURl { get; set; }
         public string GoogleFrontendloginRedirectUrl { get; set; }
     }
 }

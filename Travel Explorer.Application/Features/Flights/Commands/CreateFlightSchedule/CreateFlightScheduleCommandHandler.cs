@@ -18,7 +18,7 @@ namespace Travel_Explorer.Application.Features.Flights.Commands.CreateFlightSche
             var flightSchedule = _mapper.Map<FlightSchedule>(request);
             flightSchedule.CreatedAt = DateTime.UtcNow;
 
-            // Treat the client-supplied times as UTC (required by 'timestamp with time zone').
+            
             flightSchedule.DepartureTime = DateTime.SpecifyKind(request.DepartureTime, DateTimeKind.Utc);
             flightSchedule.ArrivalTime = DateTime.SpecifyKind(request.ArrivalTime, DateTimeKind.Utc);
 

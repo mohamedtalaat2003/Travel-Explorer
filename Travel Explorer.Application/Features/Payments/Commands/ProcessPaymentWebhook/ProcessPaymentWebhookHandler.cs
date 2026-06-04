@@ -56,7 +56,7 @@ namespace Travel_Explorer.Application.Features.Payments.Commands.ProcessPaymentW
                     "[{Provider}] Payment SUCCESS - TxId={TxId}, ProviderTxId={PTxId}",
                     request.ProviderName, paymentTxId, webhook.ProviderTransactionId);
 
-                // Find DestinationBooking by PaymentId
+                
                 var destSpec = new DestinationBookingSpecification(paymentTx.Id, isPayment: true);
                 var destBooking = await _unitOfWork.Repository<DestinationBooking>()
                     .GenericEntitiesWithSpec(destSpec);
@@ -69,7 +69,7 @@ namespace Travel_Explorer.Application.Features.Payments.Commands.ProcessPaymentW
                 }
                 else
                 {
-                    // Find FlightBooking by PaymentId
+                    
                     var flightSpec = new FlightBookingSpecification(paymentTx.Id, isPayment: true);
                     var flightBooking = await _unitOfWork.Repository<FlightBooking>()
                         .GenericEntitiesWithSpec(flightSpec);

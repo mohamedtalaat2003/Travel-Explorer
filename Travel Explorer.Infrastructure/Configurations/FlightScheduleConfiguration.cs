@@ -38,10 +38,10 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(fs => !fs.IsDeleted);
 
-            // Optimistic concurrency using PostgreSQL's system xmin column (no extra column added).
-            // Makes the seat-decrement DbUpdateConcurrencyException in CreateFlightBooking effective,
-            // preventing overselling under concurrent bookings. The xmin mapping is PostgreSQL-specific,
-            // so we keep this API despite its generic-EF obsolete notice.
+            
+            
+            
+            
 #pragma warning disable CS0618
             builder.UseXminAsConcurrencyToken();
 #pragma warning restore CS0618

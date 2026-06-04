@@ -5,9 +5,9 @@ using Travel_Explorer.Application.Features.Reviews.Queries.GetReviewById;
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages user reviews on destinations.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/Reviews")]
     [Produces("application/json")]
@@ -15,9 +15,9 @@ namespace Travel_Explorer.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        /// <summary>
-        /// Returns a single review by its ID.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
@@ -29,9 +29,9 @@ namespace Travel_Explorer.Controllers
 
         }
 
-        /// <summary>
-        /// Submits a new review for a destination. Requires the Traveler role.
-        /// </summary>
+        
+        
+        
         [HttpPost]
         [Authorize(Roles = "Traveler")]
         [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status201Created)]
@@ -46,9 +46,9 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Updates the current user's own review. Requires the Traveler role.
-        /// </summary>
+        
+        
+        
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Traveler")]
         [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
@@ -63,9 +63,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Soft-deletes a review. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

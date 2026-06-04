@@ -27,7 +27,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<ApplicationUser> RegisterAsync(RegisterDto request, CancellationToken cancellationToken = default)
         {
-            // Username and email must both be unique.
+            
             if (await _context.Users.AnyAsync(u => u.UserName == request.UserName, cancellationToken)
                 || await _context.Users.AnyAsync(u => u.Email == request.Email, cancellationToken))
             {
@@ -45,11 +45,11 @@ namespace Travel_Explorer.Infrastructure.Repositories
             user.Email = request.Email;
             user.NormalizedEmail = request.Email.ToUpperInvariant();
             user.PasswordHash = hashedPassword;
-            user.Role = "Traveler"; // by default
+            user.Role = "Traveler"; 
             user.CreatedAt = DateTime.UtcNow;
 
-            // The account is usable immediately. Becoming an Author is gated separately
-            // (requestToBeAuthor + admin approval) and must NOT block login.
+            
+            
             user.Status = AccountStatus.Approved;
             user.requestToBeAuthor = request.IWantToBeAuthor
                 ? RequestToBeAuthor.Pending
@@ -82,7 +82,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 return null;
             }
 
-            //var token = JwtTokenGenerator.GenerateToken(user, jwtSettings);
+            
             return await CreateTokenResponse(user);
         }
 
@@ -94,13 +94,13 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
             if (iWantToBeAuthor)
             {
-                // Admin is approving an Author request
+                
                 user.requestToBeAuthor = RequestToBeAuthor.Approved;
                 user.Role = "Author";
             }
             else
             {
-                // Normal role assignment (not an Author approval)
+                
                 user.requestToBeAuthor = RequestToBeAuthor.Rejected;
                 user.Role = request.newRole;
             }
@@ -117,7 +117,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 new Claim (ClaimTypes.NameIdentifier , user.Id.ToString()),
                 new Claim (ClaimTypes.Role, user.Role)
             };
-            //var token = JwtTokenGenerator.GenerateToken(user, jwtSettings);
+            
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Token));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
@@ -154,7 +154,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 return null;
             }
 
-            // The associated user may have been soft-deleted (filtered out of the include).
+            
             if (storedToken.User is null)
                 return null;
 
@@ -236,13 +236,13 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<ApplicationUser?> RegisterGoogleUserAsync(string email, string name, string googleId, CancellationToken cancellationToken = default)
         {
-            //check if the user already exists
+            
 
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId || u.Email == email, cancellationToken);
 
             if (existingUser != null)
             {
-                //already Registered user
+                
                 return existingUser;
             }
 

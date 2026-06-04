@@ -40,7 +40,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<T>> ListSpecAsync(ISpecification<T> spec) => await ApplySpecification(spec).AsNoTracking().ToListAsync();
 
-        /// <inheritdoc/>
+        
         public async Task<int> CountAsync(ISpecification<T> spec)
             => await ApplySpecification(spec, true).CountAsync();
 

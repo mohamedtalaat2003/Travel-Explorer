@@ -33,8 +33,8 @@ namespace Travel_Explorer.Application.Features.Blogs.Commands.UpdateBlog
             _unitOfWork.Repository<Blog>().Update(blog);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Map the saved entity directly. Reloading via BlogSpecification(id) filters by
-            // IsPublished and would return null when the blog is a draft (-> NullReferenceException).
+            
+            
             return _mapper.Map<BlogDto>(blog);
         }
     }

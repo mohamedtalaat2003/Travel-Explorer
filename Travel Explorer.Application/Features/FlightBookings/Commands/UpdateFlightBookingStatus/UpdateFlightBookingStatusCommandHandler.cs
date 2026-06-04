@@ -13,7 +13,7 @@ namespace Travel_Explorer.Application.Features.FlightBookings.Commands.UpdateFli
             var spec = new FlightBookingSpecification(request.Id);
             var booking = await _unitOfWork.Repository<FlightBooking>().GenericEntitiesWithSpec(spec) ?? throw new NotFoundException(nameof(FlightBooking), request.Id);
 
-            // Seat reclaim logic
+            
             if ((request.Status == BookingStatus.Cancelled || request.Status == BookingStatus.Refunded) &&
                 booking.Status != BookingStatus.Cancelled && booking.Status != BookingStatus.Refunded)
             {

@@ -23,7 +23,7 @@ namespace Travel_Explorer.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
-            // Enable pg_trgm extension for fuzzy/trigram search
+            
             builder.HasPostgresExtension("pg_trgm");
 
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());               

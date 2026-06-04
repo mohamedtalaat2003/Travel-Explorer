@@ -20,7 +20,7 @@ namespace Travel_Explorer
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddHttpContextAccessor();
@@ -31,13 +31,13 @@ namespace Travel_Explorer
                     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
                 });
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Travel Explorer API", Version = "v1" });
 
-                // Add JWT Security Definition
+                
                 options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -64,7 +64,7 @@ namespace Travel_Explorer
                 });
             });
 
-            // CORS (single registration)
+            
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -72,13 +72,13 @@ namespace Travel_Explorer
                     policy.AllowAnyOrigin()
                           .AllowAnyMethod()
                           .AllowAnyHeader()
-                          // Expose the pagination header so cross-origin browsers (e.g. the SPA in
-                          // production) can read it for the admin users list.
+                          
+                          
                           .WithExposedHeaders("X-Pagination");
                 });
             });
 
-            // Authentication & Authorization
+            
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
                 ?? throw new InvalidOperationException("JwtSettings configuration section is missing.");
@@ -90,7 +90,7 @@ namespace Travel_Explorer
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                }).AddCookie("ExternalCookie") // temp cookie for google schema
+                }).AddCookie("ExternalCookie") 
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -106,9 +106,9 @@ namespace Travel_Explorer
                     };
                 });
 
-            // The Google handler is an IAuthenticationRequestHandler whose options are validated on every
-            // request; registering it without a ClientId makes every request fail with
-            // "The 'ClientId' option must be provided." Only wire it up when credentials are configured.
+            
+            
+            
             if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) &&
                 !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
             {
@@ -124,7 +124,7 @@ namespace Travel_Explorer
 
             var app = builder.Build();
 
-            // Apply pending EF Core migrations and seed roles + a default Admin account on startup.
+            
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -138,7 +138,7 @@ namespace Travel_Explorer
 
             app.UseMiddleware<Middleware.ExceptionMiddleware>();
 
-            // Configure the HTTP request pipeline.
+            
             app.UseSwagger();
             app.UseSwaggerUI();
 

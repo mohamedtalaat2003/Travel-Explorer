@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -91,7 +91,7 @@ namespace Travel_Explorer.Controllers.Account
         [AllowAnonymous]
         public ActionResult InitiateGoogleRegister()
         {
-            //challange google schema and tell it to redirct to our GoogleRegisterCallback
+            
             var redirectUrl = Url.Action("GoogleRegisterCallback", "Auth");
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
            return Challenge(properties, GoogleDefaults.AuthenticationScheme);

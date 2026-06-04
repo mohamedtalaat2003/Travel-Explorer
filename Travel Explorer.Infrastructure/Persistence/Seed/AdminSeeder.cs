@@ -5,11 +5,11 @@ using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Infrastructure.Persistence.Seed
 {
-    /// <summary>
-    /// Seeds a default Admin account on startup if one does not already exist,
-    /// so admin-only endpoints are testable out of the box. Credentials come from
-    /// the "AdminUser" configuration section (with safe defaults you should change).
-    /// </summary>
+    
+    
+    
+    
+    
     public static class AdminSeeder
     {
         public static async Task SeedAsync(IServiceProvider services)
@@ -22,7 +22,7 @@ namespace Travel_Explorer.Infrastructure.Persistence.Seed
             var password = configuration["AdminUser:Password"] ?? "Admin@123";
             var fullName = configuration["AdminUser:FullName"] ?? "System Administrator";
 
-            // If the admin (by username) already exists, do nothing.
+            
             if (await userManager.FindByNameAsync(userName) is not null)
                 return;
 

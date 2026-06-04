@@ -3,14 +3,14 @@ using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Application.Features.DestinationBookings
 {
-    /// <summary>
-    /// Specification for querying destination bookings with optional filters and includes.
-    /// </summary>
+    
+    
+    
     public class DestinationBookingSpecification : BaseSpecification<DestinationBooking>
     {
-        /// <summary>
-        /// Get a single booking by ID (non-deleted) with User and Destination included.
-        /// </summary>
+        
+        
+        
         public DestinationBookingSpecification(int id)
             : base(b => b.Id == id )
         {
@@ -18,9 +18,9 @@ namespace Travel_Explorer.Application.Features.DestinationBookings
             AddInclude(b => b.Destination);
         }
 
-        /// <summary>
-        /// Get booking by PaymentId.
-        /// </summary>
+        
+        
+        
         public DestinationBookingSpecification(int paymentId, bool isPayment)
             : base(b => b.PaymentId == paymentId)
         {
@@ -28,9 +28,9 @@ namespace Travel_Explorer.Application.Features.DestinationBookings
             AddInclude(b => b.Destination);
         }
 
-        /// <summary>
-        /// Get bookings filtered by optional UserId and/or Status.
-        /// </summary>
+        
+        
+        
         public DestinationBookingSpecification(int? userId, string? status)
              : base(b => (!userId.HasValue || b.UserId == userId.Value))
         {
@@ -42,7 +42,7 @@ namespace Travel_Explorer.Application.Features.DestinationBookings
                 }
                 else
                 {
-                    // Force zero results on invalid status value
+                    
                     AddCriteria(b => false);
                 }
             }
