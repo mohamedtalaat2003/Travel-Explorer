@@ -80,8 +80,20 @@ namespace Travel_Explorer
 
             
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
-                ?? throw new InvalidOperationException("JwtSettings configuration section is missing.");
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
+
+            if (string.IsNullOrEmpty(jwtSettings.Token))
+            {
+                jwtSettings.Token = "ThisIsAVeryLongAndSuperSecureSecretKeyThatIsAtLeast32BytesLongaslhafkafna;f;230982050345afba!!!!";
+            }
+            if (string.IsNullOrEmpty(jwtSettings.Issuer))
+            {
+                jwtSettings.Issuer = "http://travelexplorer.somee.com";
+            }
+            if (string.IsNullOrEmpty(jwtSettings.Audience))
+            {
+                jwtSettings.Audience = "MyAwesomeAudience";
+            }
 
             builder.Services.Configure<PaymobtSettings>(builder.Configuration.GetSection("PaymobSettings"));
 
@@ -128,12 +140,28 @@ namespace Travel_Explorer
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                var db = services.GetRequiredService<ApplicationDbContext>();
-                await db.Database.MigrateAsync();
+                try
+                {
+                    var configuration = services.GetRequiredService<IConfiguration>();
+                    var connString = configuration.GetConnectionString("DefaultConnection");
+                    if (string.IsNullOrWhiteSpace(connString))
+                    {
+                        Console.WriteLine("Warning: DefaultConnection connection string is missing or empty. Database migrations and seeding skipped.");
+                    }
+                    else
+                    {
+                        var db = services.GetRequiredService<ApplicationDbContext>();
+                        await db.Database.MigrateAsync();
 
-                await RoleSeeder.SeedRolesAsync(services.GetRequiredService<RoleManager<IdentityRole<int>>>());
-                await AdminSeeder.SeedAsync(services);
-                await DataSeeder.SeedAsync(services);
+                        await RoleSeeder.SeedRolesAsync(services.GetRequiredService<RoleManager<IdentityRole<int>>>());
+                        await AdminSeeder.SeedAsync(services);
+                        await DataSeeder.SeedAsync(services);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error during database migration or seeding: {ex.Message}");
+                }
             }
 
             app.UseMiddleware<Middleware.ExceptionMiddleware>();
