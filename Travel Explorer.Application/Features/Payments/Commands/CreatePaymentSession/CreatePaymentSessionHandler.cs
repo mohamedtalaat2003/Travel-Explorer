@@ -7,21 +7,26 @@ using Travel_Explorer.Domain.Entities;
 using Travel_Explorer.Domain.Enums;
 using Travel_Explorer.Domain.Interfaces;
 
+using Microsoft.Extensions.Options;
+
 namespace Travel_Explorer.Application.Features.Payments.Commands.CreatePaymentSession
 {
     public class CreatePaymentSessionHandler : IRequestHandler<CreatePaymentSessionCommand, CreatePaymentSessionResult>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPaymentGatewayFactory _gatewayFactory;
+        private readonly PaymobtSettings _settings;
         private readonly ILogger<CreatePaymentSessionHandler> _logger;
 
         public CreatePaymentSessionHandler(
             IUnitOfWork unitOfWork,
             IPaymentGatewayFactory gatewayFactory,
+            IOptions<PaymobtSettings> settingsOptions,
             ILogger<CreatePaymentSessionHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _gatewayFactory = gatewayFactory;
+            _settings = settingsOptions.Value;
             _logger = logger;
         }
 
@@ -65,6 +70,20 @@ namespace Travel_Explorer.Application.Features.Payments.Commands.CreatePaymentSe
             booking.PaymentId = paymentTx.Id;
             _unitOfWork.Repository<DestinationBooking>().Update(booking);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            if (_settings.Secretkey != null && _settings.Secretkey.StartsWith("mock", StringComparison.OrdinalIgnoreCase))
+            {
+                paymentTx.Status = PaymentStatus.Paid;
+                paymentTx.PaidAt = DateTime.UtcNow;
+                paymentTx.TransactionReference = "mock_tx_ref_" + Guid.NewGuid().ToString("N");
+                _unitOfWork.Repository<PaymentTransaction>().Update(paymentTx);
+
+                booking.Status = BookingStatus.Confirmed;
+                _unitOfWork.Repository<DestinationBooking>().Update(booking);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return CreatePaymentSessionResult.Ok("mock_payment_success");
+            }
 
             _logger.LogInformation(
                 "PaymentTx {TxId} created via {Provider} for Booking {BookingId}",

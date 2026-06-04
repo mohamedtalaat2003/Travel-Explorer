@@ -63,7 +63,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<TokenResponseDto> LoginAsync(LoginDto request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName || u.Email == request.UserName);
             if (user == null)
             {
                 return null;
