@@ -79,7 +79,6 @@ namespace Travel_Explorer
             });
 
             
-            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
 
             if (string.IsNullOrEmpty(jwtSettings.Token))
@@ -94,6 +93,19 @@ namespace Travel_Explorer
             {
                 jwtSettings.Audience = "MyAwesomeAudience";
             }
+
+            builder.Services.Configure<JwtSettings>(options =>
+            {
+                options.Token = jwtSettings.Token;
+                options.Issuer = jwtSettings.Issuer;
+                options.Audience = jwtSettings.Audience;
+                options.AccessTokenExpirationMinutes = jwtSettings.AccessTokenExpirationMinutes == 0 ? 60 : jwtSettings.AccessTokenExpirationMinutes;
+                options.RefreshTokenExpirationDays = jwtSettings.RefreshTokenExpirationDays == 0 ? 7 : jwtSettings.RefreshTokenExpirationDays;
+                options.GoogleClientId = jwtSettings.GoogleClientId;
+                options.GoogleClientSecret = jwtSettings.GoogleClientSecret;
+                options.GoogleFrontendRedirectURl = jwtSettings.GoogleFrontendRedirectURl;
+                options.GoogleFrontendloginRedirectUrl = jwtSettings.GoogleFrontendloginRedirectUrl;
+            });
 
             builder.Services.Configure<PaymobtSettings>(builder.Configuration.GetSection("PaymobSettings"));
 
