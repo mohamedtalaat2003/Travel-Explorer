@@ -7,7 +7,7 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Crea
         public CreateBookingCommandValidator()
         {
             RuleFor(x => x.CheckInDate)
-                .GreaterThanOrEqualTo(DateTime.UtcNow.Date.AddDays(-1))
+                .GreaterThanOrEqualTo(DateTime.UtcNow.Date)
                 .WithMessage("CheckInDate must not be in the past.");
 
             RuleFor(x => x.CheckOutDate)
