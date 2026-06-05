@@ -40,4 +40,4 @@ jobs:
           username: ${{ secrets.SOMEE_FTP_USERNAME }}
           password: ${{ secrets.SOMEE_FTP_PASSWORD }}
           local-dir: ./publish/
-          server-dir: / # غيرها إذا كان حساب FTP الخاص بك يدخل على مجلد رئيسي آخر (مثل /wwwroot/)
+          server-dir: /www.TravelExplorer.somee.com/
