@@ -249,10 +249,15 @@ namespace Travel_Explorer.Infrastructure.Repositories
             var newUser = new ApplicationUser
             {
                 UserName = name,
+                NormalizedUserName = name.ToUpperInvariant(),
                 Email = email,
+                NormalizedEmail = email.ToUpperInvariant(),
                 GoogleId = googleId,
                 Role = "Traveler",
-                PasswordHash = null
+                PasswordHash = null,
+                Status = AccountStatus.Approved,
+                CreatedAt = DateTime.UtcNow,
+                SecurityStamp = Guid.NewGuid().ToString()
             };
 
             _context.Users.Add(newUser);

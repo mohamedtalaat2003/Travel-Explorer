@@ -99,7 +99,7 @@ namespace Travel_Explorer.Controllers.Account
 
         [HttpGet("google-register-callback")]
         [AllowAnonymous]
-        public async Task<ActionResult> GoogleRegisterCallback([FromQuery] string code, [FromQuery] string? error)
+        public async Task<ActionResult> GoogleRegisterCallback([FromQuery] string? code = null, [FromQuery] string? error = null)
         {
             var result = await HttpContext.AuthenticateAsync("ExternalCookie");
             if(!result.Succeeded|| result.Principal == null)
