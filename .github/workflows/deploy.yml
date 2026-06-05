@@ -1,0 +1,43 @@
+name: Build and Deploy to Somee
+
+on:
+  push:
+    branches:
+      - master # يتم التفعيل تلقائياً عند الدفع (push) لفرع master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. جلب الكود من المستودع
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. إعداد بيئة .NET SDK
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # 3. استعادة الحزم (Restore)
+      - name: Restore Dependencies
+        run: dotnet restore "Travel Explorer/Travel Explorer.csproj"
+
+      # 4. بناء المشروع (Build)
+      - name: Build Project
+        run: dotnet build "Travel Explorer/Travel Explorer.csproj" -c Release --no-restore
+
+      # 5. نشر المشروع (Publish) في مجلد مؤقت ./publish
+      - name: Publish Project
+        run: dotnet publish "Travel Explorer/Travel Explorer.csproj" -c Release -o ./publish --no-build
+
+      # 6. رفع الملفات إلى Somee باستخدام FTP
+      - name: Deploy to Somee via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.SOMEE_FTP_SERVER }}
+          username: ${{ secrets.SOMEE_FTP_USERNAME }}
+          password: ${{ secrets.SOMEE_FTP_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: / # غيرها إذا كان حساب FTP الخاص بك يدخل على مجلد رئيسي آخر (مثل /wwwroot/)
