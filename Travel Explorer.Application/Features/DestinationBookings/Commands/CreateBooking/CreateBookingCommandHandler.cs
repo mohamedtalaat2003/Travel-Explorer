@@ -20,7 +20,7 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Crea
 
             var booking = _mapper.Map<DestinationBooking>(request);
             booking.UserId = _currentUserService.UserId ?? 0;
-            booking.TotalPrice = destination.PricePerNight * nights;
+            booking.TotalPrice = destination.PricePerNight * nights * booking.NumberOfGuests;
             booking.Status = Domain.Enums.BookingStatus.Pending;
             booking.CreatedAt = DateTime.UtcNow;
 
