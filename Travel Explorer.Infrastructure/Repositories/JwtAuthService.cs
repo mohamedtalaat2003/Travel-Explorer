@@ -236,13 +236,16 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<ApplicationUser?> RegisterGoogleUserAsync(string email, string name, string googleId, CancellationToken cancellationToken = default)
         {
-            
-
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId || u.Email == email, cancellationToken);
+            var normalizedEmail = email.ToUpperInvariant();
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId || u.NormalizedEmail == normalizedEmail, cancellationToken);
 
             if (existingUser != null)
             {
-                
+                if (string.IsNullOrEmpty(existingUser.GoogleId))
+                {
+                    existingUser.GoogleId = googleId;
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                }
                 return existingUser;
             }
 
@@ -251,7 +254,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 UserName = name,
                 NormalizedUserName = name.ToUpperInvariant(),
                 Email = email,
-                NormalizedEmail = email.ToUpperInvariant(),
+                NormalizedEmail = normalizedEmail,
                 GoogleId = googleId,
                 Role = "Traveler",
                 PasswordHash = null,
@@ -266,15 +269,26 @@ namespace Travel_Explorer.Infrastructure.Repositories
             return newUser;
         }
 
-        public async Task<TokenResponseDto?> LoginGoogleUserAsync(string googleId, CancellationToken cancellationToken = default)
+        public async Task<TokenResponseDto?> LoginGoogleUserAsync(string googleId, string? email = null, CancellationToken cancellationToken = default)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId, cancellationToken);
+
+            if (user == null && !string.IsNullOrEmpty(email))
+            {
+                var normalizedEmail = email.ToUpperInvariant();
+                user = await _context.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
+                if (user != null)
+                {
+                    user.GoogleId = googleId;
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                }
+            }
 
             if (user == null)
                 return null;
 
-            string token =await CreateToken(user);
-            var refreshToken =await GenerateAndSaveRefreshTokenAsync(user, cancellationToken);
+            string token = await CreateToken(user);
+            var refreshToken = await GenerateAndSaveRefreshTokenAsync(user, cancellationToken);
 
             return new TokenResponseDto
             { AccessToken = token, RefreshToken = refreshToken };

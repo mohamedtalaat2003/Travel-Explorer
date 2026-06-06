@@ -44,34 +44,45 @@ namespace Travel_Explorer.Infrastructure.Services
                 };
             }
 
-            var uploadResult = new ImageUploadResult();
-
-            if (fileStream.Length > 0)
+            try
             {
-                var uploadParams = new ImageUploadParams
+                var uploadResult = new ImageUploadResult();
+
+                if (fileStream.Length > 0)
                 {
-                    File = new FileDescription(fileName, fileStream),
-                    Transformation = new Transformation().Height(800).Width(1200).Crop("limit")
+                    var uploadParams = new ImageUploadParams
+                    {
+                        File = new FileDescription(fileName, fileStream),
+                        Transformation = new Transformation().Height(800).Width(1200).Crop("limit")
+                    };
+
+                    uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                }
+
+                if (uploadResult.Error != null)
+                {
+                    return new PhotoUploadResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = uploadResult.Error.Message
+                    };
+                }
+
+                return new PhotoUploadResult
+                {
+                    IsSuccess = true,
+                    Url = uploadResult.SecureUrl?.ToString() ?? "",
+                    PublicId = uploadResult.PublicId
                 };
-
-                uploadResult = await _cloudinary.UploadAsync(uploadParams);
             }
-
-            if (uploadResult.Error != null)
+            catch (Exception ex)
             {
                 return new PhotoUploadResult
                 {
                     IsSuccess = false,
-                    ErrorMessage = uploadResult.Error.Message
+                    ErrorMessage = $"Cloudinary upload failed: {ex.Message}"
                 };
             }
-
-            return new PhotoUploadResult
-            {
-                IsSuccess = true,
-                Url = uploadResult.SecureUrl.ToString(),
-                PublicId = uploadResult.PublicId
-            };
         }
 
         public async Task<bool> DeletePhotoAsync(string publicId)
