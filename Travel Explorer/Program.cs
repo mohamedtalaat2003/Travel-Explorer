@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
@@ -19,6 +20,33 @@ namespace Travel_Explorer
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Translate Azure dash-separated configuration keys and environment variables to nested keys
+            var translatedConfig = new Dictionary<string, string>();
+            foreach (var item in builder.Configuration.AsEnumerable())
+            {
+                var key = item.Key;
+                var val = item.Value;
+                if (!string.IsNullOrEmpty(val))
+                {
+                    if (key.StartsWith("APPSETTING_", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var cleanKey = key.Substring("APPSETTING_".Length);
+                        if (cleanKey.Contains('-'))
+                        {
+                            translatedConfig[cleanKey.Replace('-', ':')] = val;
+                        }
+                    }
+                    else if (key.Contains('-'))
+                    {
+                        translatedConfig[key.Replace('-', ':')] = val;
+                    }
+                }
+            }
+            if (translatedConfig.Count > 0)
+            {
+                builder.Configuration.AddInMemoryCollection(translatedConfig!);
+            }
 
             
             builder.Services.AddApplicationServices();
@@ -158,7 +186,31 @@ namespace Travel_Explorer
                     var connString = configuration.GetConnectionString("DefaultConnection");
                     if (string.IsNullOrWhiteSpace(connString))
                     {
+                        connString = configuration["POSTGRESQLCONNSTR_DefaultConnection"] ?? 
+                                     Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_DefaultConnection");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(connString))
+                    {
                         Console.WriteLine("Warning: DefaultConnection connection string is missing or empty. Database migrations and seeding skipped.");
+                        Console.WriteLine("Diagnostics (Startup): Scanning available configuration keys that might contain connection settings...");
+                        try
+                        {
+                            foreach (var child in configuration.AsEnumerable())
+                            {
+                                if (child.Key.Contains("Conn", StringComparison.OrdinalIgnoreCase) ||
+                                    child.Key.Contains("Postgres", StringComparison.OrdinalIgnoreCase) ||
+                                    child.Key.Contains("Default", StringComparison.OrdinalIgnoreCase) ||
+                                    child.Key.Contains("Db", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Console.WriteLine($"Config Key found: '{child.Key}' (Length: {child.Value?.Length ?? 0})");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Diagnostics (Startup): Failed to scan configuration keys: {ex.Message}");
+                        }
                     }
                     else
                     {

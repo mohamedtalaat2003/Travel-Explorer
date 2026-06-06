@@ -15,9 +15,16 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                connectionString = configuration["POSTGRESQLCONNSTR_DefaultConnection"] ?? 
+                                   Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_DefaultConnection");
+            }
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection"), 
+                    connectionString, 
                     npgsqlOptions => {
                         
                         npgsqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);

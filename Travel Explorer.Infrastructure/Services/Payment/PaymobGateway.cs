@@ -44,8 +44,8 @@ namespace Travel_Explorer.Infrastructure.Services.Payment
 
             _logger.LogInformation("[Paymob] Creating payment intention for Order={MerchantOrderId}, Amount={Amount}", 
                 context.MerchantOrderId, context.Amount);
-
-            var response = await _httpClient.PostAsJsonAsync("/api/intention/", new
+            // add right paymoeb endpoint
+            var response = await _httpClient.PostAsJsonAsync("/v1/intention", new
             {
                 amount = amountCents,
                 currency = context.Currency,
