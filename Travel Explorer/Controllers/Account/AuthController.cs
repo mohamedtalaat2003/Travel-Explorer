@@ -152,6 +152,7 @@ namespace Travel_Explorer.Controllers.Account
 
             var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
             var googleId = claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
             await HttpContext.SignOutAsync("ExternalCookie");
 
@@ -160,7 +161,7 @@ namespace Travel_Explorer.Controllers.Account
                 return Redirect($"{_jwtSettings.GoogleFrontendloginRedirectUrl}?error=MissingGoogleId");
             }
             
-            var token = await _jwtAuthService.LoginGoogleUserAsync(googleId);
+            var token = await _jwtAuthService.LoginGoogleUserAsync(googleId, email);
             if(token == null)
                 return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?error=UserNotRegistered");
 
