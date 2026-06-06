@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
@@ -159,6 +160,24 @@ namespace Travel_Explorer
                     if (string.IsNullOrWhiteSpace(connString))
                     {
                         Console.WriteLine("Warning: DefaultConnection connection string is missing or empty. Database migrations and seeding skipped.");
+                        Console.WriteLine("Diagnostics (Startup): Scanning available configuration keys that might contain connection settings...");
+                        try
+                        {
+                            foreach (var child in configuration.AsEnumerable())
+                            {
+                                if (child.Key.Contains("Conn", StringComparison.OrdinalIgnoreCase) ||
+                                    child.Key.Contains("Postgres", StringComparison.OrdinalIgnoreCase) ||
+                                    child.Key.Contains("Default", StringComparison.OrdinalIgnoreCase) ||
+                                    child.Key.Contains("Db", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Console.WriteLine($"Config Key found: '{child.Key}' (Length: {child.Value?.Length ?? 0})");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Diagnostics (Startup): Failed to scan configuration keys: {ex.Message}");
+                        }
                     }
                     else
                     {
