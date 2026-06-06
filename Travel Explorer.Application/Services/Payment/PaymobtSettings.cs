@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +15,6 @@ namespace Travel_Explorer.Application.Services.Payment
         public string CardIntegrationId { get; set; } = string.Empty;
         public string HmacSecret { get; set; } = string.Empty;
         public string Currency { get; set; } = "EGP";
-        [Required]
         public string PaymentMethodId { get; set; } = string.Empty;
     }
 }

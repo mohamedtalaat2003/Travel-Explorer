@@ -27,53 +27,43 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<ApplicationUser> RegisterAsync(RegisterDto request, CancellationToken cancellationToken = default)
         {
-            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))
+            
+            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName, cancellationToken)
+                || await _context.Users.AnyAsync(u => u.Email == request.Email, cancellationToken))
             {
                 return null;
             }
 
             var user = new ApplicationUser();
 
-            try
-            {
-                var hashedPassword = new PasswordHasher<ApplicationUser>()
-                    .HashPassword(user, request.Password);
+            var hashedPassword = new PasswordHasher<ApplicationUser>()
+                .HashPassword(user, request.Password);
 
-                user.FullName = request.FullName;
-                user.UserName = request.UserName;
-                user.Email = request.Email;
-                user.PasswordHash = hashedPassword;
-                user.Role = "Traveler"; // by default
-                user.CreatedAt = DateTime.UtcNow;
+            user.FullName = request.FullName;
+            user.UserName = request.UserName;
+            user.NormalizedUserName = request.UserName.ToUpperInvariant();
+            user.Email = request.Email;
+            user.NormalizedEmail = request.Email.ToUpperInvariant();
+            user.PasswordHash = hashedPassword;
+            user.Role = "Traveler"; 
+            user.CreatedAt = DateTime.UtcNow;
 
-                // If the user is requesting to become an Author, mark as Pending for Admin approval.
-                // Otherwise, the Traveler is Approved automatically and doesn't need admin approval.
-                if (request.IWantToBeAuthor)
-                {
-                    user.requestToBeAuthor = RequestToBeAuthor.Pending;
-                    user.Status = AccountStatus.Pending;
-                }
-                else
-                {
-                    user.requestToBeAuthor = RequestToBeAuthor.Rejected;
-                    user.Status = AccountStatus.Approved;
-                }
+            
+            
+            user.Status = AccountStatus.Approved;
+            user.requestToBeAuthor = request.IWantToBeAuthor
+                ? RequestToBeAuthor.Pending
+                : RequestToBeAuthor.Rejected;
 
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (you can use a logging framework like Serilog, NLog, etc.)
-                throw;
-            }
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return user;
         }
 
         public async Task<TokenResponseDto> LoginAsync(LoginDto request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName || u.Email == request.UserName);
             if (user == null)
             {
                 return null;
@@ -92,7 +82,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 return null;
             }
 
-            //var token = JwtTokenGenerator.GenerateToken(user, jwtSettings);
+            
             return await CreateTokenResponse(user);
         }
 
@@ -104,13 +94,13 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
             if (iWantToBeAuthor)
             {
-                // Admin is approving an Author request
+                
                 user.requestToBeAuthor = RequestToBeAuthor.Approved;
                 user.Role = "Author";
             }
             else
             {
-                // Normal role assignment (not an Author approval)
+                
                 user.requestToBeAuthor = RequestToBeAuthor.Rejected;
                 user.Role = request.newRole;
             }
@@ -127,7 +117,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 new Claim (ClaimTypes.NameIdentifier , user.Id.ToString()),
                 new Claim (ClaimTypes.Role, user.Role)
             };
-            //var token = JwtTokenGenerator.GenerateToken(user, jwtSettings);
+            
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Token));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
@@ -154,7 +144,8 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
             if (storedToken.IsUsed)
             {
-                await RevokeAllTokenForUserAsync(storedToken.UserId.Value);
+                if (storedToken.UserId.HasValue)
+                    await RevokeAllTokenForUserAsync(storedToken.UserId.Value);
                 return null;
             }
 
@@ -162,6 +153,10 @@ namespace Travel_Explorer.Infrastructure.Repositories
             {
                 return null;
             }
+
+            
+            if (storedToken.User is null)
+                return null;
 
             storedToken.IsUsed = true;
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -241,23 +236,28 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<ApplicationUser?> RegisterGoogleUserAsync(string email, string name, string googleId, CancellationToken cancellationToken = default)
         {
-            //check if the user already exists
+            
 
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId || u.Email == email, cancellationToken);
 
             if (existingUser != null)
             {
-                //already Registered user
+                
                 return existingUser;
             }
 
             var newUser = new ApplicationUser
             {
                 UserName = name,
+                NormalizedUserName = name.ToUpperInvariant(),
                 Email = email,
+                NormalizedEmail = email.ToUpperInvariant(),
                 GoogleId = googleId,
                 Role = "Traveler",
-                PasswordHash = null
+                PasswordHash = null,
+                Status = AccountStatus.Approved,
+                CreatedAt = DateTime.UtcNow,
+                SecurityStamp = Guid.NewGuid().ToString()
             };
 
             _context.Users.Add(newUser);

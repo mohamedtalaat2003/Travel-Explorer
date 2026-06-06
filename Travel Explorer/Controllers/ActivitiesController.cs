@@ -6,19 +6,19 @@ using Travel_Explorer.Application.Features.Activities.Queries.GetAllActivities;
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages activity resources.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/Activities")]
-    [Produces("application/json")] // response json only
+    [Produces("application/json")] 
     public class ActivitiesController(IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
 
-        /// <summary>
-        /// Returns all active activities across all destinations.
-        /// </summary>
+        
+        
+        
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<ActivityDto>), StatusCodes.Status200OK)]
@@ -28,9 +28,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Returns a single activity by its ID.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(ActivityDto), StatusCodes.Status200OK)]
@@ -42,9 +42,9 @@ namespace Travel_Explorer.Controllers
 
         }
 
-        /// <summary>
-        /// Creates a new activity linked to a destination. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ActivityDto), StatusCodes.Status201Created)]
@@ -57,9 +57,9 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Updates an existing activity. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ActivityDto), StatusCodes.Status200OK)]
@@ -69,7 +69,7 @@ namespace Travel_Explorer.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateActivityCommand command)
         {
-            // Set the ID from the URL directly into the command
+            
             command.Id = id;
 
             var result = await _mediator.Send(command);
@@ -77,9 +77,9 @@ namespace Travel_Explorer.Controllers
 
         }
 
-        /// <summary>
-        /// Soft-deletes an activity. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

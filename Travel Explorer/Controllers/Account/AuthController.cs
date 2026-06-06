@@ -1,4 +1,3 @@
-﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Http;
@@ -16,23 +15,29 @@ namespace Travel_Explorer.Controllers.Account
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
-    public class AuthController(IJwtAuthService _jwtAuthService, IMapper _mapper, IOptions<JwtSettings> jwtSettingOptions) : ControllerBase
+    public class AuthController(IJwtAuthService _jwtAuthService, IOptions<JwtSettings> jwtSettingOptions) : ControllerBase
     {
         private readonly JwtSettings _jwtSettings = jwtSettingOptions.Value;
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<ActionResult> Register(RegisterDto request)
         {
-            var userDto = await _jwtAuthService.RegisterAsync(request);
-            if (userDto == null)
+            var user = await _jwtAuthService.RegisterAsync(request);
+            if (user == null)
                 return BadRequest("User already exists.");
 
-            var user = _mapper.Map<ApplicationUser>(userDto);
-
-            return Ok(user);
+            return Ok(new
+            {
+                user.Id,
+                user.UserName,
+                user.Email,
+                user.FullName,
+                user.Role
+            });
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<ActionResult> Login(LoginDto request)
         {
             var token = await _jwtAuthService.LoginAsync(request);
@@ -44,6 +49,7 @@ namespace Travel_Explorer.Controllers.Account
         }
 
         [HttpPost("refresh-token")]
+        [AllowAnonymous]
         public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto refreshToken)
         {
             var result = await _jwtAuthService.RefreshTokenAsync(refreshToken);
@@ -55,10 +61,11 @@ namespace Travel_Explorer.Controllers.Account
         }
 
         [HttpPost("logout")]
+        [Authorize]
         public async Task<ActionResult> Logout([FromBody] RefreshTokenRequestDto request)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim) || int.TryParse(userIdClaim, out int userId))
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 return Unauthorized("User is not authenticated.");
 
             var result = await _jwtAuthService.LogoutAync(userId, request.RefreshToken);
@@ -81,16 +88,18 @@ namespace Travel_Explorer.Controllers.Account
         }
 
         [HttpGet("google-register")]
+        [AllowAnonymous]
         public ActionResult InitiateGoogleRegister()
         {
-            //challange google schema and tell it to redirct to our GoogleRegisterCallback
+            
             var redirectUrl = Url.Action("GoogleRegisterCallback", "Auth");
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
         [HttpGet("google-register-callback")]
-        public async Task<ActionResult> GoogleRegisterCallback([FromQuery] string code, [FromQuery] string? error)
+        [AllowAnonymous]
+        public async Task<ActionResult> GoogleRegisterCallback([FromQuery] string? code = null, [FromQuery] string? error = null)
         {
             var result = await HttpContext.AuthenticateAsync("ExternalCookie");
             if(!result.Succeeded|| result.Principal == null)
@@ -103,7 +112,7 @@ namespace Travel_Explorer.Controllers.Account
             var name = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             var googleId = claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            await HttpContext.SignOutAsync("ExternamCookie");
+            await HttpContext.SignOutAsync("ExternalCookie");
 
             if(string.IsNullOrEmpty(email) ||string.IsNullOrEmpty(googleId))
             {
@@ -121,6 +130,7 @@ namespace Travel_Explorer.Controllers.Account
         }
 
         [HttpGet("google-login")]
+        [AllowAnonymous]
         public ActionResult IntiateGoogleLogin()
         {
             var redirectUrl = Url.Action("GoogleLoginCallback", "Auth");
@@ -131,6 +141,7 @@ namespace Travel_Explorer.Controllers.Account
 
 
         [HttpGet("google-login-callback")]
+        [AllowAnonymous]
         public async Task<ActionResult> GoogleLoginCallback()
         {
             var result = await HttpContext.AuthenticateAsync("ExternalCookie");

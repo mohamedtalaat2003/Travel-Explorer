@@ -13,7 +13,7 @@ namespace Travel_Explorer.Application.Features.Flights.Queries.GetAllFlightSched
         {
             var p = request.Params;
 
-            // Perform local query to apply paging, specification criteria, and sorting
+            
             var dataSpec = new FlightScheduleSpecification(p);
             var totalCount = await _unitOfWork.Repository<FlightSchedule>().CountAsync(dataSpec);
             var flightSchedules = await _unitOfWork.Repository<FlightSchedule>().ListSpecAsync(dataSpec);

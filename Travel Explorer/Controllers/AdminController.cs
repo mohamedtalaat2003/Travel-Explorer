@@ -13,9 +13,9 @@ using Travel_Explorer.Application.Features.Users.Queries.GetUserById;
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Controller responsible for administrative operations and user management.
-    /// </summary>
+    
+    
+    
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
@@ -23,11 +23,11 @@ namespace Travel_Explorer.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        /// <summary>
-        /// Retrieves all users with pagination, filtering, and search functionality.
-        /// </summary>
-        /// <param name="parameters">Pagination and filtering parameters.</param>
-        /// <returns>List of users.</returns>
+        
+        
+        
+        
+        
         [HttpGet]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
@@ -51,11 +51,11 @@ namespace Travel_Explorer.Controllers
             return Ok(users);
         }
 
-        /// <summary>
-        /// Retrieves user details by user id.
-        /// </summary>
-        /// <param name="id">User identifier.</param>
-        /// <returns>User details.</returns>
+        
+        
+        
+        
+        
         [HttpGet("{id}")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(UserDetailsDto), StatusCodes.Status200OK)]
@@ -71,11 +71,11 @@ namespace Travel_Explorer.Controllers
                 : Ok(user);
         }
 
-        /// <summary>
-        /// Blocks a specific user account.
-        /// </summary>
-        /// <param name="id">User identifier.</param>
-        /// <returns>Success message.</returns>
+        
+        
+        
+        
+        
         [HttpPut("{id}/block")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -92,11 +92,11 @@ namespace Travel_Explorer.Controllers
             return Ok(new { Message = "User blocked successfully." });
         }
 
-        /// <summary>
-        /// Unblocks a specific user account.
-        /// </summary>
-        /// <param name="id">User identifier.</param>
-        /// <returns>Success message.</returns>
+        
+        
+        
+        
+        
         [HttpPut("{id}/unblock")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -113,12 +113,12 @@ namespace Travel_Explorer.Controllers
             return Ok(new { Message = "User unblocked successfully." });
         }
 
-        /// <summary>
-        /// Changes the role of a specific user.
-        /// </summary>
-        /// <param name="id">User identifier.</param>
-        /// <param name="model">Role update request.</param>
-        /// <returns>Success message.</returns>
+        
+        
+        
+        
+        
+        
         [HttpPut("{id}/role")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -140,11 +140,11 @@ namespace Travel_Explorer.Controllers
             });
         }
 
-        /// <summary>
-        /// Performs a soft delete for a specific user.
-        /// </summary>
-        /// <param name="id">User identifier.</param>
-        /// <returns>Success message.</returns>
+        
+        
+        
+        
+        
         [HttpDelete("{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -170,10 +170,10 @@ namespace Travel_Explorer.Controllers
 
         }
 
-        /// <summary>
-        /// Retrieves admin dashboard statistics.
-        /// </summary>
-        /// <returns>System statistics.</returns>
+        
+        
+        
+        
         [HttpGet("statistics")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(AdminStatisticsDto), StatusCodes.Status200OK)]
@@ -186,12 +186,12 @@ namespace Travel_Explorer.Controllers
             return Ok(stats);
         }
 
-        // ===== Author Request Management =====
+        
 
-        /// <summary>
-        /// Retrieves all users who have a pending Author role request.
-        /// </summary>
-        /// <returns>List of users with pending Author requests.</returns>
+        
+        
+        
+        
         [HttpGet("pending-author-requests")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
@@ -203,11 +203,11 @@ namespace Travel_Explorer.Controllers
             return Ok(users);
         }
 
-        /// <summary>
-        /// Approves a user's request to become an Author.
-        /// </summary>
-        /// <param name="id">User identifier.</param>
-        /// <returns>Success message.</returns>
+        
+        
+        
+        
+        
         [HttpPut("{id}/approve-author")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -228,11 +228,11 @@ namespace Travel_Explorer.Controllers
             });
         }
 
-        /// <summary>
-        /// Rejects a user's request to become an Author.
-        /// </summary>
-        /// <param name="id">User identifier.</param>
-        /// <returns>Success message.</returns>
+        
+        
+        
+        
+        
         [HttpPut("{id}/reject-author")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]

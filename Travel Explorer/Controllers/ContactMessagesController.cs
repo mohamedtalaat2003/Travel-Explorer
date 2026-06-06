@@ -9,21 +9,20 @@ using Travel_Explorer.Application.Features.ContactMessages.MarkAsRead;
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages contact messages submitted via the Contact Us form.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/ContactMessages")]
     [Produces("application/json")]
-    [Authorize(Roles = "Admin")]
     public class ContactMessagesController(IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
 
-        /// <summary>
-        /// Retrieves a paginated list of all contact messages. Supports filtering by read status.
-        /// Requires Admin role.
-        /// </summary>
+        
+        
+        
+        
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
@@ -34,9 +33,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Retrieves a specific contact message by ID. Pure read — no side effects. Requires Admin role.
-        /// </summary>
+        
+        
+        
         
         [HttpGet("{id:int}")]
         [Authorize]
@@ -49,10 +48,10 @@ namespace Travel_Explorer.Controllers
 
         }
 
-        /// <summary>
-        /// Submits a new contact message. Accessible by anyone.
-        /// If the user is authenticated, their UserId is automatically attached.
-        /// </summary>
+        
+        
+        
+        
         [HttpPost]
         [AllowAnonymous]
         [ProducesResponseType(typeof(ContactMessageDto), StatusCodes.Status201Created)]
@@ -62,9 +61,9 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetMessage), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Marks a contact message as read. Requires Admin role.
-        /// </summary>
+        
+        
+        
         
         [HttpPatch("{id:int}")]
         [Authorize(Roles = "Admin")]
@@ -77,9 +76,9 @@ namespace Travel_Explorer.Controllers
 
         }
 
-        /// <summary>
-        /// Deletes a contact message by ID. Requires Admin role.
-        /// </summary>
+        
+        
+        
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

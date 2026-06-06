@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
 using Travel_Explorer.Application.Common.Exceptions;
 
@@ -28,14 +28,15 @@ namespace Travel_Explorer.Middleware
             context.Response.ContentType = "application/json";
             string result;
 
-            // 🛠️ استخدام الـ Switch Expression لتحديد الـ StatusCode والـ Response بشكل ذكي ونظيف
+            
             var statusCode = exception switch
             {
                 NotFoundException => HttpStatusCode.NotFound,
                 BadRequestException => HttpStatusCode.BadRequest,
+                ConflictException => HttpStatusCode.Conflict,
                 ForbiddenAccessException => HttpStatusCode.Forbidden,
 
-                // 🔒 حل ثغرة الـ 500: معالجة استثناءات الأمان الرسمية لـ دوت نت
+                
                 UnauthorizedAccessException => HttpStatusCode.Unauthorized,
 
                 Travel_Explorer.Application.Common.Exceptions.ValidationException => HttpStatusCode.BadRequest,
@@ -44,7 +45,7 @@ namespace Travel_Explorer.Middleware
                 _ => HttpStatusCode.InternalServerError
             };
 
-            // 📑 صياغة الـ JSON الناتج بناءً على نوع الـ Exception
+            
             switch (exception)
             {
                 case Travel_Explorer.Application.Common.Exceptions.ValidationException customEx:

@@ -10,9 +10,9 @@ using Travel_Explorer.Application.Features.Flights.Commands.DeleteFlightSchedule
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages flight schedule operations.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/Flights")]
     [Produces("application/json")]
@@ -20,9 +20,9 @@ namespace Travel_Explorer.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        /// <summary>
-        /// Returns a paginated list of available flight schedules.
-        /// </summary>
+        
+        
+        
         [HttpGet]
         [ProducesResponseType(typeof(PaginatedResult<FlightScheduleDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] FlightScheduleSpecParams p)
@@ -31,9 +31,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Returns details of a specific flight schedule.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(FlightScheduleDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,9 +43,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Creates a new flight schedule. Requires Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(FlightScheduleDto), StatusCodes.Status201Created)]
@@ -58,9 +58,9 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Updates a flight schedule. Requires Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(FlightScheduleDto), StatusCodes.Status200OK)]
@@ -75,9 +75,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Soft-deletes a flight schedule. Requires Admin role.
-        /// </summary>
+        
+        
+        
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -11,9 +11,9 @@ using Travel_Explorer.Application.Common.Parameters;
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages travel destination resources.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/Destinations")]
     [Produces("application/json")]
@@ -21,22 +21,22 @@ namespace Travel_Explorer.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        // ─── Reads (anonymous) ────────────────────────────────────────────────
+        
 
-        /// <summary>
-        /// Returns a paginated list of active destinations.
-        /// Supports optional filtering: <paramref name="p"/>.Keyword, .Location,
-        /// .MinPrice, .MaxPrice, .CategoryId.
-        /// </summary>
+        
+        
+        
+        
+        
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(typeof(PaginatedResult<DestinationDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] DestinationSpecParams p)
             => Ok(await _mediator.Send(new GetAllDestinationsQuery(p)));
 
-        /// <summary>
-        /// Returns a single destination by its unique ID.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(DestinationDto), StatusCodes.Status200OK)]
@@ -44,18 +44,18 @@ namespace Travel_Explorer.Controllers
         public async Task<IActionResult> GetById(int id)
             => Ok(await _mediator.Send(new GetDestinationByIdQuery(id)));
 
-        /// <summary>
-        /// Returns the top-rated destinations ordered by AverageRating descending.
-        /// </summary>
+        
+        
+        
         [HttpGet("top-rated")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<DestinationDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTopRated([FromQuery] int count = 6)
             => Ok(await _mediator.Send(new GetTopRatedDestinationsQuery(count)));
 
-        /// <summary>
-        /// Returns all activities available at a specific destination.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}/activities")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<ActivityDto>), StatusCodes.Status200OK)]
@@ -63,9 +63,9 @@ namespace Travel_Explorer.Controllers
         public async Task<IActionResult> GetActivities(int id)
             => Ok(await _mediator.Send(new GetDestinationActivitiesQuery(id)));
 
-        /// <summary>
-        /// Returns all user reviews for a specific destination.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}/reviews")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<ReviewDto>), StatusCodes.Status200OK)]
@@ -73,11 +73,11 @@ namespace Travel_Explorer.Controllers
         public async Task<IActionResult> GetReviews(int id)
             => Ok(await _mediator.Send(new GetDestinationReviewsQuery(id)));
 
-        // ─── Writes (Admin only) ──────────────────────────────────────────────
+        
 
-        /// <summary>
-        /// Creates a new destination. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(DestinationDto), StatusCodes.Status201Created)]
@@ -90,9 +90,9 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Updates an existing destination. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(DestinationDto), StatusCodes.Status200OK)]
@@ -106,9 +106,9 @@ namespace Travel_Explorer.Controllers
             return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>
-        /// Soft-deletes a destination. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

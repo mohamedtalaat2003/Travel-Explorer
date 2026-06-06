@@ -8,9 +8,9 @@ using Travel_Explorer.Application.Features.Categories.Queries.GetAllCategories;
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages travel and blog categories.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/Categories")]
     [Produces("application/json")]
@@ -18,20 +18,20 @@ namespace Travel_Explorer.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        // ─── Reads (anonymous) ────────────────────────────────────────────────
+        
 
-        /// <summary>
-        /// Returns a paginated list of all active categories.
-        /// </summary>
+        
+        
+        
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(typeof(PaginatedResult<CategoryDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] CategorySpecParams p)
             => Ok(await _mediator.Send(new GetAllCategoriesQuery(p)));
 
-        /// <summary>
-        /// Returns a single category by its ID.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
@@ -39,11 +39,11 @@ namespace Travel_Explorer.Controllers
         public async Task<IActionResult> GetById(int id)
             => Ok(await _mediator.Send(new GetCategoryByIdQuery(id)));
 
-        // ─── Writes (Admin only) ──────────────────────────────────────────────
+        
 
-        /// <summary>
-        /// Creates a new category. Requires Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status201Created)]
@@ -56,9 +56,9 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Updates an existing category. Requires Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
@@ -72,9 +72,9 @@ namespace Travel_Explorer.Controllers
             return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>
-        /// Soft-deletes a category. Requires Admin role.
-        /// </summary>
+        
+        
+        
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

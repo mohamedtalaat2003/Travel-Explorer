@@ -23,12 +23,12 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(b => !b.IsDeleted);
 
-            // Indexes
+            
             builder.HasIndex(b => b.AuthorId).HasDatabaseName("IX_Blogs_AuthorId");
             builder.HasIndex(b => b.CategoryId).HasDatabaseName("IX_Blogs_CategoryId");
             builder.HasIndex(a => a.IsDeleted).HasDatabaseName("IX_blogs_IsDeleted");
 
-            // Relationships
+            
             builder.HasOne(b => b.Author)
                 .WithMany(u => u.Blogs)
                 .HasForeignKey(b => b.AuthorId)

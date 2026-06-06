@@ -5,10 +5,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Travel_Explorer.Infrastructure.Migrations
 {
-    /// <inheritdoc />
+    
     public partial class initial : Migration
     {
-        /// <inheritdoc />
+        
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -685,7 +685,7 @@ namespace Travel_Explorer.Infrastructure.Migrations
                 unique: true);
         }
 
-        /// <inheritdoc />
+        
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

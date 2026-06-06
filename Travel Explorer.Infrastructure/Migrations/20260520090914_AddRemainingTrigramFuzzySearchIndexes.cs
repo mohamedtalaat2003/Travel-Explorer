@@ -1,13 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Travel_Explorer.Infrastructure.Migrations
 {
-    /// <inheritdoc />
+    
     public partial class AddRemainingTrigramFuzzySearchIndexes : Migration
     {
-        /// <inheritdoc />
+        
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateIndex(
@@ -65,7 +65,7 @@ namespace Travel_Explorer.Infrastructure.Migrations
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
         }
 
-        /// <inheritdoc />
+        
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropIndex(

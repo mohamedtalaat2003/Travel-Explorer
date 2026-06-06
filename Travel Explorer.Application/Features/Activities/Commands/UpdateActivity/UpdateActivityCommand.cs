@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace Travel_Explorer.Application.Features.Activities.Commands.UpdateActivity
 {
-    /// <summary>
-    /// Updates an existing activity.
-    /// </summary>
+    
+    
+    
     public record UpdateActivityCommand(
         string Name,
         string Description,

@@ -63,7 +63,7 @@ namespace Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFli
                 throw new BadRequestException("The flight seats were booked by another user. Please try again.");
             }
 
-            // We reload with Spec to get full user name and flight info
+            
             var spec = new FlightBookingSpecification(booking.Id);
             var loadedBooking = await _unitOfWork.Repository<FlightBooking>().GenericEntitiesWithSpec(spec);
 

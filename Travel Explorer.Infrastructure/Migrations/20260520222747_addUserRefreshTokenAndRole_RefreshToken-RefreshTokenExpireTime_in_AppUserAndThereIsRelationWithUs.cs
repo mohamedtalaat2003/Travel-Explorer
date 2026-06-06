@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -6,10 +6,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Travel_Explorer.Infrastructure.Migrations
 {
-    /// <inheritdoc />
+    
     public partial class addUserRefreshTokenAndRole_RefreshTokenRefreshTokenExpireTime_in_AppUserAndThereIsRelationWithUs : Migration
     {
-        /// <inheritdoc />
+        
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -69,7 +69,7 @@ namespace Travel_Explorer.Infrastructure.Migrations
                 column: "UserId");
         }
 
-        /// <inheritdoc />
+        
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

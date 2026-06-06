@@ -21,7 +21,7 @@ namespace Travel_Explorer.Application.Features.Users.Commands.RejectAuthorReques
 
             user.requestToBeAuthor = RequestToBeAuthor.Rejected;
             user.Status = AccountStatus.Approved;
-            // Role stays as "Traveler" — the user was never promoted
+            
             _unitOfWork.Repository<ApplicationUser>().Update(user);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);

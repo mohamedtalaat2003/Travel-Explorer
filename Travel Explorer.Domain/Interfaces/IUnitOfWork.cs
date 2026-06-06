@@ -1,4 +1,4 @@
-﻿namespace Travel_Explorer.Domain.Interfaces
+namespace Travel_Explorer.Domain.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {

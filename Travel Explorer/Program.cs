@@ -1,45 +1,43 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
 using Travel_Explorer.Application.Services;
 using Travel_Explorer.Application.Services.Payment;
+using Travel_Explorer.Infrastructure.Data;
 using Travel_Explorer.Infrastructure.DependencyInjection;
+using Travel_Explorer.Infrastructure.Persistence.Seed;
 using Travel_Explorer.Middleware;
 
 namespace Travel_Explorer
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddCors(options => {
-                options.AddPolicy("AllowAll", policy => {
-                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-                });
-            });
-
-            // Add services to the container.
+            
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddHttpContextAccessor();
-          
+
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
                 });
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Travel Explorer API", Version = "v1" });
+
                 
-                // Add JWT Security Definition
                 options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -66,33 +64,60 @@ namespace Travel_Explorer
                 });
             });
 
-            // Register CORS policy
+            
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
                     policy.AllowAnyOrigin()
                           .AllowAnyMethod()
-                          .AllowAnyHeader();
+                          .AllowAnyHeader()
+                          
+                          
+                          .WithExposedHeaders("X-Pagination");
                 });
             });
 
-            // Authentication & Authorization
-            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+            
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
+
+            if (string.IsNullOrEmpty(jwtSettings.Token))
+            {
+                jwtSettings.Token = "ThisIsAVeryLongAndSuperSecureSecretKeyThatIsAtLeast32BytesLongaslhafkafna;f;230982050345afba!!!!";
+            }
+            if (string.IsNullOrEmpty(jwtSettings.Issuer))
+            {
+                jwtSettings.Issuer = "http://travelexplorer.somee.com";
+            }
+            if (string.IsNullOrEmpty(jwtSettings.Audience))
+            {
+                jwtSettings.Audience = "MyAwesomeAudience";
+            }
+
+            builder.Services.Configure<JwtSettings>(options =>
+            {
+                options.Token = jwtSettings.Token;
+                options.Issuer = jwtSettings.Issuer;
+                options.Audience = jwtSettings.Audience;
+                options.AccessTokenExpirationMinutes = jwtSettings.AccessTokenExpirationMinutes == 0 ? 60 : jwtSettings.AccessTokenExpirationMinutes;
+                options.RefreshTokenExpirationDays = jwtSettings.RefreshTokenExpirationDays == 0 ? 7 : jwtSettings.RefreshTokenExpirationDays;
+                options.GoogleClientId = jwtSettings.GoogleClientId;
+                options.GoogleClientSecret = jwtSettings.GoogleClientSecret;
+                options.GoogleFrontendRedirectURl = jwtSettings.GoogleFrontendRedirectURl;
+                options.GoogleFrontendloginRedirectUrl = jwtSettings.GoogleFrontendloginRedirectUrl;
+            });
 
             builder.Services.Configure<PaymobtSettings>(builder.Configuration.GetSection("PaymobSettings"));
 
-
-            builder.Services.AddAuthentication(
+            var authenticationBuilder = builder.Services.AddAuthentication(
                 options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                }).AddCookie("ExternalCookie")//temp cookie for google schema
+                }).AddCookie("ExternalCookie") 
                 .AddJwtBearer(options =>
                 {
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
@@ -103,45 +128,75 @@ namespace Travel_Explorer
                         ClockSkew = TimeSpan.Zero,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Token))
                     };
-                })
-                .AddGoogle(Options =>
-                {
-                    Options.ClientId = jwtSettings.GoogleClientId;
-                    Options.ClientSecret = jwtSettings.GoogleClientSecret;
-                    Options.SignInScheme = "ExternalCookie";
                 });
 
-         
+            
+            
+            
+            if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) &&
+                !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
+            {
+                authenticationBuilder.AddGoogle(options =>
+                {
+                    options.ClientId = jwtSettings.GoogleClientId;
+                    options.ClientSecret = jwtSettings.GoogleClientSecret;
+                    options.SignInScheme = "ExternalCookie";
+                });
+            }
 
-            builder.Services.AddHttpContextAccessor();
             builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
+            
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var configuration = services.GetRequiredService<IConfiguration>();
+                    var connString = configuration.GetConnectionString("DefaultConnection");
+                    if (string.IsNullOrWhiteSpace(connString))
+                    {
+                        Console.WriteLine("Warning: DefaultConnection connection string is missing or empty. Database migrations and seeding skipped.");
+                    }
+                    else
+                    {
+                        var db = services.GetRequiredService<ApplicationDbContext>();
+                        await db.Database.MigrateAsync();
+
+                        await RoleSeeder.SeedRolesAsync(services.GetRequiredService<RoleManager<IdentityRole<int>>>());
+                        await AdminSeeder.SeedAsync(services);
+                        await DataSeeder.SeedAsync(services);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error during database migration or seeding: {ex.Message}");
+                }
+            }
+
             app.UseMiddleware<Middleware.ExceptionMiddleware>();
 
-            // Configure the HTTP request pipeline.
-
+            
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseCors("AllowAll");
-
-            
             if (app.Environment.IsDevelopment())
             {
                 app.UseHttpsRedirection();
             }
 
+            app.UseCors("AllowAll");
+
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors("AllowAll");
-            
+
             app.UsePaymentWebhookVerification();
 
             app.MapControllers();
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }

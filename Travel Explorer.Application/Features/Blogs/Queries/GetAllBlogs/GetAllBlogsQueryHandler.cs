@@ -13,7 +13,7 @@ namespace Travel_Explorer.Application.Features.Blogs.Queries.GetAllBlogs
         {
             var p = request.Params;
 
-            // CountAsync respects the spec's Criteria but ignores paging (via ignorePaging=true)
+            
             var dataSpec = new BlogSpecification(p);
 
             var totalCount = await _unitOfWork.Repository<Blog>().CountAsync(dataSpec);

@@ -17,7 +17,7 @@ namespace Travel_Explorer.Application.Features.ContactMessages.CreateContactMess
             await _unitOfWork.Repository<ContactMessage>().AddAsync(message);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Return the mapped DTO directly from the saved entity
+            
             return _mapper.Map<ContactMessageDto>(message);
         }
     }

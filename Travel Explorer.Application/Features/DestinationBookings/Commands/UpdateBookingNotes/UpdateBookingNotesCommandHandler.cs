@@ -15,7 +15,7 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Upda
             var spec = new DestinationBookingSpecification(request.Id);
             var booking = await _unitOfWork.Repository<DestinationBooking>().GenericEntitiesWithSpec(spec) ?? throw new NotFoundException(nameof(DestinationBooking), request.Id);
 
-            // Only the booking owner or admin can update notes
+            
             if (!_currentUserService.IsAdmin && booking.UserId != _currentUserService.UserId)
                 throw new ForbiddenAccessException("You are not authorized to update this booking.");
 

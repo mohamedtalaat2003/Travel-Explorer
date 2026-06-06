@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Travel_Explorer.Infrastructure.Migrations
 {
-    /// <inheritdoc />
+    
     public partial class AddGenderAndNationalityToFlightBooking : Migration
     {
-        /// <inheritdoc />
+        
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
@@ -24,7 +24,7 @@ namespace Travel_Explorer.Infrastructure.Migrations
                 nullable: true);
         }
 
-        /// <inheritdoc />
+        
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

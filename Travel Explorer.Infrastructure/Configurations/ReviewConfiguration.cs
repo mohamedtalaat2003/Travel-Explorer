@@ -19,12 +19,12 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(r => !r.IsDeleted);
 
-            // Indexes
+            
             builder.HasIndex(r => r.DestinationId).HasDatabaseName("IX_Reviews_DestinationId");
             builder.HasIndex(r => r.UserId).HasDatabaseName("IX_Reviews_UserId");
             builder.HasIndex(r => r.IsDeleted).HasDatabaseName("IX_Reviews_IsDeleted");
 
-            // Relationships
+            
             builder.HasOne(r => r.User)
                 .WithMany(u => u.Reviews)
                 .HasForeignKey(r => r.UserId)

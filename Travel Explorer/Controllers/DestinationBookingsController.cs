@@ -9,9 +9,9 @@ using Travel_Explorer.Application.Features.DestinationBookings.Queries.GetMyBook
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages destination booking operations.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/DestinationBookings")]
     [Produces("application/json")]
@@ -19,9 +19,9 @@ namespace Travel_Explorer.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        /// <summary>
-        /// Creates a new destination booking. Requires the Traveler role.
-        /// </summary>
+        
+        
+        
         [HttpPost]
         [Authorize(Roles = "Traveler")]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status201Created)]
@@ -35,9 +35,9 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Returns a single booking by its ID.
-        /// </summary>
+        
+        
+        
         [HttpGet("{id:int}")]
         [Authorize]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status200OK)]
@@ -50,9 +50,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Returns all bookings belonging to the currently authenticated Traveler.
-        /// </summary>
+        
+        
+        
         [HttpGet("my")]
         [Authorize(Roles = "Traveler")]
         [ProducesResponseType(typeof(IEnumerable<DestinationBookingDto>), StatusCodes.Status200OK)]
@@ -63,9 +63,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Returns all bookings in the system. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpGet]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(IEnumerable<DestinationBookingDto>), StatusCodes.Status200OK)]
@@ -77,9 +77,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Updates the status of a specific booking. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpPatch("{id:int}/status")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status200OK)]
@@ -94,9 +94,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Updates the notes on a booking. Accessible by the booking owner (Traveler) only.
-        /// </summary>
+        
+        
+        
         [HttpPatch("{id:int}")]
         [Authorize(Roles = "Traveler")]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status200OK)]
@@ -111,9 +111,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Soft-deletes a booking record. Requires the Admin role.
-        /// </summary>
+        
+        
+        
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -126,9 +126,9 @@ namespace Travel_Explorer.Controllers
             return NoContent();
         }
 
-        /// <summary>
-        /// Cancels a specific destination booking. Accessible by the booking owner or Admin.
-        /// </summary>
+        
+        
+        
         [HttpPatch("{id:int}/cancel")]
         [Authorize]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]

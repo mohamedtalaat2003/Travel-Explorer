@@ -10,10 +10,10 @@ namespace Travel_Explorer.Application.Features.Users
     {
         public UserSpecification(UserSpecParams parameters)
         {
-            // Filter out deleted users
+            
             AddCriteria(u => !u.IsDeleted);
 
-            // Filtering
+            
             if (parameters.Gender.HasValue)
             {
                 AddCriteria(u => u.Gender == parameters.Gender.Value);
@@ -34,7 +34,7 @@ namespace Travel_Explorer.Application.Features.Users
                 AddCriteria(u => u.requestToBeAuthor == parameters.AuthorRequestStatus.Value);
             }
 
-            // Searching
+            
             if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
             {
                 var search = parameters.SearchTerm.Trim().ToLower();
@@ -44,7 +44,7 @@ namespace Travel_Explorer.Application.Features.Users
                     u.FullName.ToLower().Contains(search));
             }
 
-            // Pagination
+            
             ApplyPaging((parameters.PageNumber - 1) * parameters.PageSize, parameters.PageSize);
         }
 

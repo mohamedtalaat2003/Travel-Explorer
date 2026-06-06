@@ -27,12 +27,12 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(fb => !fb.IsDeleted);
 
-            // Indexes
+            
             builder.HasIndex(fb => fb.FlightScheduleId).HasDatabaseName("IX_flightBookings_FlightScheduleId");
             builder.HasIndex(fb => fb.UserId).HasDatabaseName("IX_flightBookings_UserId");
             builder.HasIndex(fb => fb.PaymentId).HasDatabaseName("IX_flightBookings_PaymentId");
             builder.HasIndex(a => a.IsDeleted).HasDatabaseName("IX_flightBookings_IsDeleted");
-            // Relationships
+            
             builder.HasOne(fb => fb.User)
                 .WithMany(u => u.FlightBookings)
                 .HasForeignKey(fb => fb.UserId)

@@ -20,6 +20,10 @@ namespace Travel_Explorer.Application.Features.Flights.Commands.UpdateFlightSche
             _mapper.Map(request, flightSchedule);
             flightSchedule.UpdatedAt = DateTime.UtcNow;
 
+            
+            flightSchedule.DepartureTime = DateTime.SpecifyKind(request.DepartureTime, DateTimeKind.Utc);
+            flightSchedule.ArrivalTime = DateTime.SpecifyKind(request.ArrivalTime, DateTimeKind.Utc);
+
             _unitOfWork.Repository<FlightSchedule>().Update(flightSchedule);
             await _unitOfWork.SaveChangesAsync();
 

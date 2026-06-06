@@ -12,19 +12,33 @@ namespace Travel_Explorer.Application.Features.Reviews.Commands.CreateReview
         public async Task<ReviewDto> Handle(
             CreateReviewCommand request, CancellationToken cancellationToken)
         {
+            var userId = _currentUserService.UserId ?? throw new UnauthorizedAccessException();
+
+            
+            var destination = await _unitOfWork.Repository<Destination>().GetAsync(request.DestinationId);
+            if (destination is null || destination.IsDeleted)
+                throw new NotFoundException(nameof(Destination), request.DestinationId);
+
+            
+            var duplicateSpec = new BaseSpecification<Review>(
+                r => r.UserId == userId && r.DestinationId == request.DestinationId);
+            var existingReview = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(duplicateSpec);
+            if (existingReview is not null)
+                throw new ConflictException("You have already reviewed this destination.");
+
             var review = _mapper.Map<Review>(request);
-            review.UserId = _currentUserService.UserId ?? 0;
+            review.UserId = userId;
             review.CreatedAt = DateTime.UtcNow;
 
             await _unitOfWork.Repository<Review>().AddAsync(review);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Update destination average rating and review count
+            
             await RecalculateDestinationRating(request.DestinationId);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Reload with includes
+            
             var spec = new ReviewSpecification(review.Id);
             var loaded = await _unitOfWork.Repository<Review>().GenericEntitiesWithSpec(spec);
 

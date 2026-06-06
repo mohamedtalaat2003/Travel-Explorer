@@ -39,7 +39,7 @@ namespace Travel_Explorer.Domain.Common
             }
             else
             {
-                // ده جزء تقني شوية لدمج اتنين Expressions مع بعض
+                
                 var parameter = Expression.Parameter(typeof(T));
                 var combined = Expression.Lambda<Func<T, bool>>(
                     Expression.AndAlso(

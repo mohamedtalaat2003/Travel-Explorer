@@ -16,7 +16,7 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(u => !u.IsDeleted);
 
-            // Relationships
+            
             builder.HasOne(u => u.Profile)
                 .WithOne(p => p.User)
                 .HasForeignKey<UserProfile>(p => p.UserId)

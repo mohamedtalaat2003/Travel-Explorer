@@ -14,7 +14,7 @@ namespace Travel_Explorer.Application.Features.Destinations.Queries.GetAllDestin
             var p = request.Params;
             var spec = new DestinationSpecification(p);
 
-            // CountAsync uses ignorePaging=true internally so count reflects filtered set
+            
             var totalCount   = await _unitOfWork.Repository<Destination>().CountAsync(spec);
             var destinations = await _unitOfWork.Repository<Destination>().ListSpecAsync(spec);
 

@@ -27,11 +27,11 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(p => !p.IsDeleted);
 
-            // Indexes
+            
             builder.HasIndex(p => p.UserId).HasDatabaseName("IX_Payments_UserId");
             builder.HasIndex(p => p.IsDeleted).HasDatabaseName("IX_Payments_IsDeleted");
 
-            // Relationships
+            
             builder.HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId)

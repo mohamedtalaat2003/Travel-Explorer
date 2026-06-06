@@ -23,14 +23,14 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(db => !db.IsDeleted);
 
-            // Indexes
+            
             builder.HasIndex(db => db.DestinationId).HasDatabaseName("IX_destinationBookings_DestinationId");
             builder.HasIndex(db => db.UserId).HasDatabaseName("IX_dstinationBookings_UserId");
             builder.HasIndex(db => db.Status).HasDatabaseName("IX_destinationBookings_Status");
             builder.HasIndex(db => db.PaymentId).HasDatabaseName("IX_destinationBookings_PaymentId");
             builder.HasIndex(a => a.IsDeleted).HasDatabaseName("IX_destinationBokings_IsDeleted");
 
-            // Relationships
+            
             builder.HasOne(db => db.User)
                 .WithMany(u => u.DestinationBookings)
                 .HasForeignKey(db => db.UserId)

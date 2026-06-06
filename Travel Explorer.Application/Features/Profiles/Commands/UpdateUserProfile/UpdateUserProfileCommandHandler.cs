@@ -11,14 +11,39 @@ namespace Travel_Explorer.Application.Features.Profiles.Commands.UpdateUserProfi
 
         public async Task<UserProfileDto?> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
         {
-            var userId = _currentUserService.UserId ?? 0;
-            var spec = new UserProfileSpecification(userId); 
-            var profile = await _unitOfWork.Repository<UserProfile>().GenericEntitiesWithSpec(spec) ?? throw new NotFoundException(nameof(UserProfile), userId);
+            var userId = _currentUserService.UserId ?? throw new UnauthorizedAccessException();
 
-            // Update UserProfile and nested User fields using AutoMapper
+            var spec = new UserProfileSpecification(userId);
+            var profile = await _unitOfWork.Repository<UserProfile>().GenericEntitiesWithSpec(spec);
+
+            var isNew = profile is null;
+            if (profile is null)
+            {
+                
+                
+                var user = await _unitOfWork.Repository<ApplicationUser>().GetAsync(userId)
+                    ?? throw new NotFoundException(nameof(ApplicationUser), userId);
+
+                profile = new UserProfile { UserId = userId, User = user };
+            }
+
+            
             _mapper.Map(request, profile);
+            profile.UserId = userId;
 
-            _unitOfWork.Repository<UserProfile>().Update(profile);
+            
+            if (profile.User is not null && !string.IsNullOrWhiteSpace(profile.User.Email))
+                profile.User.NormalizedEmail = profile.User.Email.ToUpperInvariant();
+
+            
+            if (profile.DateOfBirth.HasValue)
+                profile.DateOfBirth = DateTime.SpecifyKind(profile.DateOfBirth.Value, DateTimeKind.Utc);
+
+            if (isNew)
+                await _unitOfWork.Repository<UserProfile>().AddAsync(profile);
+            else
+                _unitOfWork.Repository<UserProfile>().Update(profile);
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<UserProfileDto>(profile);

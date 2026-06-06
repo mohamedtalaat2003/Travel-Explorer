@@ -12,7 +12,7 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Crea
         public async Task<DestinationBookingDto> Handle(
             CreateBookingCommand request, CancellationToken cancellationToken)
         {
-            // Fetch destination to calculate total price
+            
             var destination = await _unitOfWork.Repository<Destination>().GetAsync(request.DestinationId) ?? throw new NotFoundException(nameof(Destination), request.DestinationId);
             var nights = (request.CheckOutDate.Date - request.CheckInDate.Date).Days;
             if (nights <= 0)
@@ -20,14 +20,18 @@ namespace Travel_Explorer.Application.Features.DestinationBookings.Commands.Crea
 
             var booking = _mapper.Map<DestinationBooking>(request);
             booking.UserId = _currentUserService.UserId ?? 0;
-            booking.TotalPrice = destination.PricePerNight * nights;
+            booking.TotalPrice = destination.PricePerNight * nights * booking.NumberOfGuests;
             booking.Status = Domain.Enums.BookingStatus.Pending;
             booking.CreatedAt = DateTime.UtcNow;
+
+            
+            booking.CheckInDate = DateTime.SpecifyKind(request.CheckInDate, DateTimeKind.Utc);
+            booking.CheckOutDate = DateTime.SpecifyKind(request.CheckOutDate, DateTimeKind.Utc);
 
             await _unitOfWork.Repository<DestinationBooking>().AddAsync(booking);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Reload with includes for the response
+            
             var spec = new DestinationBookingSpecification(booking.Id);
             var loaded = await _unitOfWork.Repository<DestinationBooking>().GenericEntitiesWithSpec(spec);
 

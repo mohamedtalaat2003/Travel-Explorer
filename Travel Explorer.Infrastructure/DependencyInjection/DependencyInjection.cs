@@ -25,7 +25,7 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
                 )
             );
 
-            // Register Identity Services
+            
             services.AddIdentityCore<ApplicationUser>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -46,11 +46,11 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
             
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-            // Cloudinary Photo Upload
+            
             services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
             services.AddScoped<IPhotoService, CloudinaryPhotoService>();
 
-            // Payment Strategy & Factory
+            
             services.AddOptions<Travel_Explorer.Application.Services.Payment.PaymobtSettings>()
                 .BindConfiguration("PaymobSettings")
                 .ValidateDataAnnotations()

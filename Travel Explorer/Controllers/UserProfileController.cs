@@ -6,9 +6,9 @@ using Travel_Explorer.Application.Common;
 
 namespace Travel_Explorer.Controllers
 {
-    /// <summary>
-    /// Manages user profile information.
-    /// </summary>
+    
+    
+    
     [ApiController]
     [Route("api/UserProfile")]
     [Authorize]
@@ -18,9 +18,9 @@ namespace Travel_Explorer.Controllers
         private readonly IMediator _mediator = mediator;
         private readonly ICurrentUserService _currentUserService = currentUserService;
 
-        /// <summary>
-        /// Retrieves the profile of the currently authenticated user.
-        /// </summary>
+        
+        
+        
         [HttpGet]
         [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -31,9 +31,9 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Updates the profile of the currently authenticated user.
-        /// </summary>
+        
+        
+        
         [HttpPut]
         [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -45,10 +45,10 @@ namespace Travel_Explorer.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Submits a request for the current user to become an Author.
-        /// The request goes to Admin for approval.
-        /// </summary>
+        
+        
+        
+        
         [HttpPost("request-author")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
