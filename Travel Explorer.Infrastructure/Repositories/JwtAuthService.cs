@@ -236,7 +236,8 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         public async Task<ApplicationUser?> RegisterGoogleUserAsync(string email, string name, string googleId, CancellationToken cancellationToken = default)
         {
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId || u.Email == email, cancellationToken);
+            var normalizedEmail = email.ToUpperInvariant();
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId || u.NormalizedEmail == normalizedEmail, cancellationToken);
 
             if (existingUser != null)
             {
@@ -253,7 +254,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 UserName = name,
                 NormalizedUserName = name.ToUpperInvariant(),
                 Email = email,
-                NormalizedEmail = email.ToUpperInvariant(),
+                NormalizedEmail = normalizedEmail,
                 GoogleId = googleId,
                 Role = "Traveler",
                 PasswordHash = null,
@@ -274,7 +275,8 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
             if (user == null && !string.IsNullOrEmpty(email))
             {
-                user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+                var normalizedEmail = email.ToUpperInvariant();
+                user = await _context.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
                 if (user != null)
                 {
                     user.GoogleId = googleId;
