@@ -19,7 +19,7 @@ namespace Travel_Explorer.Application.Features.Profiles.Queries.GetUserProfile
                 var user = await _unitOfWork.Repository<ApplicationUser>().GetAsync(userId)
                     ?? throw new NotFoundException(nameof(ApplicationUser), userId);
 
-                profile = new UserProfile { UserId = userId, User = user };
+                profile = new UserProfile { UserId = userId, User = user, PassportNumber = "" };
                 await _unitOfWork.Repository<UserProfile>().AddAsync(profile);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
