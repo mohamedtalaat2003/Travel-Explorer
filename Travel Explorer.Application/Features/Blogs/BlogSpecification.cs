@@ -22,7 +22,7 @@ namespace Travel_Explorer.Application.Features.Blogs
         
         
         public BlogSpecification(BlogSpecParams p)
-            : base(b =>  b.IsPublished)
+            : base(b => p.IncludeDrafts ? true : b.IsPublished)
         {
             if (!string.IsNullOrWhiteSpace(p.Keyword))
             {

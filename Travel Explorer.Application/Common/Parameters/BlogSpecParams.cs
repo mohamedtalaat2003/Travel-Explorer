@@ -5,5 +5,6 @@ namespace Travel_Explorer.Application.Common.Parameters
         public string? Keyword { get; set; }
         public int? AuthorId { get; set; }
         public int? CategoryId { get; set; }
+        public bool IncludeDrafts { get; set; } = false;
     }
 }
