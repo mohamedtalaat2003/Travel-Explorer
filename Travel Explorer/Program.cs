@@ -159,6 +159,12 @@ namespace Travel_Explorer
                     var connString = configuration.GetConnectionString("DefaultConnection");
                     if (string.IsNullOrWhiteSpace(connString))
                     {
+                        connString = configuration["POSTGRESQLCONNSTR_DefaultConnection"] ?? 
+                                     Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_DefaultConnection");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(connString))
+                    {
                         Console.WriteLine("Warning: DefaultConnection connection string is missing or empty. Database migrations and seeding skipped.");
                         Console.WriteLine("Diagnostics (Startup): Scanning available configuration keys that might contain connection settings...");
                         try
