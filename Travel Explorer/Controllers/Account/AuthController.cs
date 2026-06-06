@@ -166,7 +166,7 @@ namespace Travel_Explorer.Controllers.Account
                 return Redirect($"{_jwtSettings.GoogleFrontendRedirectURl}?error=UserNotRegistered");
 
             var accessToken = Uri.EscapeDataString(token.AccessToken);
-            var refreshToken = Uri.UnescapeDataString(token.RefreshToken);
+            var refreshToken = Uri.EscapeDataString(token.RefreshToken);
 
             return Redirect($"{_jwtSettings.GoogleFrontendloginRedirectUrl}?success=success&accessToken={accessToken}&refreshToken={refreshToken}");
 
