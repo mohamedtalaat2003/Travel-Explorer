@@ -27,6 +27,7 @@
 		<PackageReference Include="Polly" Version="8.6.6" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+		<PackageReference Include="CloudinaryDotNet" Version="1.26.0" />
 	</ItemGroup>
 
 	<ItemGroup>
