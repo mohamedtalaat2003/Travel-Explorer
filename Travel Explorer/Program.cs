@@ -21,6 +21,33 @@ namespace Travel_Explorer
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Translate Azure dash-separated configuration keys and environment variables to nested keys
+            var translatedConfig = new Dictionary<string, string>();
+            foreach (var item in builder.Configuration.AsEnumerable())
+            {
+                var key = item.Key;
+                var val = item.Value;
+                if (!string.IsNullOrEmpty(val))
+                {
+                    if (key.StartsWith("APPSETTING_", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var cleanKey = key.Substring("APPSETTING_".Length);
+                        if (cleanKey.Contains('-'))
+                        {
+                            translatedConfig[cleanKey.Replace('-', ':')] = val;
+                        }
+                    }
+                    else if (key.Contains('-'))
+                    {
+                        translatedConfig[key.Replace('-', ':')] = val;
+                    }
+                }
+            }
+            if (translatedConfig.Count > 0)
+            {
+                builder.Configuration.AddInMemoryCollection(translatedConfig!);
+            }
+
             
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
