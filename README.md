@@ -374,16 +374,8 @@ dotnet run --project "Travel Explorer" --launch-profile https
 ```
 
 The API will be available at:
-- 🌐 **API Base URL**: `https://localhost:7133`
-- 📄 **Swagger UI**: `https://localhost:7133/swagger`
-
+* 📄 **Interactive Swagger UI Documentation:** [Explore Live Swagger API](https://travel-explorer-abhmd3g0a2e8gfbc.germanywestcentral-01.azurewebsites.net/swagger/index.html)
 ### 6. Default credentials (seeded)
-
-| Account | Username | Password |
-|---|---|---|
-| Admin | `admin` | `Admin@123` |
-| Author | `maya.lawson` | `Password@123` |
-| Traveler | `liam.carter` | `Password@123` |
 
 ---
 
