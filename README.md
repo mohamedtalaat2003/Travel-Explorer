@@ -5,13 +5,11 @@
   Explore destinations, book flights & activities, manage travel blogs — all through a scalable, clean-architecture backend built with .NET 8.
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/.NET-8.0-purple?style=for-the-badge&logo=dotnet"/>
-  <img src="https://img.shields.io/badge/Architecture-Clean%20Architecture-blue?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Pattern-CQRS%20%2B%20MediatR-orange?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql"/>
-  <img src="https://img.shields.io/badge/Auth-JWT%20%2B%20Identity-green?style=for-the-badge"/>
-</p>
+![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![Clean Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-2496ED?style=for-the-badge)
+![CQRS](https://img.shields.io/badge/Pattern-CQRS%20%2B%20MediatR-FF6B35?style=for-the-badge)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20Identity-22C55E?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 
 ---
 
@@ -339,25 +337,24 @@ cd "Travel Explorer"
 
 ### 2. Configure the connection string
 
-Open `Travel Explorer/appsettings.Development.json` and set your PostgreSQL connection string:
+Open `Travel Explorer/appsettings.Development.json` and update the `DefaultConnection` value with your own PostgreSQL host, database name, username, and password.
 
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=TravelExplorer;Username=postgres;Password=your_password"
-  }
-}
-```
+> ⚠️ **Never commit real credentials.** Use [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) or environment variables for sensitive values.
 
-### 3. Configure optional services (in `appsettings.json` or User Secrets)
+### 3. Configure optional services
 
-```json
-{
-  "JWT": { "Key": "...", "Issuer": "...", "Audience": "..." },
-  "Cloudinary": { "CloudName": "...", "ApiKey": "...", "ApiSecret": "..." },
-  "Paymob": { "ApiKey": "...", "IntegrationId": "..." }
-}
-```
+Set the following keys via **User Secrets** or **environment variables**:
+
+| Key | Description |
+|---|---|
+| `JWT__Key` | Secret key used to sign JWT tokens |
+| `JWT__Issuer` | Token issuer (e.g. your domain) |
+| `JWT__Audience` | Token audience |
+| `Cloudinary__CloudName` | Cloudinary cloud name for image uploads |
+| `Cloudinary__ApiKey` | Cloudinary API key |
+| `Cloudinary__ApiSecret` | Cloudinary API secret |
+| `Paymob__ApiKey` | Paymob API key for payment processing |
+| `Paymob__IntegrationId` | Paymob integration ID |
 
 ### 4. Apply migrations & seed data
 
