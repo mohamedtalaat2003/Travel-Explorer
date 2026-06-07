@@ -23,7 +23,7 @@ namespace Travel_Explorer.Controllers
         
         
         [HttpPost]
-        [Authorize(Roles = "Traveler")]
+        [Authorize(Roles = "Traveler,Admin")]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -39,7 +39,7 @@ namespace Travel_Explorer.Controllers
         
         
         [HttpGet("{id:int}")]
-        [Authorize]
+        [Authorize(Roles = "Traveler,Admin")]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -54,7 +54,7 @@ namespace Travel_Explorer.Controllers
         
         
         [HttpGet("my")]
-        [Authorize(Roles = "Traveler")]
+        [Authorize(Roles = "Traveler,Admin")]
         [ProducesResponseType(typeof(IEnumerable<DestinationBookingDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMyBookings([FromQuery] string? status = null)
@@ -98,7 +98,7 @@ namespace Travel_Explorer.Controllers
         
         
         [HttpPatch("{id:int}")]
-        [Authorize(Roles = "Traveler")]
+        [Authorize(Roles = "Traveler,Admin")]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -115,7 +115,7 @@ namespace Travel_Explorer.Controllers
         
         
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Traveler,Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -130,7 +130,7 @@ namespace Travel_Explorer.Controllers
         
         
         [HttpPatch("{id:int}/cancel")]
-        [Authorize]
+        [Authorize(Roles = "Traveler,Admin")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
