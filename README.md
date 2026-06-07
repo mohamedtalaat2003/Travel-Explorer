@@ -9,7 +9,7 @@ pay online, write reviews and blogs, and manage everything from an admin dashboa
 ## Contents
 
 - Backend docs: [Travel Explorer/README.md](Travel%20Explorer/README.md)
-- Frontend docs: [travel-explorer-client/README.md](travel-explorer-client/README.md)
+
 - Full API reference: [API.md](API.md)
 
 ## Features
@@ -42,7 +42,7 @@ Travel Explorer/                 # API layer (controllers, middleware, Program.c
 Travel Explorer.Application/     # CQRS features, DTOs, validators, mapping
 Travel Explorer.Domain/          # entities, enums, interfaces
 Travel Explorer.Infrastructure/  # EF Core, migrations, repositories, external services
-travel-explorer-client/          # React SPA (frontend)
+
 API.md                           # API reference
 README.md                        # this file
 ```
@@ -83,7 +83,7 @@ Prerequisites: .NET 8 SDK, Node.js 18+, PostgreSQL.
    API at `https://localhost:7133`, Swagger at `/swagger`.
 3. Frontend:
    ```bash
-   cd travel-explorer-client
+
    npm install
    npm run dev
    ```
@@ -98,7 +98,7 @@ appsettings). See:
 
 - Backend: [Travel Explorer/.env.example](Travel%20Explorer/.env.example) - DB connection,
   JWT, Google, Cloudinary, Paymob, seeded admin.
-- Frontend: [travel-explorer-client/.env.example](travel-explorer-client/.env.example) -
+
   `VITE_API_BASE_URL` (prod API origin; empty in dev to use the proxy) and
   `VITE_DEV_API_TARGET` (dev proxy target, default `https://localhost:7133`).
 
@@ -136,7 +136,7 @@ Full reference in [API.md](API.md). Frontend -> backend contract map:
 ## Verification checklist
 
 - [ ] `dotnet build "Travel Explorer.sln"` succeeds (0 errors).
-- [ ] `npm run build` in `travel-explorer-client` succeeds (0 errors).
+
 - [ ] Backend starts, applies migrations, seeds admin; Swagger loads at `/swagger`.
 - [ ] Frontend starts at `:5173` and reaches the API through the proxy.
 - [ ] Register -> auto login works; role-gated routes redirect correctly.
