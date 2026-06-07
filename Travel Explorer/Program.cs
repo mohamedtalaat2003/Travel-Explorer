@@ -92,7 +92,7 @@ namespace Travel_Explorer
                 });
             });
 
-            
+           
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>

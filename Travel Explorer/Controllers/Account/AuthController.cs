@@ -40,12 +40,12 @@ namespace Travel_Explorer.Controllers.Account
         [AllowAnonymous]
         public async Task<ActionResult> Login(LoginDto request)
         {
-            var token = await _jwtAuthService.LoginAsync(request);
+            var usertoken = await _jwtAuthService.LoginAsync(request);
 
-            if (token == null)
+            if (usertoken == null)
                 return Unauthorized("Invalid username or password.");
 
-            return Ok(new { Token = token });
+            return Ok(new { Token = usertoken , Role = usertoken.Role });
         }
 
         [HttpPost("refresh-token")]

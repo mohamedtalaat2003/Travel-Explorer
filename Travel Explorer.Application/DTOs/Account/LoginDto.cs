@@ -14,5 +14,6 @@ namespace Travel_Explorer.Application.DTOs.Users
 
         [Required(ErrorMessage = "Password is empty")]
         public string Password { get; set; } = string.Empty;
+
     }
 }

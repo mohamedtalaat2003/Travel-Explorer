@@ -185,7 +185,8 @@ namespace Travel_Explorer.Infrastructure.Repositories
             return new TokenResponseDto
             {
                 AccessToken = await CreateToken(user),
-                RefreshToken = await GenerateAndSaveRefreshTokenAsync(user)
+                RefreshToken = await GenerateAndSaveRefreshTokenAsync(user),
+                Role = user.Role
             };
         }
 
