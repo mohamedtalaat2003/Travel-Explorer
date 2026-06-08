@@ -35,9 +35,6 @@ namespace Travel_Explorer.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        
-        
-        
         [HttpGet("{id:int}")]
         [Authorize(Roles = "Traveler,Admin")]
         [ProducesResponseType(typeof(DestinationBookingDto), StatusCodes.Status200OK)]

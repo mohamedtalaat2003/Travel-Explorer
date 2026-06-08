@@ -186,7 +186,6 @@ namespace Travel_Explorer.Infrastructure.Repositories
             {
                 AccessToken = await CreateToken(user),
                 RefreshToken = await GenerateAndSaveRefreshTokenAsync(user),
-                Role = user.Role
             };
         }
 

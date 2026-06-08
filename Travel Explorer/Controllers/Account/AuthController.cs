@@ -45,7 +45,7 @@ namespace Travel_Explorer.Controllers.Account
             if (usertoken == null)
                 return Unauthorized("Invalid username or password.");
 
-            return Ok(new { Token = usertoken , Role = usertoken.Role });
+            return Ok(new { Token = usertoken});
         }
 
         [HttpPost("refresh-token")]
