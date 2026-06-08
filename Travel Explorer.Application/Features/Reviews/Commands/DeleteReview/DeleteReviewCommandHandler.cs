@@ -1,14 +1,19 @@
 
+using Travel_Explorer.Application.Common;
+
 namespace Travel_Explorer.Application.Features.Reviews.Commands.DeleteReview
 {
-    public class DeleteReviewCommandHandler(IUnitOfWork unitOfWork)
+    public class DeleteReviewCommandHandler(IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
                 : IRequestHandler<DeleteReviewCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly ICurrentUserService _currentUserService = currentUserService;
+
 
         public async Task<bool> Handle(
             DeleteReviewCommand request, CancellationToken cancellationToken)
         {
+            var userId = _currentUserService.UserId ?? throw new UnauthorizedAccessException();
             var review = await _unitOfWork.Repository<Review>().GetAsync(request.Id) ?? throw new NotFoundException(nameof(Review), request.Id);
             review.IsDeleted = true;
             review.UpdatedAt = DateTime.UtcNow;
