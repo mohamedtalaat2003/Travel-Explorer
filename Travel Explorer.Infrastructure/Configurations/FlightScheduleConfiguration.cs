@@ -47,9 +47,8 @@ namespace Travel_Explorer.Infrastructure.Configurations
 
             builder.HasQueryFilter(fs => !fs.IsDeleted);
 
-#pragma warning disable CS0618
             builder.UseXminAsConcurrencyToken();
-#pragma warning restore CS0618
+
 
             builder.HasIndex(fs => fs.FlightNumber).HasDatabaseName("IX_flightschedules_FlightNumber");
              builder.HasIndex(fs => fs.IsDeleted).HasDatabaseName("IX_flightschedules_IsDeleted");
