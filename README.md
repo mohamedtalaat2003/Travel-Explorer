@@ -5,12 +5,6 @@
   Explore destinations, book flights & activities, manage travel blogs — all through a scalable, clean-architecture backend built with .NET 8.
 </p>
 
-![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
-![Clean Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-2496ED?style=for-the-badge)
-![CQRS](https://img.shields.io/badge/Pattern-CQRS%20%2B%20MediatR-FF6B35?style=for-the-badge)
-![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
-![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20Identity-22C55E?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
-
 ---
 
 ## 📋 Table of Contents
@@ -374,16 +368,8 @@ dotnet run --project "Travel Explorer" --launch-profile https
 ```
 
 The API will be available at:
-- 🌐 **API Base URL**: `https://localhost:7133`
-- 📄 **Swagger UI**: `https://localhost:7133/swagger`
-
+* 📄 **Interactive Swagger UI Documentation:** [Explore Live Swagger API](https://travel-explorer-abhmd3g0a2e8gfbc.germanywestcentral-01.azurewebsites.net/swagger/index.html)
 ### 6. Default credentials (seeded)
-
-| Account | Username | Password |
-|---|---|---|
-| Admin | `admin` | `Admin@123` |
-| Author | `maya.lawson` | `Password@123` |
-| Traveler | `liam.carter` | `Password@123` |
 
 ---
 
