@@ -1,8 +1,6 @@
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
@@ -48,7 +46,7 @@ namespace Travel_Explorer
                 builder.Configuration.AddInMemoryCollection(translatedConfig!);
             }
 
-            
+
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddHttpContextAccessor();
@@ -59,13 +57,13 @@ namespace Travel_Explorer
                     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
                 });
 
-            
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Travel Explorer API", Version = "v1" });
 
-                
+
                 options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -92,21 +90,21 @@ namespace Travel_Explorer
                 });
             });
 
-            
+
+            // 🌐 تعديل الـ CORS لتسريع جلب البيانات وعمل كاش للـ Preflight Requests
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    policy.WithOrigins("https://travel-explorer-jade.vercel.app") // تحديد دومين الـ Frontend بدقة
                           .AllowAnyMethod()
                           .AllowAnyHeader()
-                          
-                          
-                          .WithExposedHeaders("X-Pagination");
+                          .WithExposedHeaders("X-Pagination")
+                          .SetPreflightMaxAge(TimeSpan.FromHours(1)); // كاش لطلب الاستئذان لمدة ساعة كاملة
                 });
             });
 
-            
+
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
 
             if (string.IsNullOrEmpty(jwtSettings.Token))
@@ -142,7 +140,7 @@ namespace Travel_Explorer
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                }).AddCookie("ExternalCookie") 
+                }).AddCookie("ExternalCookie")
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -158,9 +156,9 @@ namespace Travel_Explorer
                     };
                 });
 
-            
-            
-            
+
+
+
             if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) &&
                 !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
             {
@@ -176,7 +174,7 @@ namespace Travel_Explorer
 
             var app = builder.Build();
 
-            
+
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -186,7 +184,7 @@ namespace Travel_Explorer
                     var connString = configuration.GetConnectionString("DefaultConnection");
                     if (string.IsNullOrWhiteSpace(connString))
                     {
-                        connString = configuration["POSTGRESQLCONNSTR_DefaultConnection"] ?? 
+                        connString = configuration["POSTGRESQLCONNSTR_DefaultConnection"] ??
                                      Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_DefaultConnection");
                     }
 
@@ -230,7 +228,7 @@ namespace Travel_Explorer
 
             app.UseMiddleware<Middleware.ExceptionMiddleware>();
 
-            
+
             app.UseSwagger();
             app.UseSwaggerUI();
 
@@ -239,6 +237,7 @@ namespace Travel_Explorer
                 app.UseHttpsRedirection();
             }
 
+            // تفعيل سياسة الـ CORS قبل الـ Authentication والـ Authorization
             app.UseCors("AllowAll");
 
             app.UseAuthentication();
