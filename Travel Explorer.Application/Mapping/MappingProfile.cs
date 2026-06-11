@@ -112,7 +112,11 @@ namespace Travel_Explorer.Application.Mapping
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             
-            CreateMap<Blog, BlogDto>();
+            CreateMap<Blog, BlogDto>()
+                .ForMember(dest => dest.AuthorName,
+                    opt => opt.MapFrom(src => src.Author != null ? src.Author.FullName : string.Empty))
+                .ForMember(dest => dest.CategoryName,
+                    opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty));
             CreateMap<CreateBlogCommand, Blog>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
             CreateMap<UpdateBlogCommand, Blog>()

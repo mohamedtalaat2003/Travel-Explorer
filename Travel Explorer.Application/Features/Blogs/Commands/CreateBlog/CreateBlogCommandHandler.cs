@@ -21,10 +21,10 @@ namespace Travel_Explorer.Application.Features.Blogs.Commands.CreateBlog
             await _unitOfWork.Repository<Blog>().AddAsync(blog);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            
-            
-            
-            return _mapper.Map<BlogDto>(blog);
+            var spec = new BlogSpecification(blog.Id, includeDrafts: true);
+            var loadedBlog = await _unitOfWork.Repository<Blog>().GenericEntitiesWithSpec(spec);
+
+            return _mapper.Map<BlogDto>(loadedBlog);
         }
     }
 }

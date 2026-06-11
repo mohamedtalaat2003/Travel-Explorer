@@ -17,6 +17,13 @@ namespace Travel_Explorer.Application.Features.Blogs
             AddInclude(b => b.Category);
         }
 
+        public BlogSpecification(int id, bool includeDrafts)
+            : base(b => b.Id == id && (includeDrafts ? true : b.IsPublished))
+        {
+            AddInclude(b => b.Author);
+            AddInclude(b => b.Category);
+        }
+
         
         
         
