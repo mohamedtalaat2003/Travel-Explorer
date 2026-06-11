@@ -181,7 +181,6 @@ namespace Travel_Explorer.Infrastructure.Repositories
 
         private async Task<TokenResponseDto> CreateTokenResponse(ApplicationUser user)
         {
-
             return new TokenResponseDto
             {
                 AccessToken = await CreateToken(user),

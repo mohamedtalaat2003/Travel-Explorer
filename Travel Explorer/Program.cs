@@ -100,8 +100,6 @@ namespace Travel_Explorer
                     policy.AllowAnyOrigin()
                           .AllowAnyMethod()
                           .AllowAnyHeader()
-                          
-                          
                           .WithExposedHeaders("X-Pagination");
                 });
             });

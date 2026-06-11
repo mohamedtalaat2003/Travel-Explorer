@@ -35,7 +35,7 @@ namespace Travel_Explorer.Controllers.Account
                 user.Role
             });
         }
-
+        
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<ActionResult> Login(LoginDto request)
@@ -45,7 +45,7 @@ namespace Travel_Explorer.Controllers.Account
             if (usertoken == null)
                 return Unauthorized("Invalid username or password.");
 
-            return Ok(new { Token = usertoken});
+            return Ok(new { Token = usertoken, Role = usertoken.Role});
         }
 
         [HttpPost("refresh-token")]
