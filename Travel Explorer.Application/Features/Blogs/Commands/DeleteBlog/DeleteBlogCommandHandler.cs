@@ -14,6 +14,8 @@ namespace Travel_Explorer.Application.Features.Blogs.Commands.DeleteBlog
 
             var blog = await _unitOfWork.Repository<Blog>().GetAsync(request.Id);
 
+            blog.AuthorId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("You are not authorized to delete this blog.");
+
             if (blog == null || blog.IsDeleted)
             {
                 throw new NotFoundException(nameof(Blog), request.Id);

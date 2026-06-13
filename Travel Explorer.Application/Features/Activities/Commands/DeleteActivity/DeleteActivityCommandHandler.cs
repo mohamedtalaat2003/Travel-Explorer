@@ -9,7 +9,13 @@ namespace Travel_Explorer.Application.Features.Activities.Commands.DeleteActivit
         public async Task<bool> Handle(
             DeleteActivityCommand request, CancellationToken cancellationToken)
         {
-            var activity = await _unitOfWork.Repository<Activity>().GetAsync(request.Id) ?? throw new NotFoundException(nameof(Activity), request.Id);
+            if(request.Id <= 0)
+                throw new ArgumentException("Invalid activity ID.", nameof(request.Id));
+
+            var activity = await _unitOfWork.Repository<Activity>().GetAsync(request.Id);
+            if (activity == null)
+                 throw new NotFoundException(nameof(Activity), request.Id);
+
             activity.IsDeleted = true;
             activity.UpdatedAt = DateTime.UtcNow;
 

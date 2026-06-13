@@ -3,7 +3,7 @@ using Travel_Explorer.Application.DTOs.Blogs;
 
 namespace Travel_Explorer.Application.Features.Blogs.Commands.CreateBlog
 {
-    public class CreateBlogCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService) : IRequestHandler<CreateBlogCommand, BlogDto>
+    public class CreateBlogCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService? currentUserService) : IRequestHandler<CreateBlogCommand, BlogDto>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
