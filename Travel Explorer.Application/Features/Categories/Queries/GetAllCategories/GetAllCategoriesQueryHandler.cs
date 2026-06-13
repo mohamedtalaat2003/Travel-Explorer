@@ -13,17 +13,11 @@ namespace Travel_Explorer.Application.Features.Categories.Queries.GetAllCategori
             var p = request.Params;
 
             
-            _ = new CategorySpecification(new Common.Parameters.CategorySpecParams
-            {
-                PageNumber = p.PageNumber,
-                PageSize = int.MaxValue   
-            });
 
-            
-            var dataSpec = new CategorySpecification(p);
+            var spec = new CategorySpecification(p);
 
-            var totalCount = await _unitOfWork.Repository<Category>().CountAsync(dataSpec);
-            var categories  = await _unitOfWork.Repository<Category>().ListSpecAsync(dataSpec);
+            var totalCount = await _unitOfWork.Repository<Category>().CountAsync(spec);
+            var categories  = await _unitOfWork.Repository<Category>().ListSpecAsync(spec);
 
             var dtos = _mapper.Map<IReadOnlyList<CategoryDto>>(categories);
             return new PaginatedResult<CategoryDto>(dtos, totalCount, p.PageNumber, p.PageSize);
