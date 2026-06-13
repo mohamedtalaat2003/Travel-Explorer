@@ -115,7 +115,5 @@ namespace UnitTest.TravelExplorer.ActivityTests
             unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
-    
-
     }
 }
