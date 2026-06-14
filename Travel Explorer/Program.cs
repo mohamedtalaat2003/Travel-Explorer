@@ -59,36 +59,37 @@ namespace Travel_Explorer
 
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Travel Explorer API", Version = "v1" });
+            builder.Services.AddSwaggerGen();
+                //options =>
+            
+                //options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Travel Explorer API", Version = "v1" });
 
 
-                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\""
-                });
+                //options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                //{
+                //    Name = "Authorization",
+                //    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                //    Scheme = "Bearer",
+                //    BearerFormat = "JWT",
+                //    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                //    Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\""
+                //});
 
-                options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-                {
-                    {
-                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-                        {
-                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                            {
-                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                });
-            });
+                //options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+                //{
+                //    {
+                //        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                //        {
+                //            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                //            {
+                //                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                //                Id = "Bearer"
+                //            }
+                //        },
+                //        Array.Empty<string>()
+                //    }
+                //});
+            
 
 
             // 🌐 تعديل الـ CORS لتسريع جلب البيانات وعمل كاش للـ Preflight Requests
@@ -159,16 +160,16 @@ namespace Travel_Explorer
 
 
 
-            //if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) &&
-            //    !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
-            //{
-            //    authenticationBuilder.AddGoogle(options =>
-            //    {
-            //        options.ClientId = jwtSettings.GoogleClientId;
-            //        options.ClientSecret = jwtSettings.GoogleClientSecret;
-            //        options.SignInScheme = "ExternalCookie";
-            //    });
-            //}
+            if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) &&
+                !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
+            {
+                authenticationBuilder.AddGoogle(options =>
+                {
+                    options.ClientId = jwtSettings.GoogleClientId;
+                    options.ClientSecret = jwtSettings.GoogleClientSecret;
+                    options.SignInScheme = "ExternalCookie";
+                });
+            }
 
             builder.Services.AddAuthorization();
 
