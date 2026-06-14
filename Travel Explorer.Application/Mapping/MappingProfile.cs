@@ -112,11 +112,7 @@ namespace Travel_Explorer.Application.Mapping
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
 
-            CreateMap<Blog, BlogDto>().ReverseMap()
-                .ForMember(dest => dest.Author,
-                    opt => opt.MapFrom(src => src.AuthorName != null ? src.AuthorName : string.Empty))
-                .ForMember(dest => dest.Category,
-                    opt => opt.MapFrom(src => src.CategoryName != null ? src.CategoryName : string.Empty));
+            CreateMap<Blog, BlogDto>().ReverseMap();
 
             CreateMap<CreateBlogCommand, Blog>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
