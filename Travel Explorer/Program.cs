@@ -159,16 +159,16 @@ namespace Travel_Explorer
 
 
 
-            if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) &&
-                !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
-            {
-                authenticationBuilder.AddGoogle(options =>
-                {
-                    options.ClientId = jwtSettings.GoogleClientId;
-                    options.ClientSecret = jwtSettings.GoogleClientSecret;
-                    options.SignInScheme = "ExternalCookie";
-                });
-            }
+            //if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) &&
+            //    !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
+            //{
+            //    authenticationBuilder.AddGoogle(options =>
+            //    {
+            //        options.ClientId = jwtSettings.GoogleClientId;
+            //        options.ClientSecret = jwtSettings.GoogleClientSecret;
+            //        options.SignInScheme = "ExternalCookie";
+            //    });
+            //}
 
             builder.Services.AddAuthorization();
 
