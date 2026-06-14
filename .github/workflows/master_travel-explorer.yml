@@ -26,8 +26,9 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
+      # FIXED LINE BELOW: We added "Travel Explorer" so it only publishes the web app
       - name: dotnet publish
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish "Travel Explorer/Travel Explorer.csproj" -c Release -o ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
