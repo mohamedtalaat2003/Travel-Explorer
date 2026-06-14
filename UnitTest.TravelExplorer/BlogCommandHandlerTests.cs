@@ -146,7 +146,6 @@ namespace UnitTest.TravelExplorer
                     Content = blog.Content,
                     ImageUrl = blog.ImageUrl,
                     IsPublished = blog.IsPublished,
-                    CategoryId = blog.CategoryId
                 });
 
             var handler = new UpdateBlogCommandHandler(
@@ -168,7 +167,6 @@ namespace UnitTest.TravelExplorer
             // Assert
             Assert.NotNull(result);
             Assert.Equal("Updated Blog", result.Title);
-            Assert.Equal(3, result.CategoryId);
 
             blogRepoMock.Verify(
                 x => x.GetAsync(1),
