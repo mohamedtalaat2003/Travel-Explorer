@@ -111,8 +111,8 @@ namespace Travel_Explorer.Application.Mapping
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-            
-            CreateMap<Blog, BlogDto>();
+
+            CreateMap<Blog, BlogDto>().ReverseMap();
             CreateMap<CreateBlogCommand, Blog>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
             CreateMap<UpdateBlogCommand, Blog>()
