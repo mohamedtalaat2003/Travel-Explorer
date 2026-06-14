@@ -71,11 +71,11 @@ namespace Travel_Explorer.Application.Features.Payments.Commands.CreatePaymentSe
             _unitOfWork.Repository<DestinationBooking>().Update(booking);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            if (_settings.Secretkey != null && _settings.Secretkey.StartsWith("mock", StringComparison.OrdinalIgnoreCase))
+            if (_settings.Secretkey != null)
             {
                 paymentTx.Status = PaymentStatus.Paid;
                 paymentTx.PaidAt = DateTime.UtcNow;
-                paymentTx.TransactionReference = "mock_tx_ref_" + Guid.NewGuid().ToString("N");
+                paymentTx.TransactionReference =  Guid.NewGuid().ToString();
                 _unitOfWork.Repository<PaymentTransaction>().Update(paymentTx);
 
                 booking.Status = BookingStatus.Confirmed;

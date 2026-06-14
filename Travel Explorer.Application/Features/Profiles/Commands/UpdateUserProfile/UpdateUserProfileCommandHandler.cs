@@ -19,8 +19,6 @@ namespace Travel_Explorer.Application.Features.Profiles.Commands.UpdateUserProfi
             var isNew = profile is null;
             if (profile is null)
             {
-                
-                
                 var user = await _unitOfWork.Repository<ApplicationUser>().GetAsync(userId)
                     ?? throw new NotFoundException(nameof(ApplicationUser), userId);
 
