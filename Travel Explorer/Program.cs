@@ -54,8 +54,8 @@ namespace Travel_Explorer
                     options.Token = jwtSettings.Token;
                     options.Issuer = jwtSettings.Issuer;
                     options.Audience = jwtSettings.Audience;
-                    options.AccessTokenExpirationMinutes = jwtSettings.AccessTokenExpirationMinutes == 0 ? 60 : jwtSettings.AccessTokenExpirationMinutes;
-                    options.RefreshTokenExpirationDays = jwtSettings.RefreshTokenExpirationDays == 0 ? 7 : jwtSettings.RefreshTokenExpirationDays;
+                    options.AccessTokenExpirationMinutes = jwtSettings.AccessTokenExpirationMinutes;
+                    options.RefreshTokenExpirationDays = jwtSettings.RefreshTokenExpirationDays;
                     options.GoogleClientId = jwtSettings.GoogleClientId;
                     options.GoogleClientSecret = jwtSettings.GoogleClientSecret;
                     options.GoogleFrontendRedirectURl = jwtSettings.GoogleFrontendRedirectURl;
@@ -69,6 +69,7 @@ namespace Travel_Explorer
                     {
                         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
                     }).AddCookie("ExternalCookie")
                     .AddJwtBearer(options =>
                     {
