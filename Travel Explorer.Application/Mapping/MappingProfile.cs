@@ -113,9 +113,9 @@ namespace Travel_Explorer.Application.Mapping
 
 
             CreateMap<Blog, BlogDto>().ReverseMap()
-                .ForMember(dest => dest.AuthorId,
+                .ForMember(dest => dest.Author,
                     opt => opt.MapFrom(src => src.AuthorName != null ? src.AuthorName : string.Empty))
-                .ForMember(dest => dest.CategoryId,
+                .ForMember(dest => dest.Category,
                     opt => opt.MapFrom(src => src.CategoryName != null ? src.CategoryName : string.Empty));
 
             CreateMap<CreateBlogCommand, Blog>()
