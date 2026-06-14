@@ -46,6 +46,20 @@ namespace Travel_Explorer
                     });
                 });
 
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+                    npgsqlOptions =>
+                    {
+                        // زيادة مهلة الانتظار لـ 60 ثانية ليعطي فرصة للـ Cold Start
+                        npgsqlOptions.CommandTimeout(60); 
+                        
+                        // تفعيل إستراتيجية إعادة المحاولة في حال الفشل المؤقت
+                        npgsqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            errorCodesToAdd: null);
+                    }));
+
 
                 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
 
