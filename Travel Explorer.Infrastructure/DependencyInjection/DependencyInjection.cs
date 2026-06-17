@@ -22,17 +22,18 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
                                    Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_DefaultConnection");
             }
 
-            // services.AddDbContext<ApplicationDbContext>(options =>
-            //     options.UseNpgsql(
-            //         connectionString, 
-            //         npgsqlOptions => {
-                        
-            //             npgsqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
-            //         }
-            //     )
-            // );
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(
+                    connectionString,
+                    npgsqlOptions =>
+                    {
 
-            
+                        npgsqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
+                    }
+                )
+            );
+
+
             services.AddIdentityCore<ApplicationUser>(options =>
             {
                 options.Password.RequireDigit = false;
