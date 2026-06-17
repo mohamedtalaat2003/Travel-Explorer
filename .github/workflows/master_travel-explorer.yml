@@ -26,25 +26,34 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      # FIXED LINE BELOW: We added "Travel Explorer" so it only publishes the web app
       - name: dotnet publish
-        run: dotnet publish "Travel Explorer/Travel Explorer.csproj" -c Release -o ./publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ./publish
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: windows-latest
     needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7EC922AE96574ECBA87DB5741170C04C }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6F0A9DC586AF48308182DD2E5F3B6A34 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_31DA75B627EA4CE3985E9DA4225AA9C8 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -52,5 +61,5 @@ jobs:
         with:
           app-name: 'Travel-Explorer'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: .
+          
