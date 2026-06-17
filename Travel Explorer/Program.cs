@@ -44,8 +44,18 @@ namespace Travel_Explorer
                 });
             });
 
+            //  الحل القاطع لقراءة الـ Connection String بجميع الصيغ المحتملة من Azure (بما فيها بادئة الـ PostgreSQL) أو اللوكال
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+                                  ?? builder.Configuration["ConnectionStrings__DefaultConnection"]
+                                  ?? builder.Configuration["POSTGRESQLCONNSTR_DefaultConnection"];
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new Exception("Critical Error: Database Connection String is completely missing from configuration settings!");
+            }
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") ?? builder.Configuration["ConnectionStrings__DefaultConnection"],
+                options.UseNpgsql(connectionString,
                     npgsqlOptions =>
                     {
                         npgsqlOptions.CommandTimeout(60); 
@@ -55,7 +65,7 @@ namespace Travel_Explorer
                             errorCodesToAdd: null);
                     }));
 
-            // ✅ قراءة البيانات يدوياً بشكل صارم ومباشر
+            //  قراءة بيانات الـ JWT والـ Google بشكل مباشر وصريح
             var jwtToken = builder.Configuration["JwtSettings:Token"] ?? builder.Configuration["JwtSettings__Token"];
             var jwtIssuer = builder.Configuration["JwtSettings:Issuer"] ?? builder.Configuration["JwtSettings__Issuer"];
             var jwtAudience = builder.Configuration["JwtSettings:Audience"] ?? builder.Configuration["JwtSettings__Audience"];
@@ -65,10 +75,10 @@ namespace Travel_Explorer
 
             if (string.IsNullOrEmpty(jwtToken))
             {
-                throw new Exception("Critical Error: 'JwtSettings:Token' is totally missing from Azure and Local settings!");
+                throw new Exception("Critical Error: 'JwtSettings:Token' is totally missing from configuration!");
             }
 
-            // حقن الـ JwtSettings بشكل يدوي مباشر لضمان عدم استدعاء الـ OptionsFactory الافتراضي بالخطأ
+            // حقن كائن الـ JwtSettings يدوياً
             var jwtSettings = new JwtSettings
             {
                 Token = jwtToken,
@@ -95,7 +105,7 @@ namespace Travel_Explorer
                 options.GoogleFrontendloginRedirectUrl = jwtSettings.GoogleFrontendloginRedirectUrl;
             });
 
-            // ✅ تهيئة الـ Authentication بدون ترك أي خيار للـ Options التلقائية تنهار على Azure
+            //  تهيئة الـ Authentication وتمرير المتغيرات بشكل مباشر لمنع الـ Options التلقائية من الانهيار
             var authenticationBuilder = builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -131,6 +141,7 @@ namespace Travel_Explorer
 
             var app = builder.Build();
 
+            // الـ Middleware الخاص بالأخطاء في أول الـ Pipeline
             app.UseMiddleware<Middleware.ExceptionMiddleware>();
 
             app.UseSwagger();
@@ -146,6 +157,7 @@ namespace Travel_Explorer
             app.UseAuthentication();
             app.UseAuthorization();
 
+            // تطبيق الـ Migrations تلقائياً
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
