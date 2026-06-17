@@ -62,6 +62,8 @@ namespace Travel_Explorer
 
 
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+            if (jwtSettings == null)
+                throw new Exception("jwt seeting is null");
 
                 builder.Services.Configure<JwtSettings>(options =>
                 {
