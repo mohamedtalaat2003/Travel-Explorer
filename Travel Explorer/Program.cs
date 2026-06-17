@@ -44,7 +44,7 @@ namespace Travel_Explorer
                 });
             });
 
-            //  الحل القاطع لقراءة الـ Connection String بجميع الصيغ المحتملة من Azure (بما فيها بادئة الـ PostgreSQL) أو اللوكال
+            // ✅ جلب الـ Connection String بكل الصيغ المتاحة لتأمين الاتصال بقاعدة بيانات Neon
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                                   ?? builder.Configuration["ConnectionStrings__DefaultConnection"]
                                   ?? builder.Configuration["POSTGRESQLCONNSTR_DefaultConnection"];
@@ -65,7 +65,7 @@ namespace Travel_Explorer
                             errorCodesToAdd: null);
                     }));
 
-            //  قراءة بيانات الـ JWT والـ Google بشكل مباشر وصريح
+            // ✅ قراءة بيانات الـ JWT الأساسية صراحة لمنع أي تعامل عشوائي من السيرفر
             var jwtToken = builder.Configuration["JwtSettings:Token"] ?? builder.Configuration["JwtSettings__Token"];
             var jwtIssuer = builder.Configuration["JwtSettings:Issuer"] ?? builder.Configuration["JwtSettings__Issuer"];
             var jwtAudience = builder.Configuration["JwtSettings:Audience"] ?? builder.Configuration["JwtSettings__Audience"];
@@ -78,7 +78,7 @@ namespace Travel_Explorer
                 throw new Exception("Critical Error: 'JwtSettings:Token' is totally missing from configuration!");
             }
 
-            // حقن كائن الـ JwtSettings يدوياً
+            // حقن كائن الـ JwtSettings اليدوي في الـ IOption لنفس الغرض
             var jwtSettings = new JwtSettings
             {
                 Token = jwtToken,
@@ -105,13 +105,18 @@ namespace Travel_Explorer
                 options.GoogleFrontendloginRedirectUrl = jwtSettings.GoogleFrontendloginRedirectUrl;
             });
 
-            //  تهيئة الـ Authentication وتمرير المتغيرات بشكل مباشر لمنع الـ Options التلقائية من الانهيار
+            // 🔥 حل المشكلة الجذري: إجبار الدوت نت على استخدام كلاس مخصص لبناء خيارات الـ JwtBearer وتخطي الـ OptionsFactory المكسور على Azure
+            builder.Services.AddSingleton<Microsoft.Extensions.Options.IOptionsFactory<JwtBearerOptions>, CustomJwtBearerOptionsFactory>();
+
+            // ✅ بناء الـ Authentication بشكل صارم ومباشر بدون إتاحة أي فرصة للانهيار
             var authenticationBuilder = builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddCookie("ExternalCookie")
+            .AddCookie("ExternalCookie", options => {
+                options.Cookie.Name = "ExternalCookie";
+            })
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -141,7 +146,7 @@ namespace Travel_Explorer
 
             var app = builder.Build();
 
-            // الـ Middleware الخاص بالأخطاء في أول الـ Pipeline
+            // الـ Middleware المخصص لمعالجة الأخطاء في مقدمة الـ Pipeline
             app.UseMiddleware<Middleware.ExceptionMiddleware>();
 
             app.UseSwagger();
@@ -157,7 +162,7 @@ namespace Travel_Explorer
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // تطبيق الـ Migrations تلقائياً
+            // تطبيق الـ Migrations تلقائياً عند التشغيل
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -179,6 +184,36 @@ namespace Travel_Explorer
             app.UsePaymentWebhookVerification();
             app.MapControllers();
             await app.RunAsync();
+        }
+    }
+
+    // =====================================================================================
+    // ✅ كلاس مخصص لتخطي ميكانيكية الـ OptionsFactory الافتراضية التالفة على سيرفر Azure
+    // =====================================================================================
+    public class CustomJwtBearerOptionsFactory : Microsoft.Extensions.Options.IOptionsFactory<JwtBearerOptions>
+    {
+        private readonly IConfiguration _configuration;
+        public CustomJwtBearerOptionsFactory(IConfiguration configuration) => _configuration = configuration;
+
+        public JwtBearerOptions Create(string name)
+        {
+            var token = _configuration["JwtSettings:Token"] ?? _configuration["JwtSettings__Token"];
+            var issuer = _configuration["JwtSettings:Issuer"] ?? _configuration["JwtSettings__Issuer"];
+            var audience = _configuration["JwtSettings:Audience"] ?? _configuration["JwtSettings__Audience"];
+
+            var options = new JwtBearerOptions();
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = issuer,
+                ValidAudience = audience,
+                ClockSkew = TimeSpan.Zero,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token ?? "FallbackTokenAtLeast32BytesLongShouldBeReplaced!"))
+            };
+            return options;
         }
     }
 }
