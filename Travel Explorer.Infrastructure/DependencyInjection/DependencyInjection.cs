@@ -54,15 +54,12 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
             {
                 options.ApiKey = configuration["PaymobSettings:ApiKey"] ?? configuration["PaymobSettings__ApiKey"];
                 options.PublicKey = configuration["PaymobSettings:PublicKey"] ?? configuration["PaymobSettings__PublicKey"];
-                options.SecretKey = configuration["PaymobSettings:SecretKey"] ?? configuration["PaymobSettings__SecretKey"];
                 options.IFrameId = configuration["PaymobSettings:IFrameId"] ?? configuration["PaymobSettings__IFrameId"];
                 options.HmacSecret = configuration["PaymobSettings:HmacSecret"] ?? configuration["PaymobSettings__HmacSecret"];
                 options.Currency = configuration["PaymobSettings:Currency"] ?? configuration["PaymobSettings__Currency"];
                 
-                if (int.TryParse(configuration["PaymobSettings:PaymentMethodId"] ?? configuration["PaymobSettings__PaymentMethodId"], out var methodId))
-                {
-                    options.PaymentMethodId = methodId;
-                }
+                // إسناد القيمة مباشرة كـ string بدون محاولة تحويلها لـ int
+                options.PaymentMethodId = configuration["PaymobSettings:PaymentMethodId"] ?? configuration["PaymobSettings__PaymentMethodId"];
             });
 
             // إعداد الـ HttpClient الخاص بـ Paymob بشكل سليم
