@@ -38,7 +38,7 @@ namespace Travel_Explorer
                 {
                     options.AddPolicy("AllowAll", policy =>
                     {
-                        policy.WithOrigins("https://travel-explorer-jade.vercel.app") // تحديد دومين الـ Frontend بدقة
+                        policy.WithOrigins("AllowAll") // تحديد دومين الـ Frontend بدقة
                               .AllowAnyMethod()
                               .AllowAnyHeader()
                               .WithExposedHeaders("X-Pagination")
@@ -61,7 +61,7 @@ namespace Travel_Explorer
                     }));
 
 
-                var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
                 builder.Services.Configure<JwtSettings>(options =>
                 {
