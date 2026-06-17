@@ -114,7 +114,10 @@ namespace Travel_Explorer
 
                 builder.Services.AddAuthorization();
 
+
+
                 var app = builder.Build();
+
 
                 app.UseMiddleware<Middleware.ExceptionMiddleware>();
 
@@ -131,8 +134,24 @@ namespace Travel_Explorer
 
                 app.UseAuthentication();
                 app.UseAuthorization();
-
-                app.UsePaymentWebhookVerification();
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<ApplicationDbContext>(); // استبدله باسم الـ DbContext الخاص بك
+                    if (context.Database.IsRelational())
+                    {
+                        await context.Database.MigrateAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "حدث خطأ أثناء تطبيق الـ Migrations على قاعدة البيانات.");
+                }
+            }
+            app.UsePaymentWebhookVerification();
 
                 app.MapControllers();
 
