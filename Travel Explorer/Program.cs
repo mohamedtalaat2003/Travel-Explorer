@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
@@ -57,16 +58,26 @@ namespace Travel_Explorer
                 throw new Exception("Critical Error: Database Connection String is completely missing from configuration settings!");
             }
 
+          var config  builder.Services.AddDbContext<ApplicationDbContext>();
+
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connectionString,
                     npgsqlOptions =>
                     {
-                        npgsqlOptions.CommandTimeout(60); 
+                        npgsqlOptions.CommandTimeout(60);
                         npgsqlOptions.EnableRetryOnFailure(
                             maxRetryCount: 5,
                             maxRetryDelay: TimeSpan.FromSeconds(10),
-                            errorCodesToAdd:null);
+                            errorCodesToAdd: null);
                     }));
+
+
+            builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>(
+        name: "database_health_check",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: new[] { "db", "ready" });
 
             // ✅ قراءة بيانات الـ JWT الأساسية صراحة لمنع أي تعامل عشوائي من السيرفر
             var jwtToken = builder.Configuration["JwtSettings:Token"] ?? builder.Configuration["JwtSettings__Token"];
