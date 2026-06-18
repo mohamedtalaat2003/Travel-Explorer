@@ -170,11 +170,13 @@ namespace Travel_Explorer
                 app.UseHttpsRedirection();
             }
 
+
             app.UseCors("AllowAll");
 
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapHealthChecks("/health");
             // تطبيق الـ Migrations تلقائياً عند التشغيل
             using (var scope = app.Services.CreateScope())
             {
