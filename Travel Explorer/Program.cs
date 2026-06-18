@@ -58,7 +58,6 @@ namespace Travel_Explorer
                 throw new Exception("Critical Error: Database Connection String is completely missing from configuration settings!");
             }
 
-          var config  builder.Services.AddDbContext<ApplicationDbContext>();
 
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
