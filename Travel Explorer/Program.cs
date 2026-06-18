@@ -55,7 +55,7 @@ namespace Travel_Explorer
                         
                         // تفعيل إستراتيجية إعادة المحاولة في حال الفشل المؤقت
                         npgsqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 50,
+                            maxRetryCount: 5,
                             maxRetryDelay: TimeSpan.FromSeconds(10),
                             errorCodesToAdd:null);
                     }));
