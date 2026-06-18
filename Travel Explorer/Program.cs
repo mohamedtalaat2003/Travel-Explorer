@@ -64,10 +64,10 @@ namespace Travel_Explorer
                 options.UseNpgsql(connectionString,
                     npgsqlOptions =>
                     {
-                        npgsqlOptions.CommandTimeout(60);
+                        npgsqlOptions.CommandTimeout(180);
                         npgsqlOptions.EnableRetryOnFailure(
                             maxRetryCount: 5,
-                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
                             errorCodesToAdd: null);
                     }));
 
