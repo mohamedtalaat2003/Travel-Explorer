@@ -44,6 +44,9 @@ namespace Travel_Explorer
                 });
             });
 
+            // 🔥 حل المشكلة الجذري: إجبار الدوت نت على استخدام كلاس مخصص لبناء خيارات الـ JwtBearer وتخطي الـ OptionsFactory المكسور على Azure
+            builder.Services.AddSingleton<Microsoft.Extensions.Options.IOptionsFactory<JwtBearerOptions>, CustomJwtBearerOptionsFactory>();
+
             // ✅ جلب الـ Connection String بكل الصيغ المتاحة لتأمين الاتصال بقاعدة بيانات Neon
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                                   ?? builder.Configuration["ConnectionStrings__DefaultConnection"]
@@ -105,8 +108,7 @@ namespace Travel_Explorer
                 options.GoogleFrontendloginRedirectUrl = jwtSettings.GoogleFrontendloginRedirectUrl;
             });
 
-            // 🔥 حل المشكلة الجذري: إجبار الدوت نت على استخدام كلاس مخصص لبناء خيارات الـ JwtBearer وتخطي الـ OptionsFactory المكسور على Azure
-            builder.Services.AddSingleton<Microsoft.Extensions.Options.IOptionsFactory<JwtBearerOptions>, CustomJwtBearerOptionsFactory>();
+
 
             // ✅ بناء الـ Authentication بشكل صارم ومباشر بدون إتاحة أي فرصة للانهيار
             var authenticationBuilder = builder.Services.AddAuthentication(options =>
