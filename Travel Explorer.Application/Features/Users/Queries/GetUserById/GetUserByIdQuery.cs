@@ -1,9 +1,4 @@
-using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 using Travel_Explorer.Application.DTOs.Users;
-using Travel_Explorer.Domain.Entities;
-using Travel_Explorer.Domain.Interfaces;
 
 namespace Travel_Explorer.Application.Features.Users.Queries.GetUserById
 {
