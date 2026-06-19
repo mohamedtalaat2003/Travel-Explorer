@@ -61,4 +61,4 @@ RUN echo 'travel-explorer-app-dns.germanywestcentral.azurecontainer.io { \n\
 }' > /etc/caddy/Caddyfile
 
 # تشغيل Caddy والباكيند معاً
-ENTRYPOINT ["sh", "-c", "caddy start --config /etc/caddy/Caddyfile && dotnet TravelExplorer.API.dll"]
+ENTRYPOINT ["sh", "-c", "dotnet TravelExplorer.API.dll & caddy run --config /etc/caddy/Caddyfile"]

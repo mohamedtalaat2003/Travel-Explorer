@@ -94,7 +94,7 @@ namespace Travel_Explorer
                         npgsqlOptions.CommandTimeout(10);
                         npgsqlOptions.EnableRetryOnFailure(
                             maxRetryCount: 5,
-                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
                             errorCodesToAdd: null);
                     }));
 
