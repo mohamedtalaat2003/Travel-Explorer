@@ -43,3 +43,22 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 ENTRYPOINT ["dotnet", "Travel Explorer.dll"]
+
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY . .
+RUN dotnet publish -c Release -o /app
+
+FROM caddy:2-alpine AS final
+RUN apk add --no-cache libintl libssl3 libstdc++ icu-libs
+WORKDIR /app
+COPY --from=build /app .
+
+# كتابة ملف إعدادات Caddy تلقائياً
+RUN echo 'travel-explorer-app-dns.germanywestcentral.azurecontainer.io { \n\
+    reverse_proxy localhost:8080 \n\
+}' > /etc/caddy/Caddyfile
+
+# تشغيل Caddy والباكيند معاً
+ENTRYPOINT ["sh", "-c", "caddy start --config /etc/caddy/Caddyfile && dotnet TravelExplorer.API.dll"]
