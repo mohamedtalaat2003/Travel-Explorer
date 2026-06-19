@@ -49,22 +49,14 @@ namespace Travel_Explorer
             builder.Services.AddSingleton<Microsoft.Extensions.Options.IOptionsFactory<JwtBearerOptions>, CustomJwtBearerOptionsFactory>();
 
             // ✅ جلب الـ Connection String بكل الصيغ المتاحة لتأمين الاتصال بقاعدة بيانات Neon
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-                                  ?? builder.Configuration["ConnectionStrings__DefaultConnection"]
-                                  ?? builder.Configuration["POSTGRESQLCONNSTR_DefaultConnection"];
-
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new Exception("Critical Error: Database Connection String is completely missing from configuration settings!");
-            }
-
-
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+      
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connectionString,
                     npgsqlOptions =>
                     {
-                        npgsqlOptions.CommandTimeout(180);
+                        npgsqlOptions.CommandTimeout(10);
                         npgsqlOptions.EnableRetryOnFailure(
                             maxRetryCount: 5,
                             maxRetryDelay: TimeSpan.FromSeconds(30),
