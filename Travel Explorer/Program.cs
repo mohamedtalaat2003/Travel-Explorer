@@ -31,7 +31,38 @@ namespace Travel_Explorer
                 });
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(
+                options =>
+                { 
+                options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Travel Explorer API", Version = "v1" }),
+
+            options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\""
+            }),
+
+            options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+                {
+                    {
+                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                        {
+                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                            {
+                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                }
+                );
+
+
 
             builder.Services.AddCors(options =>
             {
@@ -71,45 +102,31 @@ namespace Travel_Explorer
         tags: new[] { "db", "ready" });
 
             // ✅ قراءة بيانات الـ JWT الأساسية صراحة لمنع أي تعامل عشوائي من السيرفر
-            var jwtToken = builder.Configuration["JwtSettings:Token"] ?? builder.Configuration["JwtSettings__Token"];
-            var jwtIssuer = builder.Configuration["JwtSettings:Issuer"] ?? builder.Configuration["JwtSettings__Issuer"];
-            var jwtAudience = builder.Configuration["JwtSettings:Audience"] ?? builder.Configuration["JwtSettings__Audience"];
-            
-            var googleClientId = builder.Configuration["JwtSettings:GoogleClientId"] ?? builder.Configuration["JwtSettings__GoogleClientId"];
-            var googleClientSecret = builder.Configuration["JwtSettings:GoogleClientSecret"] ?? builder.Configuration["JwtSettings__GoogleClientSecret"];
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
 
-            if (string.IsNullOrEmpty(jwtToken))
+
+            if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) &&
+                !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
             {
-                throw new Exception("Critical Error: 'JwtSettings:Token' is totally missing from configuration!");
+                authenticationBuilder.AddGoogle(options =>
+                builder.Services.Configure<JwtSettings>(options =>
+                {
+                    options.GoogleClientId = jwtSettings.GoogleClientId;
+                    options.GoogleClientSecret = jwtSettings.GoogleClientSecret;
+                    options.SignInScheme = "ExternalCookie";
+                    options.Token = jwtSettings.Token;
+                    options.Issuer = jwtSettings.Issuer;
+                    options.Audience = jwtSettings.Audience;
+                    options.AccessTokenExpirationMinutes = jwtSettings.AccessTokenExpirationMinutes == 0 ? 60 : jwtSettings.AccessTokenExpirationMinutes;
+                    options.RefreshTokenExpirationDays = jwtSettings.RefreshTokenExpirationDays == 0 ? 7 : jwtSettings.RefreshTokenExpirationDays;
+                    options.GoogleClientId = jwtSettings.GoogleClientId;
+                    options.GoogleClientSecret = jwtSettings.GoogleClientSecret;
+                    options.GoogleFrontendRedirectURl = jwtSettings.GoogleFrontendRedirectURl;
+                    options.GoogleFrontendloginRedirectUrl = jwtSettings.GoogleFrontendloginRedirectUrl;
+                });
             }
 
-            // حقن كائن الـ JwtSettings اليدوي في الـ IOption لنفس الغرض
-            var jwtSettings = new JwtSettings
-            {
-                Token = jwtToken,
-                Issuer = jwtIssuer,
-                Audience = jwtAudience,
-                AccessTokenExpirationMinutes = int.TryParse(builder.Configuration["JwtSettings:AccessTokenExpirationMinutes"] ?? builder.Configuration["JwtSettings__AccessTokenExpirationMinutes"], out var accessMins) ? accessMins : 60,
-                RefreshTokenExpirationDays = int.TryParse(builder.Configuration["JwtSettings:RefreshTokenExpirationDays"] ?? builder.Configuration["JwtSettings__RefreshTokenExpirationDays"], out var refreshDays) ? refreshDays : 7,
-                GoogleClientId = googleClientId,
-                GoogleClientSecret = googleClientSecret,
-                GoogleFrontendRedirectURl = builder.Configuration["JwtSettings:GoogleFrontendRedirectUri"] ?? builder.Configuration["JwtSettings__GoogleFrontendRedirectUri"] ?? builder.Configuration["JwtSettings:GoogleFrontendRedirectUrl"] ?? builder.Configuration["JwtSettings__GoogleFrontendRedirectUrl"],
-                GoogleFrontendloginRedirectUrl = builder.Configuration["JwtSettings:GoogleFrontendloginRedirectUrl"] ?? builder.Configuration["JwtSettings__GoogleFrontendloginRedirectUrl"]
-            };
-
-            builder.Services.Configure<JwtSettings>(options =>
-            {
-                options.Token = jwtSettings.Token;
-                options.Issuer = jwtSettings.Issuer;
-                options.Audience = jwtSettings.Audience;
-                options.AccessTokenExpirationMinutes = jwtSettings.AccessTokenExpirationMinutes;
-                options.RefreshTokenExpirationDays = jwtSettings.RefreshTokenExpirationDays;
-                options.GoogleClientId = jwtSettings.GoogleClientId;
-                options.GoogleClientSecret = jwtSettings.GoogleClientSecret;
-                options.GoogleFrontendRedirectURl = jwtSettings.GoogleFrontendRedirectURl;
-                options.GoogleFrontendloginRedirectUrl = jwtSettings.GoogleFrontendloginRedirectUrl;
-            });
-
+       
 
 
             // ✅ بناء الـ Authentication بشكل صارم ومباشر بدون إتاحة أي فرصة للانهيار
@@ -129,19 +146,19 @@ namespace Travel_Explorer
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtIssuer,
-                    ValidAudience = jwtAudience,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
                     ClockSkew = TimeSpan.Zero,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtToken))
                 };
             });
 
-            if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+            if (!string.IsNullOrWhiteSpace(jwtSettings.GoogleClientId) && !string.IsNullOrWhiteSpace(jwtSettings.GoogleClientSecret))
             {
                 authenticationBuilder.AddGoogle(options =>
                 {
-                    options.ClientId = googleClientId;
-                    options.ClientSecret = googleClientSecret;
+                    options.ClientId = jwtSettings.GoogleClientId;
+                    options.ClientSecret = jwtSettings.GoogleClientSecret;
                     options.SignInScheme = "ExternalCookie";
                 });
             }

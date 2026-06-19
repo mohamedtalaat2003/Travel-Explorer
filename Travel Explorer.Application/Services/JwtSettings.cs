@@ -14,7 +14,7 @@ namespace Travel_Explorer.Application.Services
         public int AccessTokenExpirationMinutes { get; set; } = 15;
         public int RefreshTokenExpirationDays { get; set; } = 7;
 
-        
+        public string SignInScheme { get; set; }
         public string GoogleClientId { get; set; }
         public string GoogleClientSecret { get; set; }
         
