@@ -167,10 +167,10 @@ namespace Travel_Explorer
             if (app.Environment.IsDevelopment())
             {
                 app.UseHttpsRedirection();
-                using var scope = app.Services.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                await context.Database.MigrateAsync();
             }
+                //using var scope = app.Services.CreateScope();
+                //var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                //await context.Database.MigrateAsync();
 
 
             app.UseCors("AllowAll");
