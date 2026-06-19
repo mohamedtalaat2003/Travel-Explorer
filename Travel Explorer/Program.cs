@@ -167,6 +167,9 @@ namespace Travel_Explorer
             if (app.Environment.IsDevelopment())
             {
                 app.UseHttpsRedirection();
+                using var scope = app.Services.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                await context.Database.MigrateAsync();
             }
 
 
@@ -177,23 +180,23 @@ namespace Travel_Explorer
 
             app.MapHealthChecks("/health");
             // تطبيق الـ Migrations تلقائياً عند التشغيل
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var context = services.GetRequiredService<ApplicationDbContext>();
-                    if (context.Database.IsRelational())
-                    {
-                        await context.Database.MigrateAsync();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "حدث خطأ أثناء تطبيق الـ Migrations على قاعدة البيانات.");
-                }
-            }
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var services = scope.ServiceProvider;
+            //    try
+            //    {
+            //        var context = services.GetRequiredService<ApplicationDbContext>();
+            //        if (context.Database.IsRelational())
+            //        {
+            //            await context.Database.MigrateAsync();
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        var logger = services.GetRequiredService<ILogger<Program>>();
+            //        logger.LogError(ex, "حدث خطأ أثناء تطبيق الـ Migrations على قاعدة البيانات.");
+            //    }
+            //}
 
             app.UsePaymentWebhookVerification();
             app.MapControllers();
