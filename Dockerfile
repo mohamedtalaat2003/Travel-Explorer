@@ -20,6 +20,14 @@ RUN dotnet restore "Travel Explorer/Travel Explorer.csproj"
 # نسخ باقي الكود وعمل Build
 COPY . .
 WORKDIR "/src/Travel Explorer"
+
+# حقن إعدادات الـ JWT مباشرة داخل بيئة الحاوية
+ENV JwtSettings__Token="ThisIsAVeryLongAndSuperSecureSecretKeyThatIsAtLeast32BytesLongaslhafkafna;f;230982050345afba!!!!"
+ENV JwtSettings__Issuer="https://travel-explorer-prod-api.azurewebsites.net/"
+ENV JwtSettings__Audience="https://travel-explorer-jade.vercel.app"
+ENV JwtSettings__AccessTokenExpirationMinutes=15
+ENV JwtSettings__RefreshTokenExpirationDays=7
+
 RUN dotnet build "Travel Explorer.csproj" -c Release -o /app/build
 
 # الـ Stage الثالث: تجهيز الملفات النهائية للنشر

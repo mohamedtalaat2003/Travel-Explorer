@@ -1,1 +1,7 @@
+.git
+.vs
+bin/
+obj/
+out/
+appsettings.Development.json
 .env
