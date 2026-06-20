@@ -109,8 +109,7 @@ namespace Travel_Explorer
 
             // ✅ قراءة بيانات الـ JWT الأساسية صراحة لمنع أي تعامل عشوائي من السيرفر
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
-
-
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
             // ✅ بناء الـ Authentication بشكل صارم ومباشر بدون إتاحة أي فرصة للانهيار
             var authenticationBuilder = builder.Services.AddAuthentication(options =>
