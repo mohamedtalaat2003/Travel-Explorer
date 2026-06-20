@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 
-//using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Explorer.Application.DependencyInjection;
 using Travel_Explorer.Application.Services;
@@ -133,7 +133,7 @@ namespace Travel_Explorer
                     ValidIssuer = jwtSettings.Issuer,
                     ValidAudience = jwtSettings.Audience,
                     ClockSkew = TimeSpan.Zero,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Token))
+                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Token))
                 };
             });
 
