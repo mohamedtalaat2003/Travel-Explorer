@@ -118,7 +118,7 @@ namespace Travel_Explorer.Infrastructure.Repositories
                 new Claim (ClaimTypes.Role, user.Role)
             };
             
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Token));
+            var key = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Token));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
             var tokenDescriptor = new JwtSecurityToken
