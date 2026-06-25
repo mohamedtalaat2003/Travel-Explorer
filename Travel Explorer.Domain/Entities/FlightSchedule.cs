@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Travel_Explorer.Domain.Entities
 {
     /// <summary>
@@ -66,6 +68,8 @@ namespace Travel_Explorer.Domain.Entities
         /// </summary>
         public int AvailableFirstClassSeats { get; set; }
 
+        [Timestamp]
+        public byte[] Version { get; set; }
         // ===== Navigation Properties =====
 
         /// <summary>

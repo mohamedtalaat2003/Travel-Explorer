@@ -8,11 +8,11 @@ using Travel_Explorer.Infrastructure.Data;
 
 namespace Travel_Explorer.Infrastructure.Repositories
 {
-    public class FlightBookingRepository(ApplicationDbContext _db) : IFlightBookingRepository
+    public class FlightSchedualRepository(ApplicationDbContext _db) : IFlightSchedualRepository
     {
-        public void Version(FlightBooking flightBooking, string version)
+        public void Version(FlightSchedule flightSchedule, string version)
         {
-            _db.Entry(flightBooking).Property(x => x.Version).OriginalValue = Convert.FromBase64String(version);
+            _db.Entry(flightSchedule).Property(x => x.Version).OriginalValue = Convert.FromBase64String(version);
         }
     }
 }
