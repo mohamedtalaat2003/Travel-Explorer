@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Domain.Entities
@@ -72,5 +73,9 @@ namespace Travel_Explorer.Domain.Entities
         /// The payment transaction associated with this booking (nullable if unpaid).
         /// </summary>
         public PaymentTransaction? Payment { get; set; }
+        [Timestamp]
+        public byte[] Version { get; set; }
+
+
     }
 }

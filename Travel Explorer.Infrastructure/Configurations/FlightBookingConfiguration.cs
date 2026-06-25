@@ -47,6 +47,8 @@ namespace Travel_Explorer.Infrastructure.Configurations
                 .WithOne()
                 .HasForeignKey<FlightBooking>(fb => fb.PaymentId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+           
         }
     }
 }

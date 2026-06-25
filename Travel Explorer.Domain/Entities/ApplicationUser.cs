@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using Travel_Explorer.Domain.Enums;
 
 namespace Travel_Explorer.Domain.Entities
@@ -72,6 +73,8 @@ namespace Travel_Explorer.Domain.Entities
         /// </summary>
         public ICollection<Blog> Blogs { get; set; } = new List<Blog>();
 
+        [Timestamp]
+        public byte[] Version { get; set; }
 
     }
 }

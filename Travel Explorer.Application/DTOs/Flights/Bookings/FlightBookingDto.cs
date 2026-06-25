@@ -18,5 +18,6 @@ namespace Travel_Explorer.Application.DTOs.Flights.Bookings
         public string Airline { get; set; }
         public string FlightNumber { get; set; }
         public DateTime DepartureTime { get; set; }
+        public string  Version { get; set; }
     }
 }

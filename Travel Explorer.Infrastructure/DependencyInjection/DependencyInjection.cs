@@ -89,6 +89,8 @@ namespace Travel_Explorer.Infrastructure.DependencyInjection
             services.AddScoped<Travel_Explorer.Application.Services.Payment.IPaymentGatewayFactory, 
                 Travel_Explorer.Infrastructure.Services.Payment.PaymentGatewayFactory>();
 
+            services.AddScoped<IFlightBookingRepository, IFlightBookingRepository>();
+
             return services;
         }
     }

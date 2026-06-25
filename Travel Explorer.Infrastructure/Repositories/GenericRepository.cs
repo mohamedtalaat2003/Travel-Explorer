@@ -44,8 +44,11 @@ namespace Travel_Explorer.Infrastructure.Repositories
         public async Task<int> CountAsync(ISpecification<T> spec)
             => await ApplySpecification(spec, true).CountAsync();
 
+
         private IQueryable<T> ApplySpecification(ISpecification<T> spec, bool ignorePaging = false)
             => SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec, ignorePaging);
+
+
 
     }
 }

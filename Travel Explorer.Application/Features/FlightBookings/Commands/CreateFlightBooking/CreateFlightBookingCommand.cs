@@ -9,5 +9,6 @@ namespace Travel_Explorer.Application.Features.FlightBookings.Commands.CreateFli
         int FlightScheduleId,
         string? SeatPreference,
         Gender Gender,
-        string? Nationality) : IRequest<FlightBookingDto>;
+        string? Nationality,
+       string Version ) : IRequest<FlightBookingDto>;
 }
